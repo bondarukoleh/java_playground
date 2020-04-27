@@ -11,6 +11,8 @@ mvn archetypr:generate;
 
 groupId - url of your company. For example if it would google - it would be "com.google".
 artifactId - name of your project.
+version
+Those properties are uniq identifiers for you project.
 
 pom.xml - file with maven settings.
 
@@ -91,3 +93,15 @@ mnv compile test
 And all these plugins is run one after another.
 NOTE: if you run the "compile" default lifecycle step, that means maven will run all previous to compile steps like
 initialize, generate, ... process-resources.
+
+maven_folder/lib/maven-model-builder-3.6.3 - here is a super POM, basic pom.xml. And all your settings that you've
+added in your project pom.xml - is overriding setting from a basic pom.xml.
+The effective pom - it's a mix from super POM and your project's pom.xml.
+
+```shell script
+mvn help:effective-pom; # will show current state of your pom.xml
+``` 
+
+<myPoperty>My_Property_value</myPoperty>
+<version>${project.myPoperty}-beta</version>
+You can get some properties of your project with template string syntax ${}.

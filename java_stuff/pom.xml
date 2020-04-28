@@ -6,7 +6,7 @@
 
   <groupId>com.olehbondaruk</groupId>
   <artifactId>java_stuff</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>${myProp</version>
 
   <name>java_stuff</name>
   <!-- FIXME change it to the project's website -->
@@ -16,6 +16,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.7</maven.compiler.source>
     <maven.compiler.target>1.7</maven.compiler.target>
+    <myProp>123</myProp>
   </properties>
 
   <dependencies>
@@ -24,6 +25,17 @@
       <artifactId>junit</artifactId>
       <version>4.11</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+      <version>2.11.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <version>2.11.2</version>
     </dependency>
   </dependencies>
 
@@ -43,10 +55,10 @@
           <artifactId>maven-compiler-plugin</artifactId>
           <version>3.7.0</version>
         </plugin>
-        <plugin>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.20.1</version>
-        </plugin>
+<!--        <plugin>-->
+<!--          <artifactId>maven-surefire-plugin</artifactId>-->
+<!--          <version>2.20.1</version>-->
+<!--        </plugin>-->
         <plugin>
           <artifactId>maven-jar-plugin</artifactId>
           <version>3.0.2</version>

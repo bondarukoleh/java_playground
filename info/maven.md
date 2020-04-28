@@ -6,7 +6,7 @@ by yourself, we can use mvn to generate a project.
 Maven parses settings file, understands what is going on and passes control to his plugins.
 
 ```shell script
-mvn archetypr:generate;
+mvn archetype:generate;
 ```
 
 groupId - url of your company. For example if it would google - it would be "com.google".

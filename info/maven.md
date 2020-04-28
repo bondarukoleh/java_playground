@@ -102,14 +102,21 @@ The effective pom - it's a mix from super POM and your project's pom.xml.
 mvn help:effective-pom; # will show current state of your pom.xml
 ``` 
 
+```xml
 <myPoperty>My_Property_value</myPoperty>
 <version>${project.myPoperty}-beta</version>
+```
 You can get some properties of your project with template string syntax ${}.
 
 Same story with env vars, we can get the value typing property name.
+```xml
 <version>${MY_ENV_VAR}-beta</version>
+```
+
 Or you can rely on some env var using env reference
+```xml
 <version>${env.MY_ENV_VAR}-beta</version>
+```
 
 Also, we have settings reference.
 <version>${settings.offline}-beta</version>
@@ -175,3 +182,53 @@ from his repo, and optional won't be installed.
 When you will use this specific functionality - you'll need to add dependency to your pom with your hands.
 Something like peer dependency in npm, it assumes that you have this already in your local .m2 folder, or you need to 
 add it.
+
+Dependency versioning.
+( - this brace means from this version but not include it. 
+[ - this brace means from this version but include it as well.
+```xml
+<project>
+    <version>(1.2,1.5)</version> <!-- means you can use 1.3, 1.4 -->
+    <version>[1.2,1.5)</version> <!-- means you can use 1.2, 1.3, 1.4 -->
+    <version>(1.2,1.5]</version> <!-- means you can use 1.3, 1.4, 1.5 -->
+    <version>[1.2,1.5]</version> <!-- means you can use 1.2, 1.3, 1.4, 1.5 -->
+    <version>[1.2,]</version> <!-- means you can use 1.2 and all further -->
+    <version>[,1.5)</version> <!-- means you can use all versions before 1.2 -->
+    <version>(,1.5)</version> <!-- not valid (?) -->
+</project>
+``` 
+
+Transitive Dependencies, also help when there is cycle dependency in your dependencies:
+```shell script
+ mvn dependency:resolve #will check for dependency
+ mvn dependency:tree #will print dependency as tree (like npm ls with depth)
+ mvn dependency:analyze #will print statistic about your dependencies
+```
+
+When a few of your dependencies using different version of same package, and you want to exclude one of it
+you can in dependency tag in your pom add exclusions tag and type ID of needed package to exclude.
+
+from dependency tree we know
+[INFO] +- junit:junit:jar:4.11:test
+[INFO] |  \- org.hamcrest:hamcrest-core:jar:1.3:test
+
+I want to exclude hamcrest
+my pom:
+```xml
+    <dependency>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+          <version>4.11</version>
+          <scope>test</scope>
+          <exclusions>
+            <exclusion>
+              <groupId>org.hamcrest</groupId>
+              <artifactId>hamcrest-core</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+```
+and we get:
+[INFO] +- junit:junit:jar:4.11:test
+without hamcrest.
+After you exclude something you don't want - you can add needed one as a regular dependency.

@@ -105,3 +105,73 @@ mvn help:effective-pom; # will show current state of your pom.xml
 <myPoperty>My_Property_value</myPoperty>
 <version>${project.myPoperty}-beta</version>
 You can get some properties of your project with template string syntax ${}.
+
+Same story with env vars, we can get the value typing property name.
+<version>${MY_ENV_VAR}-beta</version>
+Or you can rely on some env var using env reference
+<version>${env.MY_ENV_VAR}-beta</version>
+
+Also, we have settings reference.
+<version>${settings.offline}-beta</version>
+
+Your properties you need to add in properties section:
+```xml
+<project>
+    <properties>
+        <myProp>123</myProp>
+    </properties>
+
+    <version>${myProp}-beta</version>
+</project>
+```
+All compiled properties you can find in target/maven-archiver/pom.properties 
+
+Some settings in pom.xml don't have serious impact, and cary only informative sense.
+name, url, organization, developer, timezone, email, id, role, licence, distribution...
+
+Dependencies.
+Before maven - you need to download locally all dependencies for your project, which was not effective.
+Maven can manage it for you. All popular dependencies maven stores on his repository (like npm) in .jar files.
+All dependencies in repository, same as you project has coordinates, identification:
+groupId (backwards url), artifactId (name of dependency), and version. With this you can add package you want to 
+your project with pom.xml
+ 
+e.g. I want to use a logger in my code.
+I need to add dependencies section to pom.
+```xml
+<dependencys>
+    <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-core</artifactId>
+        <version>2.13.2</version>
+        <!--<package>war/zip/jar</package> not necessary but you can change type of package you want to include-->
+        <!--<optional>true</optional> also we have ability to make dependency optional -->
+    </dependency>
+</dependencys>
+```
+
+Then I have ability to use
+```java
+import org.apache.logging.log4j.Logger;
+public class App {
+    Logger logger = Logger.getLogger(App.class); 
+    public static void main(String[] args) {
+        System.out.println("Ahh... shi... here we go again.");
+        logger.debug("Hello from logger!");
+    }
+}
+```
+
+All dependencies (packages) lies globally in ~/.m2/repository (like global node modules in ~/AppData/Roaming (win))
+maven plugins also in this folder.
+All packages are in a hierarchy groupId > artifactId > version.
+
+You have ability to add optional dependency. 
+For example there is a big project (or yours), with a lot of functionality, and developers decided that not all
+functionality of this project will be used often, or they force user of their project to use his implementation of some
+module, and for some specific functionality - they make dependencies optional.
+When someone will add this project in his pom as a dependency, maven automatically install all not-optional dependencies
+from his repo, and optional won't be installed.
+When you will use this specific functionality - you'll need to add dependency to your pom with your hands.
+Something like peer dependency in npm, it assumes that you have this already in your local .m2 folder, or you need to 
+add it.

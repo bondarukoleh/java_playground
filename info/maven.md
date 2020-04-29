@@ -80,7 +80,7 @@ site - handles the creation of your project's site documentation.
     pre-site - execute processes needed prior to the actual project site generation
     site - generate the project's site documentation
     post-site - execute processes needed to finalize the site generation, and to prepare for site deployment
-    site-deploy - deploy the generated site documentation to the specified web server
+    site-deploy - deploy the generated site documentation to the specified web server.
 
 So all job is done with plugins, e.g. to copy resources to target, and compile java code - we need something like: 
 ```shell script
@@ -137,11 +137,11 @@ Some settings in pom.xml don't have serious impact, and cary only informative se
 name, url, organization, developer, timezone, email, id, role, licence, distribution...
 
 Dependencies.
-Before maven - you need to download locally all dependencies for your project, which was not effective.
+Before the maven - you need to download locally all dependencies for your project, which was not effective.
 Maven can manage it for you. All popular dependencies maven stores on his repository (like npm) in .jar files.
-All dependencies in repository, same as you project has coordinates, identification:
+All dependencies in the repository, same as you project has coordinates, identification:
 groupId (backwards url), artifactId (name of dependency), and version. With this you can add package you want to 
-your project with pom.xml
+your project with a pom.xml
  
 e.g. I want to use a logger in my code.
 I need to add dependencies section to pom.
@@ -175,7 +175,7 @@ All packages are in a hierarchy groupId > artifactId > version.
 
 You have ability to add optional dependency. 
 For example there is a big project (or yours), with a lot of functionality, and developers decided that not all
-functionality of this project will be used often, or they force user of their project to use his implementation of some
+functionality of this project will often be used, or they force user of their project to use his implementation of some
 module, and for some specific functionality - they make dependencies optional.
 When someone will add this project in his pom as a dependency, maven automatically install all not-optional dependencies
 from his repo, and optional won't be installed.
@@ -232,3 +232,32 @@ and we get:
 [INFO] +- junit:junit:jar:4.11:test
 without hamcrest.
 After you exclude something you don't want - you can add needed one as a regular dependency.
+
+Modules.
+Every big project contain from small projects, modules. If we are adding new module to parent project, then in parent
+and child pom will be added:
+```xml
+  <!-- Parent pom -->
+  <modules>
+    <module>Sub_project</module>
+  </modules>
+
+  <!-- Child pom -->
+  <parent>
+     <artifactId>java_stuff</artifactId>
+     <groupId>com.olehbondaruk</groupId>
+     <version>1.0</version>
+  </parent>
+  <artifactId>Sub_project</artifactId> <!-- In child module only project name is changed by default, but you can change more--> 
+```
+Child will inherit all setting from parent, same as all poms inherited settings from super maven pom and can override
+them. Also, if project has a lot of modules, and you don't need all of them - we can build modules separately with
+the maven, via a tool window in IDEA, or via terminal in root folders of submodules.
+
+Dependency management.
+For example in your project there are two sub projects (modules), each of the added different version of junit to his
+dependency. To solve this you can add dependency management to your main pom and tell set the version there, after this
+in all sub modules you can set only groupId and artifactId of the dependency, version will be set from parent pom 
+automatically.
+
+

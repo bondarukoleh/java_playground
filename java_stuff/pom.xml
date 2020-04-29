@@ -6,11 +6,15 @@
 
   <groupId>com.olehbondaruk</groupId>
   <artifactId>java_stuff</artifactId>
-  <version>${myProp</version>
+  <packaging>pom</packaging>
+  <version>1.0</version>
 
   <name>java_stuff</name>
-  <!-- FIXME change it to the project's website -->
   <url>http://www.example.com</url>
+
+  <modules>
+    <module>Module_project</module>
+  </modules>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -18,6 +22,22 @@
     <maven.compiler.target>1.7</maven.compiler.target>
     <myProp>123</myProp>
   </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-api</artifactId>
+        <version>2.11.2</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-core</artifactId>
+        <version>2.11.2</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <dependency>
@@ -29,13 +49,11 @@
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-api</artifactId>
-      <version>2.11.2</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-core</artifactId>
-      <version>2.11.2</version>
     </dependency>
   </dependencies>
 

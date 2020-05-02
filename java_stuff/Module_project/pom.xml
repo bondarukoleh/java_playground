@@ -12,19 +12,33 @@
     <artifactId>Module_project</artifactId>
     <packaging>war</packaging>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-        </dependency>
-    </dependencies>
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <run_port>3000</run_port>
+                <db.pass>1234</db.pass>
+            </properties>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <run_port>4000</run_port>
+            </properties>
+        </profile>
+    </profiles>
 
     <build>
         <plugins>
             <plugin>
-                <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
+                <groupId>org.eclipse.jetty</groupId>
                 <version>9.4.28.v20200408</version>
+                <configuration>
+                    <httpConnector>
+                        <port>${run_port}</port>
+                    </httpConnector>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -35,6 +49,12 @@
                 </configuration>
             </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <directory>${basedir}\src\main\resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
     </build>
 
 </project>

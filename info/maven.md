@@ -293,6 +293,102 @@ Add jetty to plugins
 And you can run tasks in maven tool window > plugins > jetty
 Also you can run it via a console $> mvn jetty:run
 
-
-
+Maven profiles
+To run application in different environments, e.g. dev and prod.
+And you'll see profiles section in maven tool window.
+Also, we can use terminal: mvn clean package -Pdev (-P - for profile)
+We can add profiles in pom
+```xml
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <run_port>3000</run_port>
+            </properties>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <run_port>4000</run_port>
+            </properties>
+        </profile>
+    </profiles>
+```
+Or we can create file profiles.xml in project root folder:
+```xml
+<profilesXml xmlns="http://maven.apache.org/PROFILES/1.0.0">
+    <profiles>
+        <profile>
+    <!--activation optional, if you want to run it depend on environment variable env=dev
+            <activation> 
+                <property>
+                    <name>env</name>
+                    <value>dev</value>
+                </property>
+            </activation> -->
+            <id>dev</id>
+            <properties>
+                <run_port>3000</run_port>
+            </properties>
+        </profile>
+    </profiles>
+</profilesXml>
+```
+Or we can add them in ~/settings.xml:
+```xml
+<settings>
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <run_port>3000</run_port>
+            </properties>
+        </profile>
+    </profiles>
+</settings>
+```
+IDEA will complain that in pom it cannot resolve variables (from ~/setting), but build will be ok.
+activation - tag helps to activate needed profile depends on environment where program starts.
+```xml
+<activation>
+        <activeByDefault/>
+        <jdk/> <!-- depends on JDK version -->
+        <os> <!-- depends on OS -->
+          <name/>
+          <family/>
+          <arch/>
+          <version/>
+        </os>
+        <property> <!-- if property with some name equals value -> profile will be activated -->
+          <name/>
+          <value/>
+        </property>
+        <file> <!-- depends on existing or messing file -->
+          <missing/>
+          <exists/>
+        </file>
+      </activation>
+```
+Filtering resources
+When you want to give ability user of your project customize some properties - you can add in recources
+folder something with contend depend on your pom properties tags.
+```text
+dbPassword=${db.pass}
+```
+in pom:
+```xml
+<properties>
+  <db.pass>1234</db.pass>
+</properties>
+...
+<build>
+    <resources>
+       <resource>
+       <directory>${basedir}\src\main\resources</directory>
+          <filtering>true</filtering>
+       </resource>
+    </resources>
+</build>
+```
+That gives ability to change dbPassword=${db.pass} to dbPassword=1234
 

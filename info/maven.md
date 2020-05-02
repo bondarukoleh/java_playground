@@ -261,3 +261,38 @@ in all sub modules you can set only groupId and artifactId of the dependency, ve
 automatically.
 
 
+Exec plugin
+Run code not via java -cp ./my_app.jar com.oleh.App App but via maven exec plugin
+```shell script
+mvn exec:java -Dexec.mainClass=Main
+```
+Jetty plugin
+To run web application - you need to run .war file, and you can serve it with tomcat server, and check it out on 
+localhost. To avoid run a heavy tomcat - you can use the jetty plugin.
+
+Add jetty to plugins
+```xml
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>9.4.28.v20200408</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <webXml>${project.basedir}\src\main\webapp\WEB-INF\web.xml</webXml>
+                </configuration>
+            </plugin>
+        </plugins>
+ </build>
+```
+And you can run tasks in maven tool window > plugins > jetty
+Also you can run it via a console $> mvn jetty:run
+
+
+
+

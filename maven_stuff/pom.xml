@@ -5,11 +5,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.olehbondaruk</groupId>
-  <artifactId>java_stuff</artifactId>
+  <artifactId>maven_stuff</artifactId>
   <packaging>pom</packaging>
   <version>1.0</version>
 
-  <name>java_stuff</name>
+  <name>maven_stuff</name>
   <url>http://www.example.com</url>
 
   <modules>

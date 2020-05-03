@@ -8,7 +8,10 @@ javac ./src/Test.java
 jar and war
 These files are simply zipped files using the java jar tool. These files are created for different purposes.
 Here is the description of these files:
-.jar files: The .jar files contain libraries, resources and accessories files like property files.
+.jar files: The .jar (java archive, pkzip format) files contain libraries, resources and accessories files like
+property files. In the jar file, you can include a simple text file formatted as something called a manifest, that
+defines which class in that jar holds the main() method that should run.
+
 .war files: The war file contains the web application that can be deployed on any servlet/jsp container.
 The .war file contains jsp, html, javascript and other files necessary for the development of web applications.
 
@@ -38,3 +41,51 @@ least one class, and at least one main method (not one main per class; just one 
 
 In Java, everything goes in a class.
 The main() method is where your program starts running.
+
+The two uses of main:
+■  to test your real class
+■  to launch/start your Java application
+
+Variables come in two flavors: primitive and reference.
+instance variables - object state;
+local variables - variables declared within a method;
+arguments - values sent to a method by the calling code;
+return types - values sent back to the caller of the method; 
+Primitives hold - fundamental values including integers, booleans, and floating point numbers.
+References - references to objects.
+
+#####Primitive Types:
+#####boolean char byte short int long float double
+
+Type       Bit Depth    Value Range
+boolean and char
+boolean   (NM-specific) true or false
+char        16 bits     O to 65535
+numeric (all are signed)
+integer
+byte        8 bits      -128 to 127
+short      16 bits      -32768 to 32767
+int        32 bits      -2147483648 to 2147483647
+long       64 bits      -huge to huge
+
+floating point
+float       32 bits    varies
+double      64 bits    varies
+Primitive declarations with assignments:
+int x;
+x = 234;
+int z = x;
+byte b = 89;
+boolean isFun = true;
+double d = 3456.98;
+char c = 'f';
+boolean isPunkRock;
+isPunkRock = false;
+boolean powerOn;
+powerOn = isFun;
+long big = 3456789;
+float f = 32.5f; Gotta have ‘f’ with a float, Java thinks anything with a floating point is a double, unless you use ‘f’.
+
+A primitive byte: x = 7; The bits representing 7 are go into the variable. (actual value will be placed - 00000111).
+A reference type: Dog myDog = new Dog(); The bits representing a way to get to the Dog object go into the variable.
+  

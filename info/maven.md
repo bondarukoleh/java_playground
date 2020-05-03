@@ -244,7 +244,7 @@ and child pom will be added:
 
   <!-- Child pom -->
   <parent>
-     <artifactId>java_stuff</artifactId>
+     <artifactId>maven_stuff</artifactId>
      <groupId>com.olehbondaruk</groupId>
      <version>1.0</version>
   </parent>

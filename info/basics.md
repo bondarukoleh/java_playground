@@ -91,10 +91,26 @@ A reference type: Dog myDog = new Dog(); The bits representing a way to get to t
 
 final variable unlike const in js cannot be reassigned, even for a new object.
 
-A method uses parameters.  A caller passes arguments.
-Argument - value. Parameter local variable with type and name.
-You can return anything that can be implicitly promoted as returned type. You must use an explicit cast when the
+`instance variable` - declared in class, gets default value.
+`local variable` - declared in method, and doesn't get default value, need to be initialized before used.
+A method uses `parameters`. Parameter - same as local variable with type and name, (it's declared in argument list of
+the method), and doesn't need to e initiated, since a compiler won't let you call the method without the arguments.
+A caller passes `arguments`. Argument - value. 
+You can return anything that can be implicitly promoted as `returned type`. You must use an explicit cast when the
 declared type is smaller than what you're trying to return.
+
+Encapsulation
+About hide the data and make some checks (set the appropriate boundary values for the field, or security check)
+or changes (round, set the nearest acceptable value, make some action) before saving it in an instance, or make some
+checks or changes before you return the data from the instance.     
+
+Point of getters setters, is an ability to change the behaviour of the instance without changes the code what interacts
+with it, so the API of the instance will remain the same while behaviour will change. 
+
+Default values for variables:
+Number primitives (and Char)   0/0.0
+booleans                       false
+references                     null
 
 
 

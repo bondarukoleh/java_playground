@@ -88,4 +88,14 @@ float f = 32.5f; Gotta have ‘f’ with a float, Java thinks anything with a fl
 
 A primitive byte: x = 7; The bits representing 7 are go into the variable. (actual value will be placed - 00000111).
 A reference type: Dog myDog = new Dog(); The bits representing a way to get to the Dog object go into the variable.
+
+final variable unlike const in js cannot be reassigned, even for a new object.
+
+A method uses parameters.  A caller passes arguments.
+Argument - value. Parameter local variable with type and name.
+You can return anything that can be implicitly promoted as returned type. You must use an explicit cast when the
+declared type is smaller than what you're trying to return.
+
+
+
   

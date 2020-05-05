@@ -1,10 +1,10 @@
 public class TestLoops {
     public static void main(String[] args) {
-        new TestWhile().bottleGame();
+        new Loops().bottleGame();
     }
 }
 
-class TestWhile {
+class Loops {
     public void runSimpleWhile() {
         int i = 3;
         while (i > 0) {
@@ -24,6 +24,15 @@ class TestWhile {
             System.out.println("New round...");
         }
         System.out.println("And no more beer on the wall");
+    }
+
+    public void simplerFor(){
+        int[] arr;
+        arr = new int[7];
+        System.out.println(arr[6]);
+        for (int value : arr) {
+            System.out.println(value);
+        }
     }
 
     private String getBottleWordEnd(int numOfBottles) {

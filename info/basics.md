@@ -54,6 +54,8 @@ return types - values sent back to the caller of the method;
 Primitives hold - fundamental values including integers, booleans, and floating point numbers.
 References - references to objects.
 
+Remember primitives passed by value, mean they passed by a copy, don't forget that object reference - also a primitive.
+
 #####Primitive Types:
 #####boolean char byte short int long float double
 
@@ -112,6 +114,25 @@ Number primitives (and Char)   0/0.0
 booleans                       false
 references                     null
 
+#####Comparing variables.  
+== used only for comparing bits in variables, they either equal or not.
+.equals() used to compare objects.
+
+```java
+int a = 3;
+byte b = 3;
+a == b; // true
+```
+a == b looks at the bits in a and b and returns true if the bit pattern is the same. It doesn't care about the size of
+the variable, so all the extra zeroes on the left end don't matter.
 
 
-  
+Creation of the class:
+□   Figure out what the class is supposed to do.
+□   List the instance variables and methods.
+□   Write prepcode for the methods. (You'll see this in just a moment.)
+□   Write test code for the methods.
+□   Implement the class.
+□   Test the methods.
+□   Debug and reimplement as needed.
+□   Express gratitude that we don't have to test our so-called learning experience app on actual live users.

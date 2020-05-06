@@ -1,3 +1,5 @@
+package src;
+
 public class TestArr {
     public static void main(String[] args) {
         Dog[] dogs = new DogsFarm().getDogsArr();

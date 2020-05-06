@@ -1,3 +1,5 @@
+package src;
+
 public class TestLoops {
     public static void main(String[] args) {
         new Loops().bottleGame();

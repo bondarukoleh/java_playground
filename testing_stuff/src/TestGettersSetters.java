@@ -1,3 +1,5 @@
+package src;
+
 public class TestGettersSetters {
     public static void main(String[] args) {
         ElectricGuitar electricGuitar = new ElectricGuitar("Gibson");

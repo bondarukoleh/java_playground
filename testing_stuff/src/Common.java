@@ -1,3 +1,5 @@
+package src;
+
 public class Common {
     public static void main(String[] args) {
 //        Common.returnNum();

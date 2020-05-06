@@ -126,13 +126,45 @@ a == b; // true
 a == b looks at the bits in a and b and returns true if the bit pattern is the same. It doesn't care about the size of
 the variable, so all the extra zeroes on the left end don't matter.
 
-
 Creation of the class:
 □   Figure out what the class is supposed to do.
 □   List the instance variables and methods.
-□   Write prepcode for the methods. (You'll see this in just a moment.)
+□   Write pseudocode for the methods. (You'll see this in just a moment.)
 □   Write test code for the methods.
 □   Implement the class.
 □   Test the methods.
 □   Debug and reimplement as needed.
 □   Express gratitude that we don't have to test our so-called learning experience app on actual live users.
+
+Cast
+To force the compiler to jam the value of a bigger primitive variable into a smaller one, you can use the cast operator.
+```java
+long l = 42;
+short s = (short) l;
+```
+If the primitive was bigger that casting one - it chops the value until it fits casting type, but be aware - it can 
+produce weird values
+```java
+long l = 4200000;
+short s = (short) l; // 5696
+
+// get int from float
+float f = 3.14f;
+int x = (int) f;   //  3
+```
+
+ArrayList
+add(Object elem) - add object parameter
+remove(Object elem) - remove object parameter
+remove(int index) - remove object at an index
+contains(Object elem) - return true if there's a match for the object parameter 
+isEmpty() - return true if list has no elements
+indexOf(Object elem) - returns either index of elem in list or -1
+size() - returns list length
+get(int index) returns object at index parameter
+
+ArrayList comparing to Array:
+- doesn't force to set a size
+- dot based syntax, without brackets
+- doesn't force to set a specific place for an added element (index)
+- parametrized Arraylist<Type>

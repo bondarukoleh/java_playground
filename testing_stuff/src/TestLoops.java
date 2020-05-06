@@ -2,7 +2,8 @@ package src;
 
 public class TestLoops {
     public static void main(String[] args) {
-        new Loops().bottleGame();
+//        new Loops().bottleGame();
+        new Loops().forEachTest();
     }
 }
 
@@ -35,6 +36,15 @@ class Loops {
         for (int value : arr) {
             System.out.println(value);
         }
+    }
+
+    public void forEachTest(){
+        int[] arr = {1, 2, 3};
+        for (int value : arr) {
+            System.out.println(value);
+            value = 1;
+        }
+        // arr still {1, 2, 3};
     }
 
     private String getBottleWordEnd(int numOfBottles) {

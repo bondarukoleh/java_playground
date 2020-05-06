@@ -3,6 +3,7 @@ package src;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 public class BattleShipGame {
     public static void main(String[] args) {
@@ -10,7 +11,11 @@ public class BattleShipGame {
         IOHelper ioHelper = new IOHelper();
         int numberOfGuesses = 0;
         int randomNum = (int) (Math.random() * 5);
-        int[] shipLocation = {randomNum, randomNum + 1, randomNum + 2};
+        ArrayList<String> shipLocation = new ArrayList<String>();
+        shipLocation.add(Integer.toString(randomNum));
+        shipLocation.add(Integer.toString(randomNum + 1));
+        shipLocation.add(Integer.toString(randomNum + 2));
+
         gameField.setShipLocation(shipLocation);
 
         String shipKilled = "miss";
@@ -27,31 +32,28 @@ public class BattleShipGame {
 }
 
 class GameField {
-    private int[] shipLocation;
-    private int hits;
+    private ArrayList<String> shipLocation;
 
-    public void setShipLocation(int[] location) {
+    public void setShipLocation(ArrayList<String> location) {
         shipLocation = location;
     }
 
-    public int[] getShipLocation() {
+    public ArrayList<String> getShipLocation() {
         return shipLocation;
     }
 
     public String checkHit(String hitLocation) {
-        int userHit = Integer.parseInt(hitLocation);
-        int[] shipLocation = getShipLocation();
+        ArrayList<String> shipLocation = getShipLocation();
+        int userHitIndex = shipLocation.indexOf(hitLocation);
         String hitResult = "miss";
-        for (int cell : shipLocation) {
-            if (cell == userHit) {
-                hitResult = "hit";
-                hits++;
-                break;
-            }
-        }
 
-        if (shipLocation.length == hits) {
-            hitResult = "kill";
+        if (userHitIndex >= 0) {
+            shipLocation.remove(userHitIndex);
+            if (shipLocation.isEmpty()) {
+                hitResult = "kill";
+            } else {
+                hitResult = "hit";
+            }
         }
 
         System.out.printf("Hit result is: '%s' \n", hitResult);
@@ -76,7 +78,10 @@ class TestGame {
     public static void main(String[] args) {
         GameField gameField = new GameField();
 
-        int[] shipLocation = {2, 3, 4};
+        ArrayList<String > shipLocation = new ArrayList<String>();
+        shipLocation.add("1");
+        shipLocation.add("2");
+        shipLocation.add("3");
         gameField.setShipLocation(shipLocation);
 
         String userHit = "2";

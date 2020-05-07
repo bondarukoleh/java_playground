@@ -10,11 +10,7 @@ public class BattleShipGame {
     public static void main(String[] args) {
         GameField gameField = new GameField();
         gameField.setupGame();
-        for (Ship ship : gameField.ships){
-            for (Cell cell : ship.getLocation().values()){
-                System.out.println(cell);
-            }
-        }
+//        gameField.printField();
         gameField.startGame();
     }
 }
@@ -25,15 +21,18 @@ class GameField {
     private final String[] columns = {"a", "b", "c", "d", "e", "f", "g"};
 
     public void setupGame() {
-        ships.add(new Ship("Big"));
-        ships.add(new Ship("Medium"));
-        ships.add(new Ship("Small"));
+        String[] names = {"Big", "Medium", "Small"};
+        for (String name : names) {
+            ships.add(new Ship(name));
+        }
 
         ioHelper.printGreeting();
+        int[][] borders = {{1, 2}, {2, 3}, {3, 4}};
 
-        for (Ship ship : ships) {
-            HashMap<String, Cell> location = getShipRandomLocation();
-            ship.setLocation(location);
+        for (int i = 0; i < ships.size(); i++) {
+            HashMap<String, Cell> location = getShipRandomLocation(borders[i][0], borders[i][1]);
+            ships.get(i).setLocation(location);
+            ships.get(i).setNameToLocation();
         }
     }
 
@@ -49,16 +48,22 @@ class GameField {
         System.out.printf("You've killed the ship after %d guesses!", numberOfGuesses);
     }
 
-    public HashMap<String, Cell> getShipRandomLocation() {
-        int randomNum = (int) (Math.random() * 4);
+    private int getRandomWithBorders(int min, int max) {
+        return (int) (min - 0.5 + Math.random() * (max - min + 1));
+    }
+
+    public HashMap<String, Cell> getShipRandomLocation(int borderMin, int borderMax) {
+        HashMap<String, Cell> shipLocation = new HashMap<>();
+
+        int randomNum = getRandomWithBorders(borderMin, borderMax);
         int next = randomNum + 1;
         int next2 = randomNum + 2;
 
         String id = String.format("%d%s", randomNum, columns[randomNum]);
-        String id2 = String.format("%d%s", next, columns[next]);
-        String id3 = String.format("%d%s", next2, columns[next2]);
+        String id2 = String.format("%d%s", next, columns[randomNum]);
+        String id3 = String.format("%d%s", next2, columns[randomNum]);
 
-        HashMap<String, Cell> shipLocation = new HashMap<>();
+
         shipLocation.put(id, new Cell(id));
         shipLocation.put(id2, new Cell(id2));
         shipLocation.put(id3, new Cell(id3));
@@ -79,6 +84,14 @@ class GameField {
             }
         }
         System.out.println("You've missed.");
+    }
+
+    public void printField(){
+        for (Ship ship : ships) {
+            for (Cell cell : ship.getLocation().values()) {
+                System.out.println(cell);
+            }
+        }
     }
 }
 
@@ -148,6 +161,12 @@ class Ship {
         }
         return hitResult;
     }
+
+    public void setNameToLocation(){
+        for (Cell cell : location.values()){
+            cell.setShipName(name);
+        }
+    }
 }
 
 class IOHelper {
@@ -167,18 +186,5 @@ class IOHelper {
         System.out.println("Make your guess on 7X7 board. So your guess should be from A0-7 to G0-7");
     }
 }
-
-class TestGame {
-    public static void main(String[] args) {
-        GameField gameField = new GameField();
-        gameField.setupGame();
-        for (Ship ship : gameField.ships){
-            for (Cell cell : ship.getLocation().values()){
-                System.out.println(cell);
-            }
-        }
-    }
-}
-
 
 

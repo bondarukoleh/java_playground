@@ -56,8 +56,8 @@ References - references to objects.
 
 Remember primitives passed by value, mean they passed by a copy, don't forget that object reference - also a primitive.
 
-#####Primitive Types:
-#####boolean char byte short int long float double
+##### Primitive Types:
+##### boolean char byte short int long float double
 
 Type       Bit Depth    Value Range
 boolean and char
@@ -114,7 +114,7 @@ Number primitives (and Char)   0/0.0
 booleans                       false
 references                     null
 
-#####Comparing variables.  
+##### Comparing variables.  
 == used only for comparing bits in variables, they either equal or not.
 .equals() used to compare objects.
 
@@ -153,6 +153,7 @@ float f = 3.14f;
 int x = (int) f;   //  3
 ```
 
+##### Collection
 ArrayList
 add(Object elem) - add object parameter
 remove(Object elem) - remove object parameter
@@ -168,3 +169,33 @@ ArrayList comparing to Array:
 - dot based syntax, without brackets
 - doesn't force to set a specific place for an added element (index)
 - parametrized Arraylist<Type>
+
+ArrayList holds objects and not primitives, the compiler will automatically “wrap” (and “unwrap” when you take it out)
+a primitive into an Object, and place that object in the ArrayList instead of the primitive.
+
+###### Packages 
+Has 3 main reasons to use:
+1. Organization. Help the overall organization of a project or library, they're all grouped into packages for specific
+kinds of functionality (like GUI, or data structures, or database stuff, etc.)
+2. Scoping. Give you a name-scoping, to help prevent name collisions. If you have a class named Set and someone else
+(including the Java API) has a class named Set, you need some way to tell the JVM which Set class you're trying to use.
+3. Security. Provide a level of security, because you can restrict the code you write so that only other classes in the
+same package can access it.
+
+In the Java API, classes are grouped into packages.
+Collections classes in java.utils package.
+System, Math, String in java.lang. It's preimported, and you don't have to import in explicitly.
+
+To use some class you need to know the full name of it.
+java.utils.ArrayList - full name, package + class name.
+
+You can import from the top, or write a full name
+```java
+import java.util.*; 
+// or:
+import java.util.HashMap;
+// or:
+java.util.HashMap<String, Object> h = new java.util.HashMap<String, Object>();
+```
+import doesn't make your class bigger, it's the way to tell java what class you want to use
+

@@ -199,3 +199,15 @@ java.util.HashMap<String, Object> h = new java.util.HashMap<String, Object>();
 ```
 import doesn't make your class bigger, it's the way to tell java what class you want to use
 
+
+###### Inheritance
+JVM same as V8 starts to looking for implementation of involved method or variable first in the lowest in inheritance
+tree class. If the JVM doesn't find the method in the lowest class, it starts walking back up the inheritance hierarchy
+until it finds a match.
+
+IS-A HAS-A test
+If class B extends class A, class B IS-A class A must make seance. If class C extends class B, class C passes the IS-A
+test for both B and A. Animal -> Canidae -> Wolf. Wolf IS-A Canidae, Wolf IS-A Animal. Works in one direction.
+But when classes are related, not inherited frm each other, they have a HAS-A relation. 
+Wolf IS-A WolfPride - no, WolfPride IS-A Wolf, nah, but WolfPride HAS-A wolf -> yes, means WolfPride has a reference to
+wolf.   

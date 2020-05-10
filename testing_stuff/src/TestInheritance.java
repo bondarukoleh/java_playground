@@ -1,66 +1,50 @@
 public class TestInheritance {
     public static void main(String[] args) {
-        Cat tiger = new Tiger();
-        tiger.makeSound();
-        tiger.wiggleTail();
-        System.out.println(tiger.name);
-        System.out.println(tiger.stripes);
-        tiger.printPrivate();
+        Animal[] animals = new Animal[2];
+        animals[0] = new Cat("Pussy cat");
+        animals[1] = new Tiger("Big Tiger");
+
+        for(Animal animal : animals){
+            System.out.printf("The '%s' says: ", animal.name);
+            animal.makeSound();
+        };
     }
 }
 
-class Cat {
-    public boolean stripes = false;
-    public String name = "Pussy";
-    private int somethingPrivate = 1;
+class Animal {
+    protected String name;
+
+    public Animal(String name) {
+        this.name = name;
+    }
 
     public void wiggleTail() {
         System.out.println("Tail wiggling.");
     }
 
     public void makeSound() {
-        System.out.println("Meow");
+        System.out.println("Animal sound");
     }
-
-    public void printPrivate() {
-        System.out.println(this.somethingPrivate);
-    };
 }
 
-class Tiger extends Cat {
-    public String name = "Big Tiger";
-    public boolean stripes = true;
-    private int somethingPrivate = 2;
+class Cat extends Animal {
+    public Cat(String name) {
+        super(name);
+    }
 
-    public Tiger() {
-        super();
+    @Override
+    public void makeSound() {
+        System.out.println("Meow");
+    }
+}
+
+class Tiger extends Animal {
+    public Tiger(String name) {
+        super(name);
     }
 
     @Override
     public void makeSound() {
         System.out.println("Roar");
-    }
-}
-
-
-class B {
-    public int a = 10;
-    public void print() {
-        System.out.println("inside B superclass");
-    }
-}
-
-class C extends B {
-    public int a = 20;
-    public void print() {
-        System.out.println("inside C subclass");
-    }
-}
-
-class A {
-    public static void main(String[] args) {
-        B b = new C();
-        b.print(); // prints: inside C subclass
-        System.out.println(b.a); // prints superclass variable value 10
     }
 }

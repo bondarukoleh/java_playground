@@ -101,7 +101,7 @@ A caller passes `arguments`. Argument - value.
 You can return anything that can be implicitly promoted as `returned type`. You must use an explicit cast when the
 declared type is smaller than what you're trying to return.
 
-Encapsulation
+##### Encapsulation
 About hide the data and make some checks (set the appropriate boundary values for the field, or security check)
 or changes (round, set the nearest acceptable value, make some action) before saving it in an instance, or make some
 checks or changes before you return the data from the instance.     
@@ -204,6 +204,8 @@ import doesn't make your class bigger, it's the way to tell java what class you 
 JVM same as V8 starts to looking for implementation of involved method or variable first in the lowest in inheritance
 tree class. If the JVM doesn't find the method in the lowest class, it starts walking back up the inheritance hierarchy
 until it finds a match.
+Inheritance lets you guarantee that all classes grouped under a certain supertype have all inheritable the methods that
+the supertype has. In other words, you define a common protocol for a set of classes related through inheritance.
 
 IS-A HAS-A test
 If class B extends class A, class B IS-A class A must make seance. If class C extends class B, class C passes the IS-A
@@ -225,9 +227,6 @@ DO NOT use inheritance so child can reuse code from another class, if the relati
 DO NOT use inheritance if the subclass and superclass do not pass the IS-A test. Always ask yourself subclass IS-A more
     specific type of the superclass.
 
-
-
-
 Methods can be overridden but variables - cannot. Means, if you put in parent class type variable child class type instance
 it will have behaviour of the child but state of the parent. Parent field hides re-declared field in the child class. 
 This has several reasons:
@@ -240,5 +239,49 @@ design declares all instance variables as private and provides getters/setters f
 The getters/setters can be overridden, and the parent class can "protect" itself against undesirable overrides by
 using the private fields directly, or declaring the getters/setters final.
 
+Some cases when you cannot inherit from class:
+1. default, or package-private, non-public class can be subclassed only by in the same package. It's not visible outside. 
+2. final class means that it's the end of the inheritance line. Nobody, ever, can extend a final class.
+    This can be done with security reasons, when you want your method should have one behaviour, because methods cannot
+    be overridden. Method can be final too, means it cannot be overriden.
+3. If a class has only private constructors, it can't be subclassed.
 
+##### Polymorphism
+When you define a supertype for a group of classes, any subclass of that supertype can be substituted where the 
+supertype is expected.
+Let's recall object declaration and assignment:
+Dog myDog = new Dog();
+```Dog myDog``` - Tells the JVM to allocate space for a reference variable. It is, forever, of type Dog, Dog contract.
+```new Dog()``` - Tells the JVM to allocate space for a new Dog object on the garbage collectible heap.
+```=``` - Assigns Dog object to the reference variable myDog. Links the Dog contract reference to the object.
 
+Dog myDog = new Dog() - reference type, and the assigned object type is the same here. But with polymorphism, the
+reference type can be a superclass of the actual object type. Anything that extends the declared reference variable
+type can be assigned to the reference variable.
+
+```java
+Animal[] animals = new Animal[2];
+animals[0] = new Dog();
+animals[1] = new Cat();
+
+for(Animal animal : animals){
+    animal.eat();
+    animal.sleep();
+};
+```
+
+You can have polymorphic arguments and return types.
+```java
+class A {
+    Animal returnRandomAnimal() {
+        return [new Dog(), new Cat()][Randomnum];
+    }
+
+    void takeRandomAnimal(Animal animal){ // can be a dog or a cat
+        animal.eat(); 
+        animal.sleep();
+    }
+}
+```
+This thing gives less code change in the future, if the code will depend on more generic types - it should be less
+changed in the future, e.g. when you create a new subclass.

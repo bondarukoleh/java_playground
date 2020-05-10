@@ -210,4 +210,35 @@ If class B extends class A, class B IS-A class A must make seance. If class C ex
 test for both B and A. Animal -> Canidae -> Wolf. Wolf IS-A Canidae, Wolf IS-A Animal. Works in one direction.
 But when classes are related, not inherited frm each other, they have a HAS-A relation. 
 Wolf IS-A WolfPride - no, WolfPride IS-A Wolf, nah, but WolfPride HAS-A wolf -> yes, means WolfPride has a reference to
-wolf.   
+wolf.
+
+Access Modifier 	within class	within package	  outside package by subclass only	   outside package
+Private	                  Y	              N	                        N	                       N
+Default	                  Y	              Y	                        N                          N
+Protected	              Y	              Y	                        Y                          N
+Public	                  Y	              Y	                        Y                          Y
+
+DO use inheritance when one class is a more specific type of superclass.
+DO use inheritance when behavior that should be shared among multiple classes of the same general type.
+DO NOT use inheritance so child can reuse code from another class, if the relationship between the superclass and
+    subclass violate either of the above two rules.
+DO NOT use inheritance if the subclass and superclass do not pass the IS-A test. Always ask yourself subclass IS-A more
+    specific type of the superclass.
+
+
+
+
+Methods can be overridden but variables - cannot. Means, if you put in parent class type variable child class type instance
+it will have behaviour of the child but state of the parent. Parent field hides re-declared field in the child class. 
+This has several reasons:
+1. Because overriding variables can break code in the superclass. e.g. if an override changes the variable's type,
+that is likely to change the behavior of methods declared in the parent class that used the original variable.
+2. If fields that were overridden were not private, it would be even worse. That would break the Liskov Substitutability
+Principle (LSP) in a pretty fundamental way. That removes the basis for polymorphism.
+3. On the flipside, overriding fields would not achieve anything that cannot be done better in other ways. e.g. a good
+design declares all instance variables as private and provides getters/setters for them as required.
+The getters/setters can be overridden, and the parent class can "protect" itself against undesirable overrides by
+using the private fields directly, or declaring the getters/setters final.
+
+
+

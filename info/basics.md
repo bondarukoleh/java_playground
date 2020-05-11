@@ -227,9 +227,9 @@ DO NOT use inheritance so child can reuse code from another class, if the relati
 DO NOT use inheritance if the subclass and superclass do not pass the IS-A test. Always ask yourself subclass IS-A more
     specific type of the superclass.
 
-Methods can be overridden but variables - cannot. Means, if you put in parent class type variable child class type instance
-it will have behaviour of the child but state of the parent. Parent field hides re-declared field in the child class. 
-This has several reasons:
+Methods can be overridden with same signature but variables - cannot. Means, if you put in parent class type variable
+child class type instance it will have behaviour of the child but state of the parent. Parent field hides re-declared
+field in the child class. This has several reasons:
 1. Because overriding variables can break code in the superclass. e.g. if an override changes the variable's type,
 that is likely to change the behavior of methods declared in the parent class that used the original variable.
 2. If fields that were overridden were not private, it would be even worse. That would break the Liskov Substitutability
@@ -285,3 +285,39 @@ class A {
 ```
 This thing gives less code change in the future, if the code will depend on more generic types - it should be less
 changed in the future, e.g. when you create a new subclass.
+
+When you override a method from a superclass, you're agreeing to fulfill the contract. The contract is method signature,
+these arguments and this return type. In polymorphism the compiler looks at the variable reference type to decide
+whether you can call a particular method on that reference. In code the compiler cares only if var type has the method
+you're invoking. But at runtime, the JVM looks not at the variable reference type but at the actual object on the heap.
+So if the compiler has already approved the method call, the only way it can work is if the overriding method has the
+same arguments and return types.
+
+If you want to change signature of the method - you need to overload it in the same basic type variable you are going
+to use class, or overload it in child but change the type of variable.
+Overloading is nothing more than having two methods with the same name but different argument lists. They are not 
+connected is any way, you can do everything you want with that completely new method.
+There's no polymorphism involved with overloaded methods! But you'll should remember via overloading - you cannot
+change only return type - the compiler will assume you’re trying to override the method. And that won’t be legal
+unless the return type is a subtype of the return type declared in the superclass.
+
+Also, when you are overriding  - you cannot narrow down accessible modifiers, only make them more accessible.
+```java
+// class Parent
+void someMethod() {}
+String someMethod(int arg) {} // overloading in class
+
+// class Child extends Prent
+boolean someMethod(String arg) {} // overloading in child
+
+Parent parent = new Child(); 
+obj.someMethod(); 
+obj.someMethod(123);
+
+Child child = new Child();
+child.someMethod("abc");
+```
+
+###### Interfaces
+Some class should not be initiated. Like Animal -> Canidae -> Wolf. We can imagine Wolf, but what is An animal
+object what state he has, or what skin color should canidae has? Here is where abstract class comes into play.

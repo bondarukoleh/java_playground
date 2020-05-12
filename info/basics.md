@@ -319,5 +319,27 @@ child.someMethod("abc");
 ```
 
 ###### Interfaces
-Some class should not be initiated. Like Animal -> Canidae -> Wolf. We can imagine Wolf, but what is An animal
-object what state he has, or what skin color should canidae has? Here is where abstract class comes into play.
+
+###### Abstract class
+Some class should not be instantiated. Like Animal -> Canidae -> Wolf. We can imagine Wolf, but what is An animal
+object what state he has, or what skin color should canidae has? Here is where ```abstract``` class comes into play.
+You can use that abstract type as a reference type, as a polymorphic argument or return type, or as polymorphic array.
+
+When you're thinking about the design - it's up to you to decide what should be concrete or what should be abstract.
+Concrete classes are those that are specific enough to be instantiated. 
+
+- Abstract class cannot be instantiated.
+- Abstract method can only be in abstract class.
+- Abstract method cannot have body. (they need to declare a contract in superclasses, so you can use polymorphism)
+- If a concrete class extends an abstract class, concrete must implement (override) all the abstract methods of abstract
+parent, or it has to be declared abstract as well. Abstract child can implement abstract parent's methods, so concrete
+child doesn't have to do it.
+
+```java
+Animal[] animals = new Animal[5] // this is not making the new animal object, it's making new Animal array with length 5 
+```
+
+Every class in Java extends class Object. Any class that doesn’t explicitly extend another class, implicitly extends
+Object.
+
+

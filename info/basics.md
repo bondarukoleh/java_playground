@@ -286,6 +286,11 @@ class A {
 This thing gives less code change in the future, if the code will depend on more generic types - it should be less
 changed in the future, e.g. when you create a new subclass.
 
+Even more flexible polymorphism can be if we declare some interface reference variable, that means doesn't matter where
+from class could be, or what it inherits from, as long as he implements a declared interface - you can put instance of it
+to the variable.   
+
+###### override
 When you override a method from a superclass, you're agreeing to fulfill the contract. The contract is method signature,
 these arguments and this return type. In polymorphism the compiler looks at the variable reference type to decide
 whether you can call a particular method on that reference. In code the compiler cares only if var type has the method
@@ -318,8 +323,6 @@ Child child = new Child();
 child.someMethod("abc");
 ```
 
-###### Interfaces
-
 ###### Abstract class
 Some class should not be instantiated. Like Animal -> Canidae -> Wolf. We can imagine Wolf, but what is An animal
 object what state he has, or what skin color should canidae has? Here is where ```abstract``` class comes into play.
@@ -342,4 +345,26 @@ Animal[] animals = new Animal[5] // this is not making the new animal object, it
 Every class in Java extends class Object. Any class that doesn’t explicitly extend another class, implicitly extends
 Object.
 
+The compiler decides whether you can call a method based on the reference type, not the actual object type.
+Some Object methods:
+equals()
+getClass()
+hashCode()
+toString()
+
+When you put an object in an ArrayList<Object>, you can treat it only as an Object, regardless of the type it was when
+you put it in. Don't type variables with such generic type, it's restrict to do with it anything.
+
+To make it behave like object you want it to be - you can cast it. But, better make sure about type with instanceof.
+
+###### Interface
+Interface - a 100% abstract class. Concrete class implements the interface, should override all methods from it.
+Define an interface. Interface methods are implicitly public and abstract, so typing in ‘public’ and ‘abstract’ is
+optional.
+```java
+public interface ISome {
+    public abstract void someMethod(); // no need to type "public abstract"
+}
+public class Some implements ISome {}
+```
 

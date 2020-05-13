@@ -356,15 +356,40 @@ When you put an object in an ArrayList<Object>, you can treat it only as an Obje
 you put it in. Don't type variables with such generic type, it's restrict to do with it anything.
 
 To make it behave like object you want it to be - you can cast it. But, better make sure about type with instanceof.
+```java
+ArrayList<Object> genericDogs = new ArrayList<>();
+genericDogs.add(new Dog);
+Dog dog = (Dog) genericDogs.get(0); // here you need to cast it
+
+ArrayList<Dog> dogs = new ArrayList<>(); // ArrayList<Dog> compiler cast every object to Dog for you 
+dogs.add(new Dog);
+Dog dog = dogs.get(0); // here you don't need to cast, compiler is sure that everything is a dog there
+```
 
 ###### Interface
-Interface - a 100% abstract class. Concrete class implements the interface, should override all methods from it.
+Interface - a 100% abstract class.
+Concrete class implements the interface, should override all methods from it.
 Define an interface. Interface methods are implicitly public and abstract, so typing in ‘public’ and ‘abstract’ is
 optional.
+You can implement multiple interfaces which decides what roles your object can play.
 ```java
 public interface ISome {
     public abstract void someMethod(); // no need to type "public abstract"
 }
 public class Some implements ISome {}
 ```
+
+How do you know whether to make a ```class, a subclass, an abstract class, or an interface```?
+- Make a class that doesn’t extend anything when your new class doesn’t pass the IS-A test for any other type.
+- Make a subclass only when you need to make a more specific version of a class and need to override or add new behaviors.
+- Use an abstract class when you want to define a template for a group of subclasses, and you have at least some
+ implementation code that all subclasses could use, also, to guarantee that no one will make object of that type.
+- Use an interface when you want to define a role that other classes can play, regardless of where those classes are
+ in the inheritance tree.
+
+
+An abstract class can have both abstract and non-abstract methods - interface only abstract
+All abstract methods must be implemented in the first concrete subclass in the inheritance tree.
+A reference variable of type Object can’t be assigned to any other reference type without a cast.
+
 

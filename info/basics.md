@@ -392,4 +392,26 @@ An abstract class can have both abstract and non-abstract methods - interface on
 All abstract methods must be implemented in the first concrete subclass in the inheritance tree.
 A reference variable of type Object can’t be assigned to any other reference type without a cast.
 
+##### Life of the object
+In java, we care about two areas of memory - heap (where the objects live) and stack (where method invocations and local
+variables live)
+When JVM starts up, it uses a chunk of memory from underlying OS and uses it to run the java programs.
+All objects live in garbage-collectible heap. Variables depend on their type:
+local vars (method parameters included), also known as a stack vars live on a stack, temporary, as long as method is 
+invoked, till the closing curly brace is reached, instance - on a heap, as long as object lives.
 
+When method is called, it's "frame" pushed onto the stack, it holds the state of the method, executing line of code, 
+and executing right now method values of local vars (method variables, and parameters). If local var - is reference,
+only primitive reference stored on the stack, object that var is pointing to - is on the heap.
+Method onto the stack - is executing right now.
+
+When you create an object, java makes space on the heap for it. Space that will be created for it - should be enough to
+fit all instance variables of this object. If instance vars primitives, java will create space based on their type
+int - 32 bits, long 64 bits etc. If instance var is reference type - inside instance stored only referense to object,  
+object is on the heap.
+
+```java
+class CellPhone {
+    public Antenna antenna = new Antenna(); // in cellPhone object stored reference antenna object, not the object itself    
+}
+```

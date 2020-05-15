@@ -210,7 +210,7 @@ the supertype has. In other words, you define a common protocol for a set of cla
 IS-A HAS-A test
 If class B extends class A, class B IS-A class A must make seance. If class C extends class B, class C passes the IS-A
 test for both B and A. Animal -> Canidae -> Wolf. Wolf IS-A Canidae, Wolf IS-A Animal. Works in one direction.
-But when classes are related, not inherited frm each other, they have a HAS-A relation. 
+But when classes are related, not inherited from each other, they have a HAS-A relation. 
 Wolf IS-A WolfPride - no, WolfPride IS-A Wolf, nah, but WolfPride HAS-A wolf -> yes, means WolfPride has a reference to
 wolf.
 
@@ -407,8 +407,11 @@ Method onto the stack - is executing right now.
 
 When you create an object, java makes space on the heap for it. Space that will be created for it - should be enough to
 fit all instance variables of this object. If instance vars primitives, java will create space based on their type
-int - 32 bits, long 64 bits etc. If instance var is reference type - inside instance stored only referense to object,  
+int - 32 bits, long 64 bits etc. If instance var is reference type - inside instance stored only reference to object,  
 object is on the heap.
+Any object is inherited from Object, so when you crete an instance, remember that all things from inherited class
+(Object, or any other) will be also created for this instance, object on the heap will be basically one, but it will
+contain all variables from inherited classes.
 
 ```java
 class CellPhone {
@@ -416,8 +419,25 @@ class CellPhone {
 }
 ```
 
+###### constructor
+has the code that runs when you instantiate an object, when you say new on a class type.
+Every class has an implicit constructor. It named same as class and doesn't have a return type.
+Constructor called before class is instantiated.
+
+If you want to create object from your class in different ways - best solution instead of if/else in constructors, to 
+have an overloaded constructor. Overloaded constructors must have different args list.
+If you put an any constructor in your class, the compiler will not build the default constructor.
+
+```java
+class Some {
+public Some(){};
+public Some(int arg){};
+public Some(int arg, String str){};
+// here you can new Some() or new Some(1) or new Some(1, "abc");
+};
+```
+
 All the constructors in an object's inheritance tree must run when you create a new object. Even abstract class has a 
 constructor. You cannot make an object from it, but when you extend it - his superclass constructor also called via 
 new keyword, and if there are no default (empty) constructor in parent class - child needs to implement it, and call
 super(arguments) to parent constructor.
-

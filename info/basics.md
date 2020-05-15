@@ -440,4 +440,53 @@ public Some(int arg, String str){};
 All the constructors in an object's inheritance tree must run when you create a new object. Even abstract class has a 
 constructor. You cannot make an object from it, but when you extend it - his superclass constructor also called via 
 new keyword, and if there are no default (empty) constructor in parent class - child needs to implement it, and call
-super(arguments) to parent constructor.
+super(arguments) to parent constructor. This all happens in a process called Constructor Chaining. Parent class may have
+some public methods that child wants to inherit, and those parent methods may rely on parent private variables that
+need to be initialized, that's also why we need to create each object in inheritance tree. If the parent has default
+constructor, and you define constructor in child - don't need to call super(), compiler puts this implicitly in each of
+your overloaded constructors as a first line, but pay attention, you'll invoke the dafault (empty) parent constructor.
+The call to super() must be the first statement in each constructor, because you first need to fully create parent 
+object your child object will rely on.
+Use ```this()``` to call constructor from another overloaded constructor in the same class. this() as a super() must be
+the first statement and it can be only this() or super() not both.
+ 
+```java
+class Root{ public Root(){ System.out.println("Root"); } }
+class Child extends Root { public Root(){ System.out.println("Child"); } }
+class GrandChild extends Child { public Root(){ System.out.println("GrandChild"); } }
+
+GrandChild grandChild = new GrandChild(); //Root Child GrandChild
+
+/*
+Stack:
+Object()
+Root()
+Child()
+GrandChild()
+
+GrandChild constructor called first but it immediately call parent constructor and so on.
+*/
+```
+
+Local var lives until method is in stack. Instance variable live untill object is in heap.
+Unlike js you cannot create function outside the object, so local variables is really method scoped. Also, local 
+variable can be used only when method is now on the top of the stack, means it's now executes, if some other method
+is called, variable can be used only after her method resumes the execution. Same rule for primitives and references.
+An object becomes eligible for Garbage Collector (GC) when its last live reference disappears, reference local variable,
+reseting reference variable, and set it to null - toasts the object on the end of the reference.
+
+
+```java
+class A{
+    public void someMethod() {
+        String a = "a";
+        // we can use a
+        someSecondMethod(); // while someSecondMethod is on the top of the stack - a is alive but not reachable
+        // we can use a
+    }   
+    public void someSecondMethod() {
+        System.out.println(a); // error;
+    }   
+}
+```
+

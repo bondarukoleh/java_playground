@@ -6,10 +6,11 @@ public class TestInheritance {
         animals[0] = new Cat("Pussy cat");
         animals[1] = new Tiger("Big Tiger");
 
-        for(Animal animal : animals){
+        for (Animal animal : animals) {
             System.out.printf("The '%s' says: ", animal.name);
             animal.makeSound();
-        };
+        }
+        ;
     }
 }
 
@@ -48,5 +49,42 @@ class Tiger extends Animal {
     @Override
     public void makeSound() {
         System.out.println("Roar");
+    }
+}
+
+
+/*==================================================================*/
+class Car {
+    private String label;
+
+    public Car(String label) {
+        this.label = label;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+}
+
+class SpeedCar extends Car {
+    private int startSpeed;
+
+    public SpeedCar(String label, int startSpeed) {
+        super(label);
+        this.startSpeed = startSpeed;
+    }
+
+    public SpeedCar(String label) {
+        this(label, 100);
+    }
+
+    public String getInfo() {
+        return String.format("Speed car: %s, with speed: %s", getLabel(), startSpeed);
+    }
+}
+
+class TestCar {
+    public static void main(String[] args) {
+        System.out.println(new SpeedCar("Ford").getInfo());
     }
 }

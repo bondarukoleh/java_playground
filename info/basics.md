@@ -415,3 +415,9 @@ class CellPhone {
     public Antenna antenna = new Antenna(); // in cellPhone object stored reference antenna object, not the object itself    
 }
 ```
+
+All the constructors in an object's inheritance tree must run when you create a new object. Even abstract class has a 
+constructor. You cannot make an object from it, but when you extend it - his superclass constructor also called via 
+new keyword, and if there are no default (empty) constructor in parent class - child needs to implement it, and call
+super(arguments) to parent constructor.
+

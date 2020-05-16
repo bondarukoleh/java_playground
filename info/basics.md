@@ -110,9 +110,9 @@ Point of getters setters, is an ability to change the behaviour of the instance 
 with it, so the API of the instance will remain the same while behaviour will change. 
 
 Default values for variables:
-Number primitives (and Char)   0/0.0
-booleans                       false
-references                     null
+Number primitives byte,short,int,long,Char/float,double   0/0.0
+boolean                                                   false
+reference                                                 null
 
 ##### Comparing variables.  
 == used only for comparing bits in variables, they either equal or not.
@@ -337,6 +337,8 @@ Concrete classes are those that are specific enough to be instantiated.
 - If a concrete class extends an abstract class, concrete must implement (override) all the abstract methods of abstract
 parent, or it has to be declared abstract as well. Abstract child can implement abstract parent's methods, so concrete
 child doesn't have to do it.
+- difference with private constructor class - private constructor can be called within the class, abstract class cannot
+be instantiated at all. 
 
 ```java
 Animal[] animals = new Animal[5] // this is not making the new animal object, it's making new Animal array with length 5 
@@ -490,3 +492,31 @@ class A{
 }
 ```
 
+###### static
+Some methods don't depend on object state, so they need no instance of the class, so they can be static.
+- Static methods cannot use not-static state or behavior (because they don't aware of instance).
+- You can call static methods not via class but via an instance - but this is a bad tone.
+- static variable is same for all instances of the class, it initialized when class is first time loaded, and not when
+an instance is created. Static state and behaviour lives inside a class, same and shared for all instances. Typically,
+the JVM loads a class because somebody's trying to make a new instance of the class, for the first time, or use a static
+method or variable of the class.
+- All static variables in a class are initialized before any object of that class can be created.
+- Static variables in a class are initialized before any static method of the class runs.
+- Static final variables are constants, should be named with caps.
+ - A static initializer is a block of code that runs when a class is loaded, before any other code can use the class,
+  so it’s a great place to initialize a static final variable.
+```java
+class Foo {
+    final static int x;
+    static { 
+        x = 42;
+    }
+}           
+```
+
+###### Math
+Math class constructor market as private, so you cannot make an object from it.
+round()
+min()
+max()
+abs() - returns the absolute value of a number.

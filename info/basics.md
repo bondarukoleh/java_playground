@@ -495,6 +495,7 @@ class A{
 ###### static
 Some methods don't depend on object state, so they need no instance of the class, so they can be static.
 - Static methods cannot use not-static state or behavior (because they don't aware of instance).
+- Non-static behavior CAN use static state and behavior.
 - You can call static methods not via class but via an instance - but this is a bad tone.
 - static variable is same for all instances of the class, it initialized when class is first time loaded, and not when
 an instance is created. Static state and behaviour lives inside a class, same and shared for all instances. Typically,
@@ -503,8 +504,11 @@ method or variable of the class.
 - All static variables in a class are initialized before any object of that class can be created.
 - Static variables in a class are initialized before any static method of the class runs.
 - Static final variables are constants, should be named with caps.
- - A static initializer is a block of code that runs when a class is loaded, before any other code can use the class,
+- A static initializer is a block of code that runs when a class is loaded, before any other code can use the class,
   so it’s a great place to initialize a static final variable.
+- a class with only static methods, and you do not want it to be instantiated, you can mark the constructor private.
+- There is only one copy of a static variable in a class, rather than one copy per each instance for instance variables.
+
 ```java
 class Foo {
     final static int x;
@@ -514,9 +518,36 @@ class Foo {
 }           
 ```
 
+###### final
+- final variable means you can't change its value.
+- final method means you can't override the method (but you can make final overridden regular method, or overload final).
+- final class means you can't extend the class (implicitly state and behavior are also final there).
+- final variable should be initialized either when declared or in a constructor.
+You want to make class final, for security reason, when you want to be sure in behavior of it.
+
 ###### Math
 Math class constructor market as private, so you cannot make an object from it.
-round()
+Math.random() Returns a double between 0.0 through (but not including) 1.0.
 min()
 max()
-abs() - returns the absolute value of a number.
+Math.abs() - Returns a double that is the absolute value of the argument. The method is overloaded, so if you pass it an
+int it returns an int. Pass it a double it returns a double.
+int x = Math.abs(-240);  // returns 240
+double d = Math.abs(240.45);  // returns  240.45
+
+Math.round()
+Returns an int or a long (depending on whether the argument is a float or a double) rounded to the nearest integer value.
+int x = Math.round(-24.8f);  // returns -25
+int y = Math.round(24.45f);  // returns 24
+
+Math.min()
+Returns a value that is the minimum of the two arguments. The method is overloaded to take ints, longs, floats,
+or doubles. 
+int x = Math.min(24,240);  // returns 24
+double y = Math.min(90876.5, 90876.49);  // returns 90876.49
+
+Math.max()
+Returns a value that is the maximum of the two arguments. The method is overloaded to take ints, longs, floats,
+or doubles.
+int x = Math.max(24,240);  // returns 240
+double y = Math.max(90876.5, 90876.49);  // returns 90876.5

@@ -10,8 +10,17 @@ public class Static {
 }
 
 class SomeClass {
+    static String someStaticVar = "abc";
+
     static void someStaticMethod() {
         System.out.println("Lala");
+    }
+
+    public void regular() {
+        System.out.println("Going to call static");
+        someStaticMethod();
+        SomeClass.someStaticMethod();
+        System.out.printf("%s %s", someStaticVar, SomeClass.someStaticVar);
     }
 }
 
@@ -44,5 +53,7 @@ class Singleton {
     static {
         instance = new Singleton();
     }
-    private Singleton() {}
+
+    private Singleton() {
+    }
 }

@@ -551,3 +551,49 @@ Returns a value that is the maximum of the two arguments. The method is overload
 or doubles.
 int x = Math.max(24,240);  // returns 240
 double y = Math.max(90876.5, 90876.49);  // returns 90876.5
+
+###### boxing
+Make a reference object from a primitive.
+Wrappers:
+Boolean
+Byte
+Character
+Float
+Integer
+Long
+Short
+Double
+```java
+Integer integerObj = Integer.valueof(42);
+int unboxed = integer.intValue(); 
+int unboxed2 = integerObj; // but now it's autoboxed
+```
+Collections can hold only objects, with autoboxing you can add any primitives in it and it will automatically boxed in
+objects.
+With autoboxing you can forget about primitives and their wrappers, everything can return, operate, and save everything.
+
+Some kinds like template string in js, but worse.
+```java
+String.format("%,d %d", 1230000000, 1230000000)
+```
+
+Format Specifier	Data Type	                        Output
+%a	                floating point (except BigDecimal)	Returns Hex output of floating point number.
+%b	                Any type	                        "true" if non-null, "false" if null
+%c	                character	                        Unicode character
+%d	                integer                             (incl. byte, short, int, long, bigint)	Decimal Integer
+%e	                floating point	                    decimal number, scientific notation
+%f	                floating point	                    decimal number
+%g	                floating point	                    decimal number, scientific notation depends on precision/value.
+%h	                any type                        	Hex String of value from hashCode() method.
+%n              	none                            	Platform-specific line separator.
+%o	                integer (incl. byte, short, int,    Octal number
+                            long, bigint)      	
+%s	                any type	                        String value
+%t	                Date/Time (incl. long, Calendar,    There are a lot of additional arguments, check docs.
+                        Date and TemporalAccessor)      e.g. Time formatted for the 24-hour clock as "%tH:%tM"
+%x	                integer (incl. byte, short, int,    Hex string.
+                            long, bigint)	
+                            
+
+

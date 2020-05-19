@@ -14,8 +14,6 @@ public class Wrap {
         System.out.println(stringFromNum);
         System.out.println(stringFromNum instanceof String); // true
         System.out.println(stringFromNum2 instanceof String); // true
-
-        System.out.println(String.format("%,d %d", 1230000000, 1230000000)); //1,230,000,000
     }
 
     static int absoluteValue(int i){

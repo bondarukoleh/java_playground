@@ -574,7 +574,10 @@ With autoboxing you can forget about primitives and their wrappers, everything c
 
 Some kinds like template string in js, but worse.
 ```java
-String.format("%,d %d", 1230000000, 1230000000)
+String.format("%,d %d", 1230000000, 1230000000) //1,230,000,000 1230000000
+String.format("%.2f", 1230000000.098098) // 1230000000.10
+String.format("%.3f", 1230000000.098098); //1230000000.098
+String.format("%,.3f", 1230000000.098098); //1,230,000,000.098
 ```
 
 Format Specifier	Data Type	                        Output
@@ -595,5 +598,16 @@ Format Specifier	Data Type	                        Output
 %x	                integer (incl. byte, short, int,    Hex string.
                             long, bigint)	
                             
-
+% - says insert argument here, and format it with instructions. 
+%,.5f - this is a strict syntax, you cannot change placement e.g. coma with a dot.
+There five parts of these arguments;
+```%[argument number][flags][width][.precision]type```
+```java
+String.format("%2$,6.1f", 24.000, 30.000, 42.000) // 30.0
+// $2 - argument number, referring that we want to get the second argument from the list
+// , - flags, put comas, or put negative in parentheses
+// 6 - width, minimum number of characters that will be used to output, not total. (not sure if working now)
+// .1 - precision, number of characters after the dot.
+// f - type, the REQUIRED argument 
+```
 

@@ -518,6 +518,24 @@ class Foo {
 }           
 ```
 
+Static imports
+Save you some typings, but you can easily get a conflict and code harder to read, use carefully
+```java
+// regular code
+import java.lang.Math;
+void NoStaticImport () {
+    System.out.println("tan " + Math.tan(60));
+}
+
+// With static import
+import static java.lang.Math.*;
+import static java.lang.System.out;
+
+void WithStaticImport () {
+    out.println("tan " + tan(60));
+}
+```
+
 ###### final
 - final variable means you can't change its value.
 - final method means you can't override the method (but you can make final overridden regular method, or overload final).
@@ -605,9 +623,49 @@ There five parts of these arguments;
 ```java
 String.format("%2$,6.1f", 24.000, 30.000, 42.000) // 30.0
 // $2 - argument number, referring that we want to get the second argument from the list
-// , - flags, put comas, or put negative in parentheses
+// , - flags, put comas, or put negative in parentheses, < - use previous argument
 // 6 - width, minimum number of characters that will be used to output, not total. (not sure if working now)
 // .1 - precision, number of characters after the dot.
 // f - type, the REQUIRED argument 
 ```
+Time formatting.
+There a lot of flags here.
+```java
+System.out.println(String.format("%tc", date)); //Tue May 19 23:19:28 CEST 2020
+System.out.println(String.format("%tr", date)); //11:19:28 PM
+System.out.println(String.format("%tA %tB %td", date, date, date)); //Tuesday May 19
+System.out.println(String.format("%tA %<tB %<td", date)); //Tuesday May 19
+```
+For a time-stamp ot "now", ate. But tor everything else, use Calendar.
+```java
+Calendar c = Calendar.getInstance(); // default subclass implementation instance returned -  java.util.GregorianCalendar
+c.set(2004, Calendar.JANUARY,7,15,40); // set date
+System.out.println("hours " + c.get(Calendar.HOUR_OF_DAY)); // new hour 15
+long newDateInMilliseconds = c.getTimeInMillis() + 1000 * 60 * 60;
+c.setTimeInMillis(newDateInMilliseconds);
+System.out.println("new hour " + c.get(Calendar.HOUR_OF_DAY)); // new hour 16
+c.add(Calendar.DATE, 35);
+System.out.println("add 35 days " + c.getTime()); // add 35 days Wed Feb 11 16:40:30 CET 2004
+c.roll(Calendar.DATE, 35);
+System.out.println("roll 35 days " + c.getTime()); // roll 35 days Tue Feb 17 16:40:30 CET 2004
+c.set(Calendar.DATE, 1);
+System.out.println("set to 1 " + c.getTime()); // set to 1 Sun Feb 01 16:40:30 CET 2004
+```
 
+
+
+##### varargs
+Variable number of arguments. Before this feature - variable-length arguments could be handled two ways. Using
+overloaded method(one for each) or put the arguments into an array, and then pass this array to the method.
+But now:
+```java
+public static void main(String[] args) {
+   Varargs.varargsMethod("some string", 1, 2, 3);
+   Varargs.varargsMethod("some string", 1, 2, 3, 4, 5);
+}
+
+static void varargsMethod(String some, int ...arr){
+   System.out.println(arr instanceof int[]); // it's an array, same as JS
+}
+```
+Restrictions: vararg - always last argument and it can be only onevararg per method. 

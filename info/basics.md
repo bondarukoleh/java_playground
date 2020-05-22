@@ -684,6 +684,58 @@ Sequencer - object that takes MIDI files and sends them to player.
 We use ```throw exception``` (declare an exception) to tell calling this functionality code that something bad can 
 happened, and you should do some precautions about it, prepare recovery mechanism or something.
 Or you can wrap risky method that can throw an exception in try/catch/finally block.
-Exception is an object, type of Exception. With polymorphism, we can catch any subtype of it.
+Exception is an object, type of Exception. With polymorphism, we can catch any subtype of it. And we can declare 
+(throw) a basic type of exception, and actually throw some subtype. The problem is when you've declared super basic
+type of exception, you don't know for sure from what error you need to recover from. So it's a tricky thing.
+Better to declare each catch block for different exceptions with diff recovery actions, and you should do it from the 
+highest child to basic. Because first basic catch, will catch all errors, like first break in switch.
+Also we can duck, do not handle but declare the exception from risky code we are calling, so we made someone who calls
+us deal with this exception. If first invoced main() declares the ex - the ex passes to JVM, and JVM just exits. 
 
-Throwable -> Exception -> IOException -> InterruptedException 
+Compiler can check all but RuntimeException (unchecked exceptions). You can throw/catch/declare them but compiler won't
+check them, he doesn't care about them. Runtime exceptions is a special cases, it can happen everywhere. Most of their
+cause is logic things in your code, you cannot guarantee that file exists or server is up, but you can check that array
+length before IndexOutOfBoundsException occurs. I mean we should use try catch to precaution behavior that we cannot
+control but in other cases - wright the good code.
+
+Finally - code that run regardless what happen in the try/catch. If catch has ```return``` execution reaches it and 
+jumps to the finally block, and then returns to catch's ```return```. 
+The only times finally won't be called are:
+If you invoke System.exit()
+If you invoke Runtime.getRuntime().halt(exitStatus)
+If the JVM crashes first
+If the JVM reaches an infinite loop (or some other non-interruptable, non-terminating statement) in the try or catch block
+If the OS forcibly terminates the JVM process; e.g., kill -9 <pid> on UNIX
+If the finally block is going to be executed by a daemon thread and all other non-daemon threads exit before finally is
+ called.
+ 
+Method can throw more that 1 exception. There can be more that 1 catch block.
+Restrictions:
+1. You cannot have catch/finally without try
+2. Cannot put code between try/catch/finally.
+3. try must be followed either catch or finally. You can have try/finally, but you cannot have only try.
+4. try/finally still has to declare an exception
+
+```java
+        public void throwException() throws InternalException , IndexOutOfBoundsException {};
+
+        try {
+            throwException();
+        } catch (InternalException | IndexOutOfBoundsException e) {
+            System.out.println("InternalException or IndexOutOfBoundsException");
+            throw e;
+        } catch (Exception e) {
+             System.out.println("Basic exception");
+             throw e;
+        } finally {
+            System.out.println("NOT YET!");
+        }
+```
+ 
+Throwable ->
+ Exception ->
+  IOException
+  InterruptedException
+  RuntimeException -> 
+    ClassCastException
+    NullPointerException 

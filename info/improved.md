@@ -39,5 +39,19 @@ As a ```listener```, your job is to ```implement``` the interface, ```register``
  event-handling.
 As an ```event source```, his job is to ```accept registrations``` (from listeners), ```get events``` from the user
  and ```call the listener’s``` event-handling method (when the user clicks him).
-As an ```event object```, he's the argument to the event call-back method (from the interface) and his job is to 
+As an ```event object```, he's the argument to the event call-back method (from the interface), and his job is to 
 ```carry data``` about the event back ```to the listener```.
+
+Three ways to put things on your GUI:
+ - Put widgets on a frame. frame.getContentPane().add(myButton);
+ - Draw 2D graphics on a widget (arts, games, graphics, charts). graphics.fillOval(70,70,100,100);
+ - Put a JPEG on a widget. graphics.drawImage(myPic,10,10,this);
+ 
+Frame has 5 regions you can add something to North, South, East, West, Center.
+Something can be another frame with it's an object and so on.
+
+###### Inner classes
+Can use everything from outside class, as it were theirs and vise versa, outer have access to inner's private.
+Exception from the rule - inner class declared in outer static method.
+Outer and inner are specially bounded on the heap.
+ 

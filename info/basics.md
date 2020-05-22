@@ -670,16 +670,6 @@ static void varargsMethod(String some, int ...arr){
 ```
 Restrictions: vararg - always last argument, and it can be only one vararg per method. 
 
-###### Java Sound API
-It splits in two parts MIDI and Sampled. 
-MIDI - Musical Instrument Digital interface.
-MIDI files don't include any sounds but instructions how we sound should be played. And where it will be played - that's
-another story it can be electric piano, synthesizer, or any other instrument that understands MIDI files. It can be 
-Java-program on your PC.
-So MIDI is like html file, MIDI-device is like a browser.
-
-Sequencer - object that takes MIDI files and sends them to player.
-
 ###### Exceptions
 We use ```throw exception``` (declare an exception) to tell calling this functionality code that something bad can 
 happened, and you should do some precautions about it, prepare recovery mechanism or something.

@@ -31,6 +31,8 @@ class MyPanel {
     }
 
     public void draw() {
+        changeColorButton.setFont(new Font("serif", Font.ROMAN_BASELINE, 28));
+
         changeColorButton.addActionListener(buttonEventListener);
         changeLabelButton.addActionListener(changeLabelButtonListener);
         //        window.getContentPane().add(new MyPanel());

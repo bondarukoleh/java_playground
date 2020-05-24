@@ -93,4 +93,50 @@ Outer and inner are specially bounded on the heap.
 - Also, do not forget that inner cass can extend any class it wants, while outer class is free to extend something else.
 
 ###### Saving/restoring the object state
- 
+Several ways to save the state (we don't have DB for now):
+1. If your data will be used by only the Java program that generated it? 
+```serialization``` - write a file that holds flattened (serialized) objects. Then have your program read the serialized 
+objects from the file and inflate them back into living, breathing, heap-inhabiting objects.
+2. If your data will be used by other programs?
+```plain parceble format file``` - write a file, with delimiters that other programs can parse. For example,
+a tab-delimited file that a spreadsheet or database application can use. Or any kind of yur format.
+
+1. Using serialization.
+```java
+FileOutputStream fileStream = new FileOutputStream("MyGame.ser"); // creates a file, connection stream
+ObjectOutputStream os = new ObjectOutputStream(fileStream); /* lets you write objects, but it's a chain stream high level,
+can’t directly connect to a file. So it needs low-level connection stream */
+os.writeObject(characterOne); // serialize a few object to file
+os.writeObject(characterTwo);
+os.close(); /* Closing the stream at the top closes the ones underneath, so the FileOutputStream (and the file) will 
+             close automatically.*/
+```
+
+The Java I/0 API has ```connection streams```, that represent connections to destinations and sources such as files or
+network sockets, and ```chain streams``` that work only if chained to other streams. Often, it takes at least two
+streams hooked together to do something useful-one to represent the connection and another to call methods on. Why two?
+Because connection streams are usually too low-level. FileOutputStream (a connection stream), for example, has methods
+for writing bytes. But we don't want to write bytes, we want to write objects, so we need a higher-level 
+ObjectOutputStream (chain) stream.
+
+Serialized objects save the values of the instance variables, so that an identical instance (object) can be brought 
+back to life on the heap. Primitives just copied to serialized object, but what if object is more complicated with
+inheritance hierarchy, and has references to different object, what we need to save?
+When an object is serialized, all the objects it refers to from instance variables are also serialized, and so on and on.
+Serialization saves whole object graph. To make this happened all graph should implement a ```Serializable``` interface,
+(their superclasses should) if something is not implement it:
+- if it is some parent with his state - it won't be saved silently (when an object is deserialized and its superclass is
+  not serializable, the superclass constructor will run just as though a new object of that type were being created)
+- if something that current serializing object has reference to isn't serializable - NotSerializableException. So 
+  every direct referenced state should be saved, if it cannot be saved - operation is impossible. Otherwise, you could
+  get Dog without the weight, or Engine without the carburetor. If you cannot change third party class - you can mark
+  reference variable ```transient``` - serialization will avoid it, and won't complain. Or maybe you can subclass 
+  non-serialize class and make it serializable. transient value will be null when it comes back. Either you can 
+  re-initiate it somehow or you can save the state of this var and re-assign it after deserialization.
+  Such things like runtime info dependency, network connection, threads, files - cannot be serialized. 
+The Serializable interface is known as a ```marker``` or ```tag``` interface, because the interface doesn't have any
+methods to implement. Its sole purpose is to announce that the class implementing it is, well, serializable.
+If any superclass of a class is serializable, the subclass is automatically serializable even if the subclass doesn't
+explicitly declare implements Serializable. (This is how interfaces always work. If your superclass "IS-A" Serializable,
+you are too).
+If reference var points on the same object - it will be saved once.

@@ -101,7 +101,7 @@ objects from the file and inflate them back into living, breathing, heap-inhabit
 ```plain parceble format file``` - write a file, with delimiters that other programs can parse. For example,
 a tab-delimited file that a spreadsheet or database application can use. Or any kind of yur format.
 
-1. Using serialization.
+`1. Using serialization.`
 ```java
 FileOutputStream fileStream = new FileOutputStream("MyGame.ser"); // creates a file, connection stream
 ObjectOutputStream os = new ObjectOutputStream(fileStream); /* lets you write objects, but it's a chain stream high level,
@@ -113,10 +113,10 @@ os.close(); /* Closing the stream at the top closes the ones underneath, so the 
 ```
 
 The Java I/0 API has ```connection streams```, that represent connections to destinations and sources such as files or
-network sockets, and ```chain streams``` that work only if chained to other streams. Often, it takes at least two
-streams hooked together to do something useful-one to represent the connection and another to call methods on. Why two?
-Because connection streams are usually too low-level. FileOutputStream (a connection stream), for example, has methods
-for writing bytes. But we don't want to write bytes, we want to write objects, so we need a higher-level 
+network sockets, file, or console, and ```chain streams``` that work only if chained to other streams. Often, it takes
+at least two streams hooked together to do something useful-one to represent the connection and another to call methods
+on. Why two? Because connection streams are usually too low-level. FileOutputStream (a connection stream), for example,
+has methods for writing bytes. But we don't want to write bytes, we want to write objects, so we need a higher-level 
 ObjectOutputStream (chain) stream.
 
 Serialized objects save the values of the instance variables, so that an identical instance (object) can be brought 
@@ -140,3 +140,33 @@ If any superclass of a class is serializable, the subclass is automatically seri
 explicitly declare implements Serializable. (This is how interfaces always work. If your superclass "IS-A" Serializable,
 you are too).
 If reference var points on the same object - it will be saved once.
+
+The whole point of serializing is restoring back to original state at some later date, in a different 'run' of the JVM
+(which might not even be the same JVM that was running at the time the object was serialized). Or to send object over
+the network connection. 
+Deserialization is a lot like serialization in reverse.
+```java
+FileInputStream fileStream = new FileInputStream("MyGame.ser"); // connects to file, and can read from it
+ObjectInputStream os = new ObjectInputStream(fileStream); /* lets you read objects */
+Object first = os.readObject(); // deserialize first object in file
+Object second = os.readObject(); /* deserialize second one. Each time you call readObject - you get next one in order 
+ they were serialized. If you try to get more objects you serialized - you'll get an exception, for gods sake, wth. */
+os.close(); /* Closing the stream */
+
+MyFirstCharacter = (MyFirstCharacter) first; // you need to cast deserialized objects to your type
+MySecondCharacter = (MySecondCharacter) second;
+```
+While deserialization JVM tries to restore the object, and it won't run the object's constructor to not renew the state,
+but if somewhere in the chain there is a non-serializable class, the constructor for that non-serializable class will
+run along with any constructors above that (even if they’re serializable), which means all superclasses, beginning with
+the first non-serializable one, will reinitialize their state. If they won't be in the app object tries to deserialize -
+there will be an error. There is a method Java's Remote Method Invocation (RMI) to get the classes via URL to more safe
+deserialize the object.
+During deserialization, the class of all objects in the graph must be available to the JVM.
+
+Static stuff - don't make serializable objects dependent on a dynamically-changing static variable! They won't be
+serialized, because they one per class. They might not be the same when the object comes back.
+
+`2. Using writing to a file`
+
+

@@ -1,4 +1,4 @@
-package savingState;
+package src.savingState;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -8,17 +8,19 @@ public class TestWriting {
     public static void main(String[] args) {
         String dataToWrite = "Hello there";
         String dataToWrite2 = "Hello there Buffered";
+        String pathFromRoot = "/testing_stuff/src/savingState/data";
+        String fileName = "SuperHeroes.txt";
+        Path textFilePath = Paths.get(System.getProperty("user.dir"), pathFromRoot, fileName);
         FileWriterClass writer = new FileWriterClass();
-        writer.writeToFile(dataToWrite);
-        writer.readFromFile();
-        writer.writeToFileBuf(dataToWrite2);
-        writer.readFromFileBuf();
+        writer.writeToFile(textFilePath, dataToWrite);
+        writer.readFromFile(textFilePath);
+        writer.writeToFileBuf(textFilePath, dataToWrite2);
+        writer.readFromFileBuf(textFilePath);
     }
 }
 
 class FileWriterClass {
-    public void writeToFile(String data) {
-        Path filePath = Paths.get(System.getProperty("user.dir"), "data", "SuperHeroes.txt");
+    public void writeToFile(Path filePath, String data) {
         try {
             FileWriter writer = new FileWriter(filePath.toString());
             writer.write(data);
@@ -27,8 +29,7 @@ class FileWriterClass {
             e.printStackTrace();
         }
     }
-    public void readFromFile() {
-        Path filePath = Paths.get(System.getProperty("user.dir"), "data", "SuperHeroes.txt");
+    public void readFromFile(Path filePath) {
         try {
             FileReader reader = new FileReader(filePath.toString());
             int i;
@@ -41,8 +42,7 @@ class FileWriterClass {
         }
     }
 
-    public void writeToFileBuf(String data) {
-        Path filePath = Paths.get(System.getProperty("user.dir"), "data", "SuperHeroes.txt");
+    public void writeToFileBuf(Path filePath, String data) {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toString()));
             writer.write(data);
@@ -52,8 +52,7 @@ class FileWriterClass {
         }
     }
 
-    public void readFromFileBuf() {
-        Path filePath = Paths.get(System.getProperty("user.dir"), "data", "SuperHeroes.txt");
+    public void readFromFileBuf(Path filePath) {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(filePath.toString()));
             String line;

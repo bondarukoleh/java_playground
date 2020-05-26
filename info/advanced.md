@@ -1,4 +1,4 @@
-###### Java Sound API
+#### Java Sound API
 It splits in two parts MIDI and Sampled. 
 MIDI - Musical Instrument Digital interface.
 MIDI files don't include any sounds but instructions how we sound should be played. And where it will be played - that's
@@ -17,7 +17,7 @@ a.setMessage(144 - message type (NOTE ON, NOTE OFF, etc.),
 MIDI event - says when to do what message says.             
 
 
-###### GUI 
+#### GUI 
 JFrame is an object represents a window on the screen.
 To JFrame you can add Widgets (buttons, text, checkboxes, UI Elements)
 
@@ -81,7 +81,7 @@ artificial. A JPanel, for example, is usually used as a background for grouping 
 can be interactive. Just as with other components, you can register for the JPanel's events including mouse clicks and 
 keystrokes. JFrame, JPanel - background, JButton, JTextField - interactive. 
 
-###### Inner classes
+#### Inner classes
 Can use everything from outside class, as it were theirs and vise versa, outer have access to inner's private.
 Exception from the rule - inner class declared in outer static method.
 Outer and inner are specially bounded on the heap.
@@ -92,7 +92,7 @@ Outer and inner are specially bounded on the heap.
  behavior to place it in one callback - implement them in inner classes.
 - Also, do not forget that inner cass can extend any class it wants, while outer class is free to extend something else.
 
-###### Saving/restoring the object state
+#### Saving/restoring the object state
 Several ways to save the state (we don't have DB for now):
 1. If your data will be used by only the Java program that generated it? 
 ```serialization``` - write a file that holds flattened (serialized) objects. Then have your program read the serialized 
@@ -168,5 +168,35 @@ Static stuff - don't make serializable objects dependent on a dynamically-changi
 serialized, because they one per class. They might not be the same when the object comes back.
 
 `2. Using writing to a file`
+```java
+BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toString())); // to write a file
+writer.write(data);
 
+BufferedReader reader = new BufferedReader(new FileReader(filePath.toString())); // to read not by char but line
+String line;
+while ((line = reader.readLine()) != null){
+  System.out.print(line);
+}
+```
 
+##### java.io.File
+Represent the file or directory or path on the disk, not the content. It's like an address, it's not the house, not 
+people living in this house, it's just an address. It's more confident to have File instance instead
+of just string name. All classes that can have string filename in their constructors, also can have File instance. 
+
+##### Buffers
+Buffer gives you a temporary place to store your data.
+You have a text, you put it in BufferedStream, chain stream that works with Char, when BufferedStream is full, it adds
+a chunk to FileWriter, connection stream of a file, that put this chunk to a file. If you want to add chunk before it
+is full - you can flush() it to the file.
+
+```java
+File myFile = new File("MyText.txt");
+FileReader fileReader = new FileReader(myFile);
+BufferedReader reader = new BufferedReader(fileReader); // when buffer is full, it will go to the file for another one
+String line = null;
+while ((line = reader.readLine()) != null) {
+    System.out.println(line);
+}
+reader.close();
+```  

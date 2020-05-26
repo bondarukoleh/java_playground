@@ -21,6 +21,10 @@ public class TestString {
         String randomWord2 = wordListTwo[(int) (wordListOne.length * Math.random())];
         String randomWord3 = wordListThree[(int) (wordListOne.length * Math.random())];
 
-        System.out.printf("What you really need is: %s %s %s", randomWord, randomWord2, randomWord3);
+//        System.out.printf("What you really need is: %s %s %s", randomWord, randomWord2, randomWord3);
+
+        for (String part : wordListOne[0].split("/")) {
+            System.out.println(part);
+        }
     }
 }

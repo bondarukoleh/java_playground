@@ -5,6 +5,9 @@ package beatbox;
 import java.awt.*;
 import javax.swing.*;
 import javax.sound.midi.*;
+import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.awt.event.*;
 
@@ -155,5 +158,47 @@ public class BeatBox {
             e.printStackTrace();
         }
         return event;
+    }
+
+    public class MySendListener implements ActionListener {
+        public void actionPerformed(ActionEvent a) {
+            boolean[] checkboxState = new boolean[256];
+            for (int i = 0; i < 256; i++) {
+                JCheckBox check = (JCheckBox) checkboxList.get(i);
+                if (check.isSelected()) {
+                    checkboxState[i] = true;
+                }
+            }
+            try {
+                Path filePath = Paths.get(System.getProperty("user.dir"), "/testing_stuff/src/beatbox/Checkbox.ser");
+                FileOutputStream fileStream = new FileOutputStream(new File(filePath.toString()));
+                ObjectOutputStream os = new ObjectOutputStream(fileStream);
+                os.writeObject(checkboxState);
+            } catch(Exception ex) {
+                ex.printStackTrace();
+            }
+        } // close method
+    }
+
+    public class MyReadInListener implements ActionListener {
+        public void actionPerformed(ActionEvent a) {
+            boolean[] checkboxState = null;
+            try {
+                Path filePath = Paths.get(System.getProperty("user.dir"), "/testing_stuff/src/beatbox/Checkbox.ser");
+                FileInputStream fileIn = new FileInputStream(new File(filePath.toString()));
+                ObjectInputStream is = new ObjectInputStream(fileIn);
+                checkboxState = (boolean[]) is.readObject();
+            } catch(Exception ex) {ex.printStackTrace();}
+            for (int i = 0; i < 256; i++) {
+                JCheckBox check = (JCheckBox) checkboxList.get(i);
+                if (checkboxState[i]) {
+                    check.setSelected(true);
+                } else {
+                    check.setSelected(false);
+                }
+            }
+            sequencer.stop();
+            buildTrackAndStart();
+        }
     }
 }

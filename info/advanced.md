@@ -113,7 +113,7 @@ os.close(); /* Closing the stream at the top closes the ones underneath, so the 
 ```
 
 The Java I/0 API has ```connection streams```, that represent connections to destinations and sources such as files or
-network sockets, file, or console, and ```chain streams``` that work only if chained to other streams. Often, it takes
+network sockets, file, or console, and ```chain/filter streams``` that work only if chained to other streams. Often, it takes
 at least two streams hooked together to do something useful-one to represent the connection and another to call methods
 on. Why two? Because connection streams are usually too low-level. FileOutputStream (a connection stream), for example,
 has methods for writing bytes. But we don't want to write bytes, we want to write objects, so we need a higher-level 
@@ -163,6 +163,28 @@ the first non-serializable one, will reinitialize their state. If they won't be 
 there will be an error. There is a method Java's Remote Method Invocation (RMI) to get the classes via URL to more safe
 deserialize the object.
 During deserialization, the class of all objects in the graph must be available to the JVM.
+If you've changed the code of the serialized object's class - deserialization will give you an error, “you can’t teach
+an old Dog new code". When you serialize, the object (including every object in its graph) is 'stamped' with a version
+ID number for the object's class. If you think there is ANY possibility that your class might evolve, put a serial version
+ID in your class. 
+```shell script
+$> serialver Dog;
+serialVersionUID = -5849794470654667210L;
+```
+```java
+public class Dog {
+static final long serialVersionUID = -6849794470754667710L;
+/* Now after you change the class, JVM will check before the serialization current serialVersionUID, if it matches the 
+serialized object value - JVM think that class has not changed (but it has), and won't throw the exception
+but you should be careful with the changes */  
+}
+```
+
+ Changes that won't break the code, after you trick the JVM with serialVersionUID:
+ - Adding new instance variables to the class (existing objects will deserialize with default values for the instance)
+ - Adding/Removing classes to the inheritance tree
+ - Changing the access level of an instance variable has no affect on deserialization
+ - Changing an instance variable from transient to non-transient
 
 Static stuff - don't make serializable objects dependent on a dynamically-changing static variable! They won't be
 serialized, because they one per class. They might not be the same when the object comes back.

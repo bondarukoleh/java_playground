@@ -222,3 +222,47 @@ while ((line = reader.readLine()) != null) {
 }
 reader.close();
 ```  
+
+#### Network
+To connect to server you need - IP address and TCP port number.
+Socket connection.
+A Socket is an object that represents a network connection between two machines.
+Connection - two pieces of software know how to communicate with each other, how to send bits to each other.
+
+A TCP port is just a number. A 16-bit number that identifies a specific program/application on the server/machine.
+Well-known TCP port numbers for common server applications:
+20 - FTP, 23 - Telnet, SMTP - 25, Time - 37, 443 - HTTPS, 80 - HTTP, 110 - POP3. 65536 ports at all. 0 - 1023 are
+occupied by well know servers, so you shouldn't use them.
+
+Port needed so OS know what app you are reaching. If your browser, landed at the POP3 mail server instead of the HTTP
+server - the mail server won't know how to parse an HTTP request and doesn't know how servicing the HTTP request.
+
+To communicate over a Socket connection, you use I/O streams.
+```java
+Socket chatSocket = new Socket("196.164.1.103", 5000); // gets bytes from server
+/* To read data */
+InputStreamReader stream = new InputStreamReader(chatSocket.getInputStream()); // Convert them to symbols/chars
+BufferedReader reader = new BufferedReader(stream); // buffers chars
+String message = reader.readLine(); // get buffered data
+/* To send data */ 
+PrintWriter writer = new PrintWriter(chatSocket.getOutputStream()); // to write one line to stream and send it 
+// BufferedWriter - to write more that one line
+writer.println("message to send");
+writer.print("another message");
+```
+
+Socket server
+Couple of Sockets. A ServerSocket, which waits for client requests (when a client makes a new Socket()) and a plain
+old Socket socket to use for communication with the client.
+```java
+ServerSocket serverSock = new ServerSocket(5000); // start server
+Socket sock = serverSock.accept(); // create a socket to communicate with client
+```
+The accept() method blocks while it’s waiting for a client Socket connection.
+When a client connects, the method returns a plain old Socket (on a different port) that knows how to communicate with
+the client (i.e., knows the client’s IP address and port number).
+The Socket is on a different port, so that the ServerSocket can go back to waiting for other clients.
+So client connects on one port but gets response from another, from one server's communication Socket is started.
+
+
+

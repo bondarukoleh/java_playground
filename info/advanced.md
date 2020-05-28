@@ -264,5 +264,70 @@ the client (i.e., knows the client’s IP address and port number).
 The Socket is on a different port, so that the ServerSocket can go back to waiting for other clients.
 So client connects on one port but gets response from another, from one server's communication Socket is started.
 
+####Threads
+A Thread object represents a thread of execution, you'll create an instance of class Thread each time you want to 
+start up a new thread of execution, separate call stack.
+Every Java application starts up a main thread-the thread that puts the main() method on the bottom of the stack.
+The JVM is responsible for starting the main thread (and others, as it chooses, like garbage collection thread).
+As a programmer, you can write code to start other threads of your own.
+
+With more than one call stack, you get the appearance of having multiple things happen at the same time.
+In reality, only a true multiprocessor system can actually do more than one thing at a time.
+With Java threads, execution can move back and forth between stacks so rapidly that you feel as though all stacks are
+executing at the same time. Remember, Java is just a process running on your OS. So first, Java itself has to be
+'the currently executing process' on the OS.
+But once Java gets its turn to execute, exactly what does the JVM run? Which bytecodes execute?
+Whatever is on the top of the currently-running stack! And in 100 milliseconds, the currently executing code might switch
+to a different method on a different stack.
+One of the things a thread must do is keep track of which statement (of which method) is currently executing on the
+thread's stack.
+
+###### Launch a new Thread
+1. Make a Runnable object (a job), one that implements Runnable interface. Job that Thread object will perform, and 
+run() method it will put at the bottom of the stack. 
+2. Make a thread object (a worker) and give it a Runnable (a job), it will puts job.run() at the bottom of worker stack
+3. Start the thread. worker.start() will create a separate stack and put job.run() at the bottom. 
+
+You can create thread without the runnable. Via an instance of class extended Thread, and overriding Thread run() method.
+Time you want to subclass/extend the Thread class, is if you are making a new and more specific type of Thread.
+If you think of the Thread as the worker, don't extend the Thread class unless you need more specific worker behaviors.
+
+
+Thread states:
+1. New. Thread t = new Thread(r); A Thread instance has been created but not started. In other words, there is a Thread
+object, but no thread of execution.
+2. Runnable. t.start(); When you start the thread, it moves into the runnable state. Thread is ready to run and just
+waiting for be selected for execution. At this point, there is a new call stack for this thread.
+3. Running. The Currently Running Thread. Only the JVM thread scheduler can make that decision. You can sometimes 
+influence that decision, but you cannot force a thread to move from runnable to running. In the running state, a thread
+(and ONLY this thread) has an active call stack, and the method on the top of the stack is executing.
+4. Blocked. Once the thread becomes runnable, it can move back and forth between runnable, running, temporarily not
+runnable/blocked. (sleeping, waiting for another thread to finish, waiting for data to be available, waiting for an
+object he wants to work with is unlocked);
+5. Dead. When thread finishes his run() method. Thread cannot be restarted. The Thread object might still be on the
+heap, you can call other methods if there is, but there is no longer a separate call stack, and the Thread object is no
+longer a thread. It's just an object, at that point, like all other objects.
+
+Thread Scheduler - is the entity that can operate the state of the runnable thread to running or blocked and back. 
+You cannot control it, so don't base too much on it your logic, your program must run no matter how scheduler behaves
+The scheduler implementations are different for different JVM's, and even running the same program on the same machine 
+can give you different results.
+
+To change from running to runnable state - sleep thread for a few seconds, if Thread.sleep(2000) means thread will 
+become blocked for 2 seconds then runnable and then running somewhere after 2 seconds, not earlier.
+
+The thing is, there no guarantee about new thread.run() will run some job in first run, only guarantee that runnable.run()
+will fire, but thread can be kicked to runnable state after the first curly brace.  
+
+But threads can lead to concurrency ‘issues’. Concurrency issues lead to race conditions. Race conditions lead to data
+corruption. Data corruption leads to fear. It all comes down to one potentially deadly scenario: two or more threads
+have access to a single object's data. In other words, methods executing on two different stacks are both calling, say, 
+getters or setters on a single object on the heap. Thread think that he is the only one, and he never knows that he was
+asleep. Or threads want to change the data with some condition. 1st thread check condition, and before the change he
+falls asleep, 2nd thread in mean time, checks the condition, change the data, and make condition unchangeable, and die.
+1st thread awakes, thinks that condition is still changeable, and changes the data once again. Boom, mess up. 
+Object lock is comming to rescue. When some thread is working with object, he should lock it from the other threads 
+activities. 
+
 
 

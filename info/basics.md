@@ -470,7 +470,7 @@ GrandChild constructor called first but it immediately call parent constructor a
 */
 ```
 
-Local var lives until method is in stack. Instance variable live untill object is in heap.
+Local var lives until method is in stack. Instance variable live until an object is in heap.
 Unlike js you cannot create function outside the object, so local variables is really method scoped. Also, local 
 variable can be used only when method is now on the top of the stack, means it's now executes, if some other method
 is called, variable can be used only after her method resumes the execution. Same rule for primitives and references.

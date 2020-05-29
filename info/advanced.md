@@ -326,8 +326,13 @@ getters or setters on a single object on the heap. Thread think that he is the o
 asleep. Or threads want to change the data with some condition. 1st thread check condition, and before the change he
 falls asleep, 2nd thread in mean time, checks the condition, change the data, and make condition unchangeable, and die.
 1st thread awakes, thinks that condition is still changeable, and changes the data once again. Boom, mess up. 
-Object lock is comming to rescue. When some thread is working with object, he should lock it from the other threads 
-activities. 
+
+Synchronized
+Tells that thread that entered the method, must finish it, before any other thread can access this method. Even if
+thread falls asleep in the middle of the method. It means thread needs a key in order to access synchronized code.
+
+Object lock.
+When some thread is working with an object, he should lock it from the other threads activities.
 
 
 

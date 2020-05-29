@@ -329,10 +329,30 @@ falls asleep, 2nd thread in mean time, checks the condition, change the data, an
 
 Synchronized
 Tells that thread that entered the method, must finish it, before any other thread can access this method. Even if
-thread falls asleep in the middle of the method. It means thread needs a key in order to access synchronized code.
+thread falls asleep in the middle of the method. It means thread needs an object key in order to access synchronized code.
+When Thread Scheduler kicks thread1 that not finished the sync method back to Runnable state, thread keps the key of the 
+object, thread2 wants to enter the sync method, but there is no key, so thread2 is also back to Runnable, thread1 finishes
+his work with sync, returns the key, back to Runnable, thread2 wants to enter the sync, so he grabs the key and so on.
 
-Object lock.
-When some thread is working with an object, he should lock it from the other threads activities.
+Object's lock.
+Every object has lock, if class object is created from has a synchronized method, then thread that works with this
+object's sync method gets the key of this lock, and no other thread can enter any of sync object's methods until key is
+set back. That's why they call them synchronized, means it's like they are work only together. If some thread using
+something from this group of sync methods - no one can use any of those until previous work is done.
 
+Synchronized can cost:
+1. Performance, and complexity.
+2. Restrict a concurrency, means multithreading became single-thread here.
+3. Deadlock. Be super careful with this one.
 
-
+You should sync only the critical atomic things in your code.
+```java
+public synchronized void someMethod(){}
+// or even
+public void someMethod(){
+// some not critical stuff
+    synchronized(this /*or object you want to lock*/){
+        // some critical stuff
+    }
+}
+```

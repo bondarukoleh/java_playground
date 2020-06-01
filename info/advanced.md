@@ -339,6 +339,7 @@ Every object has lock, if class object is created from has a synchronized method
 object's sync method gets the key of this lock, and no other thread can enter any of sync object's methods until key is
 set back. That's why they call them synchronized, means it's like they are work only together. If some thread using
 something from this group of sync methods - no one can use any of those until previous work is done.
+Static methods, that will work with class also can be synchronized. Class hinself also have a lock.
 
 Synchronized can cost:
 1. Performance, and complexity.
@@ -355,4 +356,6 @@ public void someMethod(){
         // some critical stuff
     }
 }
+
+static synchronized void(){}
 ```

@@ -91,7 +91,7 @@ float f = 32.5f; Gotta have ‘f’ with a float, Java thinks anything with a fl
 A primitive byte: x = 7; The bits representing 7 are go into the variable. (actual value will be placed - 00000111).
 A reference type: Dog myDog = new Dog(); The bits representing a way to get to the Dog object go into the variable.
 
-final variable unlike const in js cannot be reassigned, even for a new object.
+final variable like const in js cannot be reassigned, even for a new object.
 
 `instance variable` - declared in class, gets default value.
 `local variable` - declared in method, and doesn't get default value, need to be initialized before used.
@@ -537,7 +537,7 @@ void WithStaticImport () {
 ```
 
 ###### final
-- final variable means you can't change its value.
+- final variable means you can't change its value ```after initialization```. Means it can be default value before this.
 - final method means you can't override the method (but you can make final overridden regular method, or overload final).
 - final class means you can't extend the class (implicitly state and behavior are also final there).
 - final variable should be initialized either when declared or in a constructor.

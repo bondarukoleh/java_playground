@@ -13,6 +13,7 @@ public class TestSongsSorting {
 //        jukeBox.listByArtist();
 //        jukeBox.listBySongs();
         jukeBox.hashSetSongs();
+        jukeBox.treeSetSongs();
     }
 
     private static Path getSongsFilePath() {
@@ -48,6 +49,12 @@ class JukeBox {
         HashSet<Song> hashedSongs = new HashSet<>();
         hashedSongs.addAll(songs);
         System.out.println(hashedSongs);
+    }
+
+    public void treeSetSongs() {
+        TreeSet<Song> treeSongs = new TreeSet<>(new SongsComparator().bySongName());
+        treeSongs.addAll(songs);
+        System.out.println(treeSongs);
     }
 
     class SongsComparator {
@@ -107,6 +114,20 @@ class Song implements Comparable<Song> {
     public int compareTo(Song song) {
         // alphabetic order
         return getName().compareTo(song.getName());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Song)) return false;
+        Song song = (Song) o;
+        return getName().equals(song.getName()) &&
+                getSinger().equals(song.getSinger());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getName(), getSinger());
     }
 }
 

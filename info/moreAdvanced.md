@@ -3,7 +3,7 @@ There is a three main interfaces List, Map, Set. Map is not extend the Collectio
 of Collection framework.
 LIST - when sequence matters, `indexes`, `duplicates`. Lists know where elements are in the list. You can have more than
  one element referencing the same object.
-SET - when uniqueness matters, `no duplicates`. Sets knows element is already in the collection. You can never have more
+SET - when uniqueness matters, `no duplicates`. Set knows element is already in the collection. You can never have more
  than one element referencing the same object (or more than one element referencing two objects that are considered equal)
 MAP - when finding something `by key` matters, `key-value pairs`, `value duplicates`. You can have two keys that reference
  the same value, but you cannot have duplicate keys. Although keys are typically String names (so that you can make
@@ -77,8 +77,9 @@ state, or same variable we are comparing?
 Reference equality:
 Two references that refer to the same object on the heap are equal.
 Object.hashCode() override returns int number, based on objects state. Default behavior (on Most JVMs) - hashcode based
-on the object’s memory address on the heap. To compare references use the == operator, which compares the bits in the
-references variables.
+on the object’s memory address on the heap. ```To compare references``` use the ```== operator``` , which compares the
+bits in the references variables. Also, ```default Object.equals()``` is ```reference compairing```.
+Java hashCode() and equals() method are used in Hash table based implementations in java for storing and retrieving data.
 
 Object equality:
 Two different objects, but they equal meaningfully.
@@ -88,6 +89,19 @@ boolean equals(Object obj) -> must decide object equal or not to argument.
 If two objects foo and bar are equal, foo.equals(bar) must be true, and both foo and bar must return the same value from
 hashCode(). For a Set to treat two objects as duplicates, you must override the hashCode() and equals() methods inherited
 from class Object, so that you can make two different objects be viewed as equal.
+
+When you put an object into a Hashset, it uses the object's hashcode() value to determine where to put the object in
+the Set. But it also compares the object's hashcode() to the hashcode() of all the other objects in the HashSet, and if
+there's no matching hashcode, the HashSet assumes that this new object is not a duplicate.
+So you must override hashCode() to make sure the objects have the same value.
+But even if hashCodes will be same, objects still can be different. To be sure - HashSet will use one of the .equals()
+objects methods to check that these objects are equal, after check HashSet will know that new object is a dublicate and
+doesn't add it, and .add() method returns false.
+
+a.equals(b) must also mean that a.hashCode() == b.hashCode();
+But  a.hashCode() == b.hashCode() does NOT have to mean a.equals(b)
+
+TreeSet - is a sorted HasSet, it uses .compareTo(), of .compare() if you've passed Comparator in TreeSet constructor.
 
 ##### Generics
 Almost all the code you write that deals with generics will be collection-related code.

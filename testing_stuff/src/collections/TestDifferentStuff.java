@@ -1,4 +1,4 @@
-package collections;
+package src.collections;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,7 +16,7 @@ public class TestDifferentStuff {
 
 
         /*===================================*/
-//        List<Animal> animalList = new ArrayList<Dog>();
+//        List<Animal> animalList = new ArrayList<Dog>(); error
 //        animalList.add(new Dog());
 
         ArrayList<Dog> dogs = new ArrayList<>();

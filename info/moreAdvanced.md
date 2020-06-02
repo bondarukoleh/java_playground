@@ -1,21 +1,93 @@
-#### Collections
+#### Collections API
+There is a three main interfaces List, Map, Set. Map is not extend the Collection interface but still considered as part
+of Collection framework.
+LIST - when sequence matters, `indexes`, `duplicates`. Lists know where elements are in the list. You can have more than
+ one element referencing the same object.
+SET - when uniqueness matters, `no duplicates`. Sets knows element is already in the collection. You can never have more
+ than one element referencing the same object (or more than one element referencing two objects that are considered equal)
+MAP - when finding something `by key` matters, `key-value pairs`, `value duplicates`. You can have two keys that reference
+ the same value, but you cannot have duplicate keys. Although keys are typically String names (so that you can make
+ name/value property lists, for example), a key can be any object.
 
+Iterable (interface)
+-.-.-> Collection (interface) 
+     -.-.-> Set (interface)
+            -.-.-> SortedSet (interface) -----> TreeSet (class)
+            -----> LinkedHashSet (class)
+            -----> HashSet (class)
+     -.-.-> List (interface)
+            -----> ArrayList (class)
+            -----> LinkedList (class)
+            -----> Vector (class)
+            
+Map (interface)
+    -.-.-> SortedMap (interface) -----> TreeMap (class)
+            -----> LinkedHashMap (class)
+            -----> HashMap (class)
+            -----> HashTable (class)       
+
+##### Sorting
 We can use static Collections methods for some simple cases;
 ```java
-ArrayList<String> strings = new ArrayList<>();
+ArrayList<Е extends String> strings = new ArrayList<>();
 Collections.sort(myStringsList);
 System.out.println(myStringsList); 
 ```
 
-But to sort some more complicated things, you need your class extends Comparable.
+But to sort some more complicated things, you need your class implement Comparable.
+Comparable has one method compareTo(O o), and it should return a negative integer, zero, or a positive integer as this
+object is less than, equal to, or greater than the specified object.
+
 ```java
-class MyCustom {
-    
+class MyCustom implements Comparable<MyCustom> { /* we need to explain with what we can compare Comparable<MyCustom>
+ because it's the same as with collections type parameter - public interface Comparable<T> {compareTo(T o)} */ 
+    @Override
+    public int compareTo(MyCustom o) {
+        return this.getSomeNum() - o.getSomeNum();
+    }
 }
 ArrayList<MyCustom> customs = new ArrayList<>();
 Collections.sort(customs);
 System.out.println(customs); // will use MyCustom.toString() method to print it in the terminal
 ```
+
+To have more interesting sorting we can use Comparator interface, it has compare(T o2, T o2) method, and passed as a 
+second argument to .sort() method. Advantage that in your MyCustom class you can declare only one way to comparing your
+instance with Comparable in compareTo(MyCustom o) method (you can switch some flags in instance - but it is awful), but
+with Comparator - you can declare as many comparator classes as you want to have many ways to compare your objects.
+Remember, if you use Comparator object via sorting - than Comparable - doesn't count.
+```java
+class CompareByNum implements Comparator<MyCustom> {
+  @Override
+  public int compare(MyCustom o1, MyCustom o2) {
+      return o1.getSomeNum() - o2.getSomeNum();
+  }
+}
+
+ArrayList<MyCustom> customs = new ArrayList<>();
+Collections.sort(customs, new CompareByNum());
+System.out.println(customs);
+```
+ 
+##### Equality
+`reference` vs `object` equality
+How two objects considered equal? It is two reference pointing on the same object or it's two different objects with same
+state, or same variable we are comparing?
+
+Reference equality:
+Two references that refer to the same object on the heap are equal.
+Object.hashCode() override returns int number, based on objects state. Default behavior (on Most JVMs) - hashcode based
+on the object’s memory address on the heap. To compare references use the == operator, which compares the bits in the
+references variables.
+
+Object equality:
+Two different objects, but they equal meaningfully.
+To make this happened  - you must override both the hashCode() and equals() methods inherited from class Object.
+boolean equals(Object obj) -> must decide object equal or not to argument.
+
+If two objects foo and bar are equal, foo.equals(bar) must be true, and both foo and bar must return the same value from
+hashCode(). For a Set to treat two objects as duplicates, you must override the hashCode() and equals() methods inherited
+from class Object, so that you can make two different objects be viewed as equal.
 
 ##### Generics
 Almost all the code you write that deals with generics will be collection-related code.
@@ -63,7 +135,7 @@ public void takeThing(ArrayList<Animal> list){}
 `public void takeThing(ArrayList< Animal > list){}` - you can pass only ArrayList< Animal > that's all.
 It works with plain old polymorphism but if you try to use same "base type" tricks with Collections - you need generics.
    
-In generic `extends` - means extends or implements, little soft typing, at least something.
+In generic `extends` - means ```extends or implements```, little soft typing, at least something.
 
 
 

@@ -1,9 +1,11 @@
 package src.collections;
 
+import java.io.ObjectOutputStream;
 import java.util.*;
 
 public class TestDifferentStuff {
     public static void main(String[] args) {
+
         ArrayList<String> strings = new ArrayList<>();
         strings.add("C");
         strings.add("B");
@@ -12,9 +14,11 @@ public class TestDifferentStuff {
         Collections.sort(strings);
         System.out.println(strings);
 
-
+        ArrayList<Animal> a = new ArrayList<>();
+        a.add(new Dog());
         /*===================================*/
-//        List<Animal> animalList = new ArrayList<Dog>(); error
+//        List<Object> animalList = new ArrayList<Dog>(); // error
+        List<?> animalList = new ArrayList<Dog>(); // wildcard means anything
 //        animalList.add(new Dog());
 
         ArrayList<Dog> dogs = new ArrayList<>();
@@ -23,6 +27,9 @@ public class TestDifferentStuff {
         new Some().takeAnimal(new Dog());
         new Some().takeGenericAnimalList(dogs);
 //        new Some().takeAnimalList(dogs); error
+
+        OnlyAnimal<Animal> onlyAnimal = new OnlyAnimal<Animal>();
+//        onlyAnimal.doSomethingWeird(new WeirdAnimal<Dog>()); // error because WeirdAnimal is not an Animal
     }
 }
 
@@ -46,13 +53,25 @@ class MyCustom implements Comparable {
 
 class Animal {
     public String type;
+
+    @Override
+    public String toString() {
+        return type;
+    }
 }
 
 class Dog extends Animal {}
+class Cat extends Animal {}
 
 class WeirdAnimal<T extends Animal> {
     public void doSomethingWeird(T o){
         System.out.println(o.type);
+    }
+}
+
+class OnlyAnimal<MyGenericType> {
+    public void doSomethingWeird(MyGenericType o){
+        System.out.println(o);
     }
 }
 
@@ -67,7 +86,7 @@ class Some {
         System.out.println("do something");
     }
 
-    public <T extends Animal> void takeGenericAnimalList(ArrayList<T> someType){
+    public void takeGenericAnimalList(ArrayList<? extends Animal> someType){
         System.out.println("do something");
     }
 
@@ -118,5 +137,13 @@ class BookComparator implements Comparator<Book> {
     @Override
     public int compare(Book o1, Book o2) {
         return o1.title.compareTo(o2.title);
+    }
+}
+
+class TestMap {
+    public static void main(String[] args) {
+        Map<Integer, String> m = new HashMap<>();
+        m.put(1, "sdas");
+        System.out.println(m);
     }
 }

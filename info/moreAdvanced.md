@@ -123,6 +123,8 @@ Almost all the code you write that deals with generics will be collection-relate
 The main point of generics is to let you write type-safe collections. Code that makes the compiler stop you from putting
 a Dog into a list of Ducks. Usually, except some special cases it named "T" as a type declaration. 
 
+In generic `extends` - means ```extends or implements```, little soft typing, at least something.
+
 ```java
 public class ArrayList<E> extends AbstractList<E> implements List<E> ... {
     public boolean add(E o)
@@ -137,10 +139,13 @@ add(E o) - declared type reduces type of the passed argument to th collection.
 Using generic METHODS:
 1. Using a type parameter defined in the class declaration
 ```java
-class MyClass<MyGeneric> {
+class MyClass<MyGeneric> { // here if you want to instantiate your Generic class
     public void myClassMethod(MyGeneric o){}
 }
-class MyClass<T extends MyGeneric> {
+MyClass<SomeOfMyOtherClasses> my = new MyClass<SomeOfMyOtherClasses>();
+my.myClassMethod(new SomeOfMyOtherClasses());
+
+class MyClass<T extends MyGeneric> { // same stuff but you can pass anything that extends or implements MyGeneric
     public void myClassMethod(T o){}
 }
 ```
@@ -151,6 +156,13 @@ replaced with the type you use when you instantiate the class.
 2. Using a type parameter that was NOT defined in the class declaration
 ```java
 public <T extends Animal> void takeThing(ArrayList<T> list){}
+// same stuff, ? - is a wildcard
+public void takeThing(ArrayList<? extends Animal> list){}
+// In some cases it's easier to type:
+public <T extends Animal> void takeThing(ArrayList<T> one, ArrayList<T> two)
+// instead of:
+public void takeThing(ArrayList<? extends Animal> one, ArrayList<? extends Animal> two)
+// you cannot do something like class A<? extends B> - not here. 
 ```
 ArrayList< T > list - can be used because it is declared in method declaration before the returned type.
 Special construction if class doesn't declare any generic type, but you still want to declare some generic just for the 
@@ -165,12 +177,47 @@ public void takeThing(ArrayList<Animal> list){}
 `public < T extends Animal > void takeThing(ArrayList< T > list){}` - means you can pass here: ArrayList< Cat >,
  ArrayList< Dog >, ArrayList< Animal >, etc.
 `public void takeThing(ArrayList< Animal > list){}` - you can pass only ArrayList< Animal > that's all.
-It works with plain old polymorphism but if you try to use same "base type" tricks with Collections - you need generics.
-   
-In generic `extends` - means ```extends or implements```, little soft typing, at least something.
 
+```BUT!!!``` Plain old polymorphism works if we are talking about typed parameters and array of typed parameters,
+but if you want to use same "base type" tricks with Collections - you need generics.
+```java
+class Base {
+    public void some1(Base o){}
+    public void some2(Base[] o){}
+    public void some3(ArrayList<Base> o){}
+    public <T extends Base> void some4(ArrayList<T> o){}
+}
 
+class Specific extends Base {}
+new Base().some1(new Specific()); // work
+new Base().some2(new Specific[5]); // work
+new Base().some3(new ArrayList<Specific>()); // Won't work!!!
+new Base().some4(new ArrayList<Specific>()); // will work with generic overload
+```
+Why .some2(new Specific[5]) is ok but .some3(new ArrayList< Specific >()) is not?
+Because Array types are checked again at runtime, but collection type checks happen only when you compile.
+So the compiler won't let you mess up Collection inside the method, but it let's you mess the Array. 
+If you mess the Array, that checked in runtime - ArrayStoreException will occur.
 
+```java
+Dog[] dogs = {new Dog()};
+class AnimalsStuff {
+    public void addCat(Animal[] animals){
+        animals[0] = new Cat();
+    }
+}
+new AnimalsStuff().addCat(dogs); // ArrayStoreException, in runtime. JVM won't let you add Cat to Dog[] array.
+```
 
- 
-
+There is a trick with wildcard, that in some cases can save typings. 
+```java
+List<Object> animalList = new ArrayList<Dog>(); // error
+List<?> animalList = new ArrayList<Dog>(); // wildcard means anything
+List<? extends Animal> animalList = new ArrayList<Dog>(); // wildcard means anything
+public static void addRegistry(Map<String, ? extends Person> registry)
+```
+But you should remember using generic typed parameter method 
+```public < T extends Animal > void takeThing(ArrayList< T > list){}``` or wildcarded parameter method
+```public void takeThing(ArrayList<?extends Animal> list){}``` WON"T let you add something to collection because it's
+not safe. We don't know the what type of collection you'll pass to it, so we cannot change it. You can work with elements
+but you cannot add any new elements to it easily. 

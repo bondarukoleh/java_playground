@@ -9,23 +9,36 @@ MAP - when finding something `by key` matters, `key-value pairs`, `value duplica
  the same value, but you cannot have duplicate keys. Although keys are typically String names (so that you can make
  name/value property lists, for example), a key can be any object.
 
+```text
 Iterable (interface)
--.-.-> Collection (interface) 
+-.-.-> Collection (interface)
      -.-.-> Set (interface)
-            -.-.-> SortedSet (interface) -----> TreeSet (class)
-            -----> LinkedHashSet (class)
-            -----> HashSet (class)
+            -.-.-> SortedSet (interface)
+                -.-.-> NavigableSet (interface)
+                    -----> <b>TreeSet</b> (class)
+            -----> AbstractSet (class) 
+                -----> *HashSet* (class)
+                    -----> **LinkedHashSet** (class)
+     -.-.-> Queue (interface)
+            -.-.-> Deque (interface)
+            -----> AbstractQueue (class)
+                -----> ```PriorityQueue``` (class)
      -.-.-> List (interface)
-            -----> ArrayList (class)
-            -----> LinkedList (class)
-            -----> Vector (class)
+            -----> AbstractList (class)
+                -----> AbstractSequentialList (class) (also implements Deque)
+                    -----> ```LinkedList``` (class)
+                -----> ```ArrayList``` (class)
+                -----> ```Vector``` (class)
             
 Map (interface)
-    -.-.-> SortedMap (interface) -----> TreeMap (class)
-            -----> LinkedHashMap (class)
-            -----> HashMap (class)
-            -----> HashTable (class)       
-
+    -.-.-> SortedMap (interface)
+            -.-.-> NavigableMap (interface)
+                -----> ```TreeMap``` (class)
+            -----> AbstractMap (class)
+                -----> ```HashMap``` (class)    
+                -----> ```LinkedHashMap``` (class)  
+    -----> HashTable (class) (extends Dictionary)       
+```
 ##### Sorting
 We can use static Collections methods for some simple cases;
 ```java
@@ -102,6 +115,8 @@ a.equals(b) must also mean that a.hashCode() == b.hashCode();
 But  a.hashCode() == b.hashCode() does NOT have to mean a.equals(b)
 
 TreeSet - is a sorted HasSet, it uses .compareTo(), of .compare() if you've passed Comparator in TreeSet constructor.
+So objects in the Sorted collections should implement Comparable interface, or you can pass objects comparator in 
+collection constructor. So collection knows how it can sort values.
 
 ##### Generics
 Almost all the code you write that deals with generics will be collection-related code.
@@ -124,6 +139,9 @@ Using generic METHODS:
 ```java
 class MyClass<MyGeneric> {
     public void myClassMethod(MyGeneric o){}
+}
+class MyClass<T extends MyGeneric> {
+    public void myClassMethod(T o){}
 }
 ```
 public boolean myClassMethod(MyGeneric o) - we can use generic as an argument since MyClass< MyGeneric > is in class

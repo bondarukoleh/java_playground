@@ -1,8 +1,6 @@
 package src.collections;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class TestDifferentStuff {
     public static void main(String[] args) {
@@ -52,6 +50,12 @@ class Animal {
 
 class Dog extends Animal {}
 
+class WeirdAnimal<T extends Animal> {
+    public void doSomethingWeird(T o){
+        System.out.println(o.type);
+    }
+}
+
 class Some {
     public Some() {}
 
@@ -69,5 +73,50 @@ class Some {
 
     public void takeAnimalList(ArrayList<Animal> someType){
         System.out.println("do something");
+    }
+}
+
+class TestTree {
+    public static void main(String[] args) {
+        new TestTree().go();
+    }
+
+    public void go() {
+        Book b1 = new Book("How Cats Work");
+        Book b2 = new Book("Remix your Body");
+        Book b3 = new Book("Finding Emo");
+        TreeSet<Book> tree = new TreeSet<>(new BookComparator());
+//        HashSet<Book> tree = new HashSet<>();
+        tree.add(b1);
+        tree.add(b2);
+        tree.add(b3);
+        System.out.println(tree);
+    }
+}
+
+class Book implements Comparable<Book> {
+    String title;
+
+    public Book(String t) {
+        title = t;
+    }
+
+    @Override
+    public int compareTo(Book o) {
+        return this.title.compareTo(o.title);
+    }
+
+    @Override
+    public String toString() {
+        return "Book{" +
+                "title='" + title + '\'' +
+                '}';
+    }
+}
+
+class BookComparator implements Comparator<Book> {
+    @Override
+    public int compare(Book o1, Book o2) {
+        return o1.title.compareTo(o2.title);
     }
 }

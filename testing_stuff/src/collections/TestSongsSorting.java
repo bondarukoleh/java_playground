@@ -3,6 +3,7 @@ package src.collections;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -12,8 +13,10 @@ public class TestSongsSorting {
         JukeBox jukeBox = new JukeBox(TestSongsSorting.getSongsFilePath());
 //        jukeBox.listByArtist();
 //        jukeBox.listBySongs();
-        jukeBox.hashSetSongs();
-        jukeBox.treeSetSongs();
+//        jukeBox.hashSetSongs();
+//        jukeBox.treeSetSongs();
+        int[] a = new int[]{1, 2, 3};
+        System.out.println(Arrays.toString(a));
     }
 
     private static Path getSongsFilePath() {
@@ -27,8 +30,8 @@ class JukeBox {
     private final ArrayList<Song> songs;
     private final SongsComparator songsSorting = new SongsComparator();
 
-    public JukeBox(Path songsPath){
-            this.songs = SongsReader.parseSongList(songsPath);
+    public JukeBox(Path songsPath) {
+        this.songs = SongsReader.parseSongList(songsPath);
     }
 
     public void addSong(Song song) {
@@ -58,7 +61,7 @@ class JukeBox {
     }
 
     class SongsComparator {
-        public Comparator bySongName(){
+        public Comparator bySongName() {
             class CompareByName implements Comparator<Song> {
                 @Override
                 public int compare(Song o1, Song o2) {
@@ -69,7 +72,7 @@ class JukeBox {
             return new CompareByName();
         }
 
-        public Comparator byArtist(){
+        public Comparator byArtist() {
             class CompareByArtist implements Comparator<Song> {
                 @Override
                 public int compare(Song o1, Song o2) {

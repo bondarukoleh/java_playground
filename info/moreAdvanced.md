@@ -9,36 +9,36 @@ MAP - when finding something `by key` matters, `key-value pairs`, `value duplica
  the same value, but you cannot have duplicate keys. Although keys are typically String names (so that you can make
  name/value property lists, for example), a key can be any object.
 
-```text
-Iterable (interface)
--.-.-> Collection (interface)
-     -.-.-> Set (interface)
-            -.-.-> SortedSet (interface)
-                -.-.-> NavigableSet (interface)
-                    -----> <b>TreeSet</b> (class)
-            -----> AbstractSet (class) 
-                -----> *HashSet* (class)
-                    -----> **LinkedHashSet** (class)
-     -.-.-> Queue (interface)
-            -.-.-> Deque (interface)
-            -----> AbstractQueue (class)
-                -----> ```PriorityQueue``` (class)
-     -.-.-> List (interface)
-            -----> AbstractList (class)
-                -----> AbstractSequentialList (class) (also implements Deque)
-                    -----> ```LinkedList``` (class)
-                -----> ```ArrayList``` (class)
-                -----> ```Vector``` (class)
+Iterable (interface) \
+&ensp;&ensp;-.-.-> Collection (interface) \
+&ensp;&ensp;&ensp;&ensp;-.-.-> Set (interface) \
+&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;-.-.-> SortedSet (interface) \
+&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;-.-.-> NavigableSet (interface) \
+&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;-----> **TreeSet** (class) \
+&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;-----> AbstractSet (class) \
+&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;-----> **HashSet** (class) \
+&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;-----> **LinkedHashSet** (class) \
+&ensp;&ensp;&ensp;&ensp;-.-.-> Queue (interface) \
+&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;-.-.-> Deque (interface) \
+&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;-----> AbstractQueue (class) \
+&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;-----> **PriorityQueue** (class) \
+&ensp;&ensp;&ensp;&ensp;-.-.-> List (interface) \
+&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;-----> AbstractList (class) \
+&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;-----> AbstractSequentialList (class) (also implements Deque) \
+&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;-----> **LinkedList** (class) \
+&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;-----> **ArrayList** (class) \
+&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;-----> **Vector** (class) 
             
-Map (interface)
-    -.-.-> SortedMap (interface)
-            -.-.-> NavigableMap (interface)
-                -----> ```TreeMap``` (class)
-            -----> AbstractMap (class)
-                -----> ```HashMap``` (class)    
-                -----> ```LinkedHashMap``` (class)  
-    -----> HashTable (class) (extends Dictionary)       
-```
+Map (interface) \
+&ensp;&ensp;-.-.-> SortedMap (interface) \
+&ensp;&ensp;&ensp;&ensp;-.-.-> NavigableMap (interface) \
+&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;-----> **TreeMap** (class) \
+&ensp;&ensp;-----> AbstractMap (class) \
+&ensp;&ensp;&ensp;&ensp;-----> **HashMap** (class) \
+&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;-----> **LinkedHashMap** (class) \
+&ensp;&ensp;-----> **HashTable** (class) (extends Dictionary)        
+
+
 ##### Sorting
 We can use static Collections methods for some simple cases;
 ```java

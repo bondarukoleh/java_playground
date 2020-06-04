@@ -11,12 +11,10 @@ import java.util.*;
 public class TestSongsSorting {
     public static void main(String[] args) {
         JukeBox jukeBox = new JukeBox(TestSongsSorting.getSongsFilePath());
-//        jukeBox.listByArtist();
-//        jukeBox.listBySongs();
-//        jukeBox.hashSetSongs();
-//        jukeBox.treeSetSongs();
-        int[] a = new int[]{1, 2, 3};
-        System.out.println(Arrays.toString(a));
+        jukeBox.listByArtist();
+        jukeBox.listBySongs();
+        jukeBox.hashSetSongs();
+        jukeBox.treeSetSongs();
     }
 
     private static Path getSongsFilePath() {

@@ -9,6 +9,7 @@ other parts of the application are running. Desctop on client machine that conne
 The entire Java application runs on a server system, with the client accessing the system through some non-Java means,
 probably a web browser.
 
+```LOCAL```
 ##### Compiling
 ```shell script
 javac SomeClass.java
@@ -47,6 +48,8 @@ JAR file is Java Archive. It's pkzip file format bundle of your .class files. To
 .jar file executable. User's OS doesn't know about this bunch of .class files, so we need to explain what file have 
 main() method, what file needs to be run. This is the `MANIFEST.MF` file, we should put it in JAR and user's java API 
 will look for this file to understand how it should run this JAR.
+Package structure must be the same as it was before you use the classes. In most cases com package must be the first in
+the jar.
 
 ```manifest
 Manifest-Version: 1.0
@@ -54,9 +57,10 @@ Main-Class: your_package.SomeClass
 
 ```
 
-to create jar
+to create jar. Manifest file will be in automatically generated folder META-INF/
 ```shell script
 ~/project_dir/classes_dir:$>jar -cvmf MANIFEST.MF app.jar *
+##jar -cvmf manifest.txt packEx.jar com ## You can put root package and create jar from it.
 ##jar -cmf jar-file existing-manifest input-file(s) or jar -cf jar-file input-file(s)
 ```
 
@@ -64,6 +68,18 @@ to run it
 ```shell script
 ~/project_dir/classes_dir:$>java -jar app.jar
 ## or if you want to tell JVM what you want to call java -jar app.jar Main-Class: your_package.SomeClass.
+```
+
+to list jar content
+```shell script
+jar -tf packEx.jar
+## tf - table file
+```
+
+to unzip the jar
+```shell script
+jar -xf packEx.jar
+## xf - extrct file
 ```
 
 If there is no manifest file in JAR - you'll get runtime exception.
@@ -81,4 +97,4 @@ class Some {}
 ```
 All that in this file will be in com.olehsSite.MyClass. Directory structure should be the same with package.
 
-
+```COMBINATION OF LOCAL AND REMOTE```

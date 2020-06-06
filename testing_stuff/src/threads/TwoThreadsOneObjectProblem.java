@@ -1,5 +1,7 @@
 package src.threads;
 
+import threads.Logger;
+
 public class TwoThreadsOneObjectProblem {
     public static void main(String[] args) {
         BankAccount joinBankAccount = new BankAccount();
@@ -71,11 +73,5 @@ class Shopping implements Runnable {
         } else {
             Logger.log("I cannot take money no more :(");
         }
-    }
-}
-
-class Logger {
-    static public void log(String message) {
-        System.out.println(Thread.currentThread().getName() + ": " + message);
     }
 }

@@ -1,5 +1,7 @@
 package src.threads;
 
+import threads.Logger;
+
 public class DeadLock {
     public static void main(String[] args) {
         /* TODO: Not finished yet, need to think about how to make it  */

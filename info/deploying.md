@@ -222,3 +222,29 @@ where_my_compiled_classes$> java -classpath ./RMI_service/ network.RMI.Client
 
 ```REMOTE```
 Servlets
+Java programs that run on an HTTP web server. When a client uses a web browser to interact with a web page, a request is
+sent back to the web server. If the request needs the help of a Java servlet, the web server runs (or calls, if the
+servlet is already running) the servlet code. Servlet code is simply code that runs on the server, to do work as a 
+result of whatever the client requests. Servlets can everything from sending user-submitted info to a database, to
+running a web-site's discussion board. And even servlets can use RMI! By far, the most common use of J2EE technology is
+to mix servlets and EJBs together, where servlets are the client of the EJB. And in that case, the servlet is using RMI
+to talk to the EJBs.
+
+Servlets vs JSP. In the end, the web server turns a JSP into a servlet, but the difference between a servlet and a JSP
+With a servlet, developer write a Java class that contains HTML in the output statements (if you're sending back an HTML
+page to the client). But with a JSP, it's the opposite-you write an HTML page that contains Java code!
+Another "super" way to write front end with Java.
+Servlets and JSPs are not part of the Java language, they're considered standard extensions.
+
+RMI is great for writing and running remote services. But you wouldn't run something like an Amazon or eBay on RMI alone.
+For a large, deadly serious, enterprise application, you need something more. 
+You need something that can handle transactions, heavy concurrency issues (like a gazillion people are hitting your
+server at once), security, and data management. For that, you need an enterprise application server.
+In Java, that means a Java 2 Enterprise Edition (J2EE) server. A J2EE server includes both a web server and an Enterprise
+JavaBeans(EJB) server, so that you can deploy an application that includes both servlets and EJBs.
+
+J2EE - Java 2 Platform, Enterprise Edition is a comprehensive set of Java-based tools, standards, components, and
+technologies for large-scale distributed computing offered by Sun Microsystems Inc.
+JavaServer Pages (JSP), Java Messaging Service (JMS), Enterprise JavaBeans (EJB) and Java Naming and Directory Interface
+(JNDI) are among the parts of J2EE.
+

@@ -729,3 +729,66 @@ Throwable ->
   RuntimeException -> 
     ClassCastException
     NullPointerException 
+
+
+##### Bit Manipulation
+Bitwise NOT Operator: ~
+This operator 'flips all the bits' of a primitive.
+```java
+int x = 10;   //     bits are 00001010
+x = ~x;       // bits are now 11110101
+```
+
+The next three operators compare two primitives on a bit by bit basis, and return a result based on comparing these bits.
+```java
+int x = 10;    // bits are 00001010
+int y =  6;    // bits are 00000110
+```
+Bitwise AND Operator: &
+This operator returns a value whose bits are turned on only if both original bits are turned on:
+```java
+int a = x & y; // bits are 00000010
+```
+Bitwise OR Operator:   |
+This operator returns a value whose bits are turned on only if either of the original bits are turned on:
+```java
+int a = x | y;  // bits are 00001110
+```
+Bitwise XOR (exclusive OR) Operator:  ^
+This operator returns a value whose bits are turned on only if exactly one of the original bits are turned on:
+```java
+int a = x ^ y;  // bits are 00001100
+```
+The Shift Operators
+These operators take a single integer primitive and shift (or slide) all of its bits in one direction or another. 
+Shifting bits left effectively multiplies a number by a power of two, and shifting bits right effectively divides a
+number by a power of two.
+```java
+int X = -11;   //  bits are 11110101
+```
+Remember, the leftmost bit of an integer number is called the `sign bit`.  A negative integer number in Java always has
+its sign bit turned on (1). A positive integer number always has its sign bit turned off (0). Java uses the two's
+complement formula to store negative numbers. To change a number's sign using two's complement, flip all the bits,
+then add 1 (with a byte, for example, that would mean adding 00000001 to the flipped value).
+
+Right Shift Operator:   >>
+This operator shifts all of a number's bits right by a certain number, and fills all the bits on the left side with
+whatever the original leftmost bit was. The sign bit does not change:
+```java
+int y = x >> 2;  // bits are 11111101
+```
+
+Unsigned Right Shift Operator:   >>>
+Just like the right shift operator BUT it ALWAYS fills the leftmost bits with zeros.  The sign bit might change:
+```java
+int y = x >>> 2;  // bits are 00111101
+```
+Left Shift Operator:   <<
+Just like the unsigned right shift operator, but in the other direction; the rightmost bits are filled with zeros.
+The sign bit might change.
+```java
+int y = x << 2;  // bits are 11010100
+```
+
+##### Immutability
+

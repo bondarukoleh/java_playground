@@ -234,7 +234,8 @@ Servlets vs JSP. In the end, the web server turns a JSP into a servlet, but the 
 With a servlet, developer write a Java class that contains HTML in the output statements (if you're sending back an HTML
 page to the client). But with a JSP, it's the opposite-you write an HTML page that contains Java code!
 Another "super" way to write front end with Java.
-Servlets and JSPs are not part of the Java language, they're considered standard extensions.
+Servlets and JSPs are not part of the Java language, they're considered standard extensions. You need some sort of 
+servers that has it. Like apache.
 
 RMI is great for writing and running remote services. But you wouldn't run something like an Amazon or eBay on RMI alone.
 For a large, deadly serious, enterprise application, you need something more. 

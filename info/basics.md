@@ -220,6 +220,12 @@ Default	                  Y	              Y	                        N           
 Protected	              Y	              Y	                        Y                          N
 Public	                  Y	              Y	                        Y                          Y
 
+private - can be used with nested classes, state, behavior 
+default - can be used with nested classes, state, behavior, class declaration
+protected - can be used with nested classes, state, behavior. Also, subclass cannot invoke protected superclass stuff,
+    it has to inherit them only. 
+public - can be used with nested classes, state, behavior.
+
 DO use inheritance when one class is a more specific type of superclass.
 DO use inheritance when behavior that should be shared among multiple classes of the same general type.
 DO NOT use inheritance so child can reuse code from another class, if the relationship between the superclass and
@@ -652,8 +658,6 @@ c.set(Calendar.DATE, 1);
 System.out.println("set to 1 " + c.getTime()); // set to 1 Sun Feb 01 16:40:30 CET 2004
 ```
 
-
-
 ##### varargs
 Variable number of arguments. Before this feature - variable-length arguments could be handled two ways. Using
 overloaded method(one for each) or put the arguments into an array, and then pass this array to the method.
@@ -791,4 +795,83 @@ int y = x << 2;  // bits are 11010100
 ```
 
 ##### Immutability
+Strings are immutable
+Whenever you make a new String, the JVM puts it into a special part of memory called the 'String Pool'. If there is
+already a String in the String Pool with the same value, the JVM doesn't create a duplicate, it simply refers your 
+reference variable to the existing entry. This is safe because strings are immutable, so you cannot change a String's
+value. Means when you assign a new string to var - it simply either changes your reference to existing one in pool or 
+create a new one. The other issue with the String pool is that the Garbage Collector doesn't go there. So all your 
+strings will waste your memory if you don't use them.
+To use this feature to save memory, we can use StringBuilder.
+
+Primitive wrappers are also immutable.
+Integer iWrap = new Integer(42); That's it, its value will always be 42. There is no setter method for a wrapper object.
+You can, of course, refer iWrap to a different wrapper object, but then you'll have two objects. Once you create a
+wrapper object, there's no way to change the value of that object!
+
+String and StringBuffer/StringBuilder
+These are more efficient than String because they can change their value. You should use the StringBuilder class instead
+of StringBuffer, unless your String manipulations need to be thread-safe.
+
+`Assertions`
+At runtime, if you do nothing, the assert statements you added to your code will be ignored by the JVM, and won't slow
+down your program. But if you tell the JVM to enable your assertions, they will help you do your debugging, without
+changing a line of code!
+```java
+// if true, program continues normally if false, throw an AssertionError
+assert (height > 0) : "actual height = " + height + ". But it should be above 0";
+```
+The expression after the colon can be any legal Java expression that resolves to a non-null value.  
+But whatever you do, don't create assertions that change an object's state, it will mess your assert run state with 
+regular programm run.
+```java
+// To run compiled class with assertions:
+java -ea TestDriveGame
+```
+
+`multidimensional arrays`
+```java
+int [][] multi = new int[3][2];
+multi[2] = new int[5];
+multi[2][0] = 1;
+int[] subMulti = multi[2];
+int [][] multi2 = {{1,2,3}, {1,2}};
+```
+
+##### Enumerations (also called Enumerated Types or Enums)
+Enum - is a special kind of class. 
+When you create an enum, you're creating a new class, and you're implicitly extending java.lang.Enum.
+We can compare enum instances using either == or the .equals() method.
+
+```java
+enum SimplePersons {
+    BOBBY,
+    JOHN
+}
+
+// More complicated but more functionality version
+enum PersonEnum {
+    JERRY("JERRY"),
+    PHIL("Phil"){
+        @Override
+        public void tellAboutYOurSelf() {
+            System.out.println("I'm a plumber.");
+        }
+    };
+
+    private String name;
+    PersonEnum(String name) {
+        this.name = name;
+    }
+
+    public void sayHello(){
+        System.out.printf("Hi! I'm %s. \n", name);
+    }
+
+    public void tellAboutYOurSelf(){
+        System.out.println("I don't do much.");
+    }
+}
+```
+
 

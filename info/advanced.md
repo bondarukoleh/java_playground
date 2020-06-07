@@ -81,6 +81,28 @@ artificial. A JPanel, for example, is usually used as a background for grouping 
 can be interactive. Just as with other components, you can register for the JPanel's events including mouse clicks and 
 keystrokes. JFrame, JPanel - background, JButton, JTextField - interactive. 
 
+##### Nested classes
+Can be static and anonymous and regular.
+Regular nested classes also called inner classes. So all inner classes are nested but not all nested classes are inner.
+Static classes have access only to parent static state and behavior.
+```java
+public class FooOuter {
+    private int instanceValue = 1;    
+    private static int staticValue = 2;    
+
+    static class BarInner { 
+        void getParentStaticState() {System.out.printf("static state: %s", FooOuter.staticValue);}
+//        void getParentInstanceState() {System.out.printf("instant state: %s", instanceValue);} // error
+    }
+}
+class Test {
+    public static void main (String[] args) {
+        FooOuter.BarInner foo = new FooOuter.BarInner(); // getting inner static class via Parent class
+        foo.getParentStaticState();
+    }
+}
+```
+
 #### Inner classes
 Can use everything from outside class, as it were theirs and vise versa, outer have access to inner's private.
 Exception from the rule - inner class declared in outer static method.
@@ -91,6 +113,24 @@ Outer and inner are specially bounded on the heap.
  but with different behavior, fo example you want a few action listeners of some event with same callback but too diff
  behavior to place it in one callback - implement them in inner classes.
 - Also, do not forget that inner cass can extend any class it wants, while outer class is free to extend something else.
+
+Anonymous inner classes is when you create class just where you need it to use.  
+```java
+interface IAnimal {
+    public void eat();
+}
+class PETAWorker {
+    public void saveAnimal(IAnimal animal){}
+}
+class SomeWhereAtTheStreet {
+    public static void main(String[] args) {
+        /* new IAnimal(){} - means declare and create instance of the class that implements IAnimal interface */
+        new PETAWorker().saveAnimal(new IAnimal() {
+            public void eat(){} 
+        });
+    }
+} 
+```
 
 #### Saving/restoring the object state
 Several ways to save the state (we don't have DB for now):

@@ -1,5 +1,7 @@
 package src;
 
+import java.util.Arrays;
+
 public class TestArr {
     public static void main(String[] args) {
         Dog[] dogs = new DogsFarm().getDogsArr();
@@ -55,5 +57,20 @@ class DogsFarm {
             System.out.println(dog);
         }
         return dogs;
+    }
+}
+
+class MultiDimensionalArr {
+    public static void main(String[] args) {
+        Dog [][] dogsAndPuppies = {new Dog[] {new Dog("Sheppard", "Joe"), new Dog("Sheppard", "Lisa")}};
+        Dog secondPuppy = dogsAndPuppies[0][1];
+        int [][] multi = new int[3][2];
+        multi[2] = new int[5];
+        multi[2][0] = 1;
+        int[] subMulti = multi[2];
+        int [][] multi2 = {{1,2,3}, {1,2}};
+        for(int [] sub : multi){
+            System.out.println(Arrays.toString(sub));
+        }
     }
 }

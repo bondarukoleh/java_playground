@@ -103,8 +103,8 @@ mvn help:effective-pom; # will show current state of your pom.xml
 ``` 
 
 ```xml
-<myPoperty>My_Property_value</myPoperty>
-<version>${project.myPoperty}-beta</version>
+<myProperty>My_Property_value</myProperty>
+<version>${project.myProperty}-beta</version>
 ```
 You can get some properties of your project with template string syntax ${}.
 
@@ -137,8 +137,8 @@ Some settings in pom.xml don't have serious impact, and cary only informative se
 name, url, organization, developer, timezone, email, id, role, licence, distribution...
 
 Dependencies.
-Before the maven - you need to download locally all dependencies for your project, which was not effective.
-Maven can manage it for you. All popular dependencies maven stores on his repository (like npm) in .jar files.
+Before the maven - you needed to download locally all dependencies for your project, which was not effective.
+Maven can manage it for you. All popular dependency maven stores on his repository (like npm) in .jar files.
 All dependencies in the repository, same as you project has coordinates, identification:
 groupId (backwards url), artifactId (name of dependency), and version. With this you can add package you want to 
 your project with a pom.xml
@@ -173,11 +173,11 @@ All dependencies (packages) lies globally in ~/.m2/repository (like global node 
 maven plugins also in this folder.
 All packages are in a hierarchy groupId > artifactId > version.
 
-You have ability to add optional dependency. 
+You have ability to add optional dependency.
 For example there is a big project (or yours), with a lot of functionality, and developers decided that not all
 functionality of this project will often be used, or they force user of their project to use his implementation of some
 module, and for some specific functionality - they make dependencies optional.
-When someone will add this project in his pom as a dependency, maven automatically install all not-optional dependencies
+When someone will add this project to his pom as a dependency, maven automatically install all not-optional dependencies
 from his repo, and optional won't be installed.
 When you will use this specific functionality - you'll need to add dependency to your pom with your hands.
 Something like peer dependency in npm, it assumes that you have this already in your local .m2 folder, or you need to 
@@ -370,8 +370,8 @@ activation - tag helps to activate needed profile depends on environment where p
       </activation>
 ```
 Filtering resources
-When you want to give ability user of your project customize some properties - you can add in recources
-folder something with contend depend on your pom properties tags.
+When you want to give ability user of your project customize some properties - you can add in resources
+folder something with contend depend on your pom properties tags. Like some texts file with:
 ```text
 dbPassword=${db.pass}
 ```
@@ -390,5 +390,9 @@ in pom:
     </resources>
 </build>
 ```
-That gives ability to change dbPassword=${db.pass} to dbPassword=1234
+That gives ability to change dbPassword=${db.pass} to dbPassword=1234 in that text file.
+Or pass it during the recources phase
+```shell script
+mvn resources:resources -Ddb.pass="1234"
+```
 

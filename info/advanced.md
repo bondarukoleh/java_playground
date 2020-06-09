@@ -399,3 +399,5 @@ public void someMethod(){
 
 static synchronized void(){}
 ```
+
+Spring - framework, written on java.

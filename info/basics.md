@@ -5,6 +5,12 @@ Compile a code:
 javac ./src/Test.java
 ```
 
+When java application starts
+```shell script
+java.exe               -ea                              Myclass         "My string argument"            
+#        (flags for VM, e.g. enable assertions) (Class I want to run)   main(String args[])
+```
+
 jar and war
 These files are simply zipped files using the java jar tool. These files are created for different purposes.
 Here is the description of these files:

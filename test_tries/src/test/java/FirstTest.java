@@ -1,3 +1,4 @@
+import org.hamcrest.Matcher;
 import org.junit.*;
 import org.junit.rules.Timeout;
 
@@ -59,8 +60,7 @@ public class FirstTest {
         throw new RuntimeException();
     }
 
-
-
+    @Ignore
     @Test
     public void longLongRunningTest() {
         while (true);

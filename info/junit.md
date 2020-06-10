@@ -50,3 +50,16 @@ If you want to fail the test with some condition - throw AssertionError.
 public Timeout globalTimeout = new Timeout(3000); // 10 seconds max per test method
 // Rule will override the annotation argument. Rule applies to all test cases in the test class
 ```
+
+Design by contract, means we are adding assertions inside the code, and they check all main point in our program. Like 
+incoming arguments, and outgoing data. When we want to check system - we turn on the flag to run with assertions and
+system will check itself. If unit test tests from outside the method, design by contract asserts will check the code from
+the inside, which is cool. 
+
+Imperative style, where you strictly say what are you doing.  
+Declarative - it's a describing the situations rather strict orders.
+DSL - domain specific language.
+ External DSL - when you are using different from your base project language to solve some of your business needs,
+ e.g. in Java app use Python to compute something.
+ Internal DSL - when you creating your own specific language for your needs. Not mandatory to create your own language
+ and compiler, but you can some how create your own style of writing that will be different from common. 

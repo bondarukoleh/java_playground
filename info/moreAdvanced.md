@@ -121,7 +121,8 @@ collection constructor. So collection knows how it can sort values.
 ##### Generics
 Almost all the code you write that deals with generics will be collection-related code.
 The main point of generics is to let you write type-safe collections. Code that makes the compiler stop you from putting
-a Dog into a list of Ducks. Usually, except some special cases it named "T" as a type declaration. 
+a Dog into a list of Ducks. Usually, except some special cases it named "T" as a type declaration.
+Generics - means your code will work with some type T. T is not defined, it will be defined on in the runtime.
 
 In generic `extends` - means ```extends or implements```, little soft typing, at least something.
 
@@ -163,6 +164,9 @@ public <T extends Animal> void takeThing(ArrayList<T> one, ArrayList<T> two)
 // instead of:
 public void takeThing(ArrayList<? extends Animal> one, ArrayList<? extends Animal> two)
 // you cannot do something like class A<? extends B> - not here. 
+// also another type of method. It can get some type, and next generic typed with anything that extends passed that,
+// we don't know for sure what it is, but will know it in runtime. 
+public <T> doSomething(T arg, SomeOtherGeneric<? extends T> other){}
 ```
 ArrayList< T > list - can be used because it is declared in method declaration before the returned type.
 Special construction if class doesn't declare any generic type, but you still want to declare some generic just for the 

@@ -63,3 +63,7 @@ DSL - domain specific language.
  e.g. in Java app use Python to compute something.
  Internal DSL - when you creating your own specific language for your needs. Not mandatory to create your own language
  and compiler, but you can some how create your own style of writing that will be different from common. 
+ 
+JUnit Matcher - it's a predicate, function that expects argument but returns boolean. 
+
+In Java, if something has utilities, it will be in class with "S" ending. Array, utilities for Array  in Arrays.

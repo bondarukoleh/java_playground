@@ -166,8 +166,8 @@ public void takeThing(ArrayList<? extends Animal> one, ArrayList<? extends Anima
 ```
 ArrayList< T > list - can be used because it is declared in method declaration before the returned type.
 Special construction if class doesn't declare any generic type, but you still want to declare some generic just for the 
-specific method. This method says that T can be "any type of Animal", means it's ready to work with any kind of array lists
-that typed Animal or any subtype of Animal.
+specific method. This method says that T can be "any type of Animal", means it's ready to work with any kind of array 
+lists that typed Animal or any subtype of Animal.
 ```java
 // !!!Pay attention, this:
 public <T extends Animal> void takeThing(ArrayList<T> list){}

@@ -725,14 +725,15 @@ Restrictions:
             System.out.println("NOT YET!");
         }
 ```
- 
-Throwable ->
- Exception ->
-  IOException
-  InterruptedException
-  RuntimeException -> 
-    ClassCastException
-    NullPointerException 
+
+Throwable ->\
+ Error (unchecked)\
+ Exception (checked) -> \
+    IOException
+    InterruptedException
+    RuntimeException (unchecked)  -> 
+        ClassCastException
+        NullPointerException 
 
 
 ##### Bit Manipulation

@@ -1,22 +1,28 @@
-import org.hamcrest.Matcher;
 import org.junit.*;
-import org.junit.rules.Timeout;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
-import static org.hamcrest.core.Is.is;
 
 public class FirstTest {
     static String commonErrorText = "Result should be %s";
     static int expectedResult;
     static int actualResult;
-    Calculator calculator;
+    Calculator calculator = new Calculator();
 
 //    @Rule
 //    public Timeout globalTimeout = new Timeout(3000); // 10 seconds max per test method
 
-    public FirstTest() {
-        System.out.println("NEW INSTANCE");
-        this.calculator = new Calculator();
+    @BeforeClass
+    public static void beforeSomething(){
+        System.out.println("This is before class 1");
+    }
+
+    @BeforeClass
+    public static void beforeSomething2(){
+        System.out.println("This is before class 2");
     }
 
     @Before
@@ -64,6 +70,18 @@ public class FirstTest {
     @Test
     public void longLongRunningTest() {
         while (true);
+    }
+
+    @Test
+    public void hasItemTest() {
+        ArrayList<String> list = new ArrayList<>(Arrays.asList("A", "B"));
+        assertThat(list, hasItem("CC"));
+    }
+
+    @Test
+    public void hasItemsTest() {
+        ArrayList<String> list = new ArrayList<>(Arrays.asList("A", "B"));
+        assertThat(list, allOf(hasItem("A"), hasItem("B")));
     }
 
     private String getErrorMessage(String result){

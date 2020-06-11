@@ -5,12 +5,12 @@ something that depends on another thing separately, it won't give you confident 
 
 JUnit 4
 in org.junit.Test.
-Framework for testing. All frameworks has some amound of abstractions that you can use.
-JUnit has runner to run the tests.
+Framework for testing. All frameworks have some amount of abstractions that you can use.
+JUnit has a `runner` to run the tests.
 Since Java (jvm) knows how to run only main() method - and you want to run test methods somewhere else, this Runner has
 his main, and JVM will run his main(), from what there will be invocations of your test methods.
 So when you are running from IDE - IDE runs the JUnit, JUnit runs his (or your own, if you setup) runner, runner runs 
-methods tells JUnit, JUnit tells IDE, IDE show the results.
+methods tells JUnit, JUnit tells IDE, IDE show the results. IDE somehow listen the JUnit.
 So when you need to add, or use your own runner with some specific fail conditions, or maybe that will run in 10000 
 threads, you can extend JUnit runner, or find something in internet and run JUnit with your own runner.
 
@@ -34,10 +34,18 @@ clear and fancy than JUnit.
 
 On CI server should understand junit outcome, and fail or pass the build.
 
-Tests are independent in JUnit, one fail doesn't stop the run. For each test method JUnit creates separate instance of 
-the application (so far I get);
+Tests are independent in JUnit, one fail doesn't stop the run.
+For each test method JUnit creates separate instance of the Testing class;
 
-If you trying by TDD write tests first and understand that it's too hard to write them on your functionality, it's a 
+JUnit single run
+@BeforeClass (once by class, all methods should be static)
+TestClass constructor()
+@Before (all methods, for each @Test annotated)
+@Test (all methods)
+@After
+@AfterClass
+
+If you try by TDD write tests first and understand that it's too hard to write them on your functionality, it's a 
 bell that you have too complicated and confusing API of your functionality.
 
 JUnit think that test is broken if there is an unexpected exception during the run or timeout is out.
@@ -64,6 +72,45 @@ DSL - domain specific language.
  Internal DSL - when you creating your own specific language for your needs. Not mandatory to create your own language
  and compiler, but you can some how create your own style of writing that will be different from common. 
  
-JUnit Matcher - it's a predicate, function that expects argument but returns boolean. 
+JUnit Matcher - it's a predicate, function that expects argument but returns boolean.
+Matcher - it's a collection of predicates that you want to run on your data, and depend on what you choose ther could
+be allOf() means concatenated with && sign, or anyOf() via ||, either, both, hasItem, equalTo, not, startsWith, etc. 
+Matcher has method matches, and expected value as a state. 
+JUnit will use matcher.match(actual) and pass actual value in it.
+Hamcrest good that he has a lot of matchers, so you can use predefined.
+You can create own matchers that is applicable for your needs. e.g. BasketShopMatcher.isEmpty()
 
 In Java, if something has utilities, it will be in class with "S" ending. Array, utilities for Array  in Arrays.
+
+Parametrised test
+If you have same test with a lot of different arguments. Then you need to create method that will return Iterable
+and get the data from it in test.
+```java
+@RunWith(Parameterized.class) // Means do not run with default @RunWith(JUnit4.class), but with another runner
+public class ParameterizedTest {
+    private final int actual;
+    private final int expected;
+
+    public ParameterizedTest(int actual, int expected){
+        this.actual = actual;
+        this.expected = expected;
+    }
+
+    @Parameterized.Parameters
+    public static Iterable<Object[]> data() {
+        return Arrays.asList(new Object[][]{{3, 4}, {2, 5}});
+    }
+
+    @Test
+    public void test() {
+        assertThat(actual, not(expected));
+    }
+}
+```
+@RunWith(Parameterized.class) runner can use a diff arguments with one method @RunWith(Theory.class) runner lets you
+use diff arguments with diff methods.
+
+
+
+Good test framework have to use declarative style, if it uses imperative, it will be a lot of code and logic pollution
+in the tests. They will be more difficult to understand.

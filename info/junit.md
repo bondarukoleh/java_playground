@@ -87,6 +87,7 @@ If you have same test with a lot of different arguments. Then you need to create
 and get the data from it in test.
 ```java
 @RunWith(Parameterized.class) // Means do not run with default @RunWith(JUnit4.class), but with another runner
+/* We need to pass class, because we have to use metadata about the class, because of reflection */
 public class ParameterizedTest {
     private final int actual;
     private final int expected;
@@ -110,7 +111,23 @@ public class ParameterizedTest {
 @RunWith(Parameterized.class) runner can use a diff arguments with one method @RunWith(Theory.class) runner lets you
 use diff arguments with diff methods.
 
-
-
 Good test framework have to use declarative style, if it uses imperative, it will be a lot of code and logic pollution
 in the tests. They will be more difficult to understand.
+
+All JUnit's annotations can be replaced with classes/Interfaces Test, Assert and so on, but annotations is easier.   
+
+You can gather test and testSuites in more suites. In Suite classes there no need to test something, you can setup here
+something and teardown
+```java
+@RunWith(Suite.class)
+@Suite.SuiteClasses({UserSuiteTest.class, LoginSuiteTest.class})
+public class AllSuiteTest {
+    @Before
+    public void setup(){}
+    @After
+    public void teardown(){}
+}
+```
+
+JMock, Mockito let you create mock/spy objects, that will give you all information about interoperation with your test 
+object, where, what, how many, with what it is invoked.

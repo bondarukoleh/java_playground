@@ -1,10 +1,12 @@
 import org.junit.*;
 
+import java.nio.file.FileStore;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 public class FirstTest {
     static String commonErrorText = "Result should be %s";
@@ -82,6 +84,13 @@ public class FirstTest {
     public void hasItemsTest() {
         ArrayList<String> list = new ArrayList<>(Arrays.asList("A", "B"));
         assertThat(list, allOf(hasItem("A"), hasItem("B")));
+    }
+
+    @Test
+    public void failTest() {
+        if(true){
+            fail("I know that something goes wrong here");
+        }
     }
 
     private String getErrorMessage(String result){

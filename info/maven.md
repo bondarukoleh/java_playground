@@ -384,15 +384,18 @@ in pom:
 <build>
     <resources>
        <resource>
-       <directory>${basedir}\src\main\resources</directory>
+       <directory>${project.basedir}\src\main\resources</directory>
           <filtering>true</filtering>
        </resource>
     </resources>
 </build>
 ```
 That gives ability to change dbPassword=${db.pass} to dbPassword=1234 in that text file.
-Or pass it during the recources phase
+Or pass it during the resources phrase.
 ```shell script
 mvn resources:resources -Ddb.pass="1234"
 ```
+Predefined maven variables:
+${project.basedir} is the root directory of your project.
+${project.build.directory} is equivalent to ${project.basedir}/target
 

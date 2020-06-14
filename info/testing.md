@@ -131,3 +131,13 @@ public class AllSuiteTest {
 
 JMock, Mockito let you create mock/spy objects, that will give you all information about interoperation with your test 
 object, where, what, how many, with what it is invoked.
+
+##### Rest assured.
+```java
+// Can be written in BDD style
+when().get("http://something.com/1").then().bondy("property_name", is("property_value"));
+// Or TDD
+RequestSpecBuilder builder = new RequestSpecBuilder();
+builder.setBaseUrl("http://something.com");
+assertThay(RestAssured.given().spec(builder.build()).get("/1").getBody().jsonPath().get("property_name"), is("property_value"))
+```

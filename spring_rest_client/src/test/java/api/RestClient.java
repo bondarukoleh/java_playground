@@ -18,8 +18,8 @@ public class RestClient {
 //        HttpHeaders headers = new HttpHeaders();
 //        headers.set("Authorization", "token ");
 //        HttpEntity entity = new HttpEntity(headers);
-        ResponseEntity<T> responseEntity = restTemplate.getForEntity(url, type);
-        return responseEntity.getBody();
+        return restTemplate.getForObject(url, type);
+//        return responseEntity.getBody();
     }
 
     private void log(String url){

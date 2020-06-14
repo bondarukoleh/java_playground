@@ -10,5 +10,9 @@ public class GitAPIData {
     public String getUsersUrl() {
         return mainUrl + "users/" ;
     }
+
+    public String getGistsUrl() {
+        return mainUrl + "gists" ;
+    }
 }
 

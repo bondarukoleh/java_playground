@@ -1,9 +1,12 @@
 package models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.io.Serializable;
 
 public class GitUser implements Serializable {
-    public String login;
+    @JsonProperty("login")
+    private String loginName;
     private Integer id;
     private String avatar_url;
     private String followers_url;
@@ -16,7 +19,7 @@ public class GitUser implements Serializable {
 
     public GitUser() {}
 
-    public GitUser(String login,
+    public GitUser(String loginName,
                    Integer id,
                    String avatar_url,
                    String followers_url,
@@ -26,7 +29,7 @@ public class GitUser implements Serializable {
                    String name,
                    String bio,
                    Integer public_repos) {
-        this.login = login;
+        this.loginName = loginName;
         this.id = id;
         this.avatar_url = avatar_url;
         this.followers_url = followers_url;
@@ -39,11 +42,11 @@ public class GitUser implements Serializable {
     }
 
     public String getLoginName() {
-        return login;
+        return loginName;
     }
 
     public void setLoginName(String loginName) {
-        this.login = loginName;
+        this.loginName = loginName;
     }
 
     public Integer getId() {
@@ -121,7 +124,7 @@ public class GitUser implements Serializable {
     @Override
     public String toString() {
         return "User{" +
-                "loginName='" + login + '\'' +
+                "loginName='" + loginName + '\'' +
                 ", id=" + id +
                 ", avatar_url='" + avatar_url + '\'' +
                 ", followers_url='" + followers_url + '\'' +

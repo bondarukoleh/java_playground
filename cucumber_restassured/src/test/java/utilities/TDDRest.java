@@ -43,4 +43,9 @@ public class TDDRest {
         request.pathParams(params);
         return request.get("{path}/{postIdLALA}", path);
     }
+
+    public Response post(String path, HashMap<String, String> body) {
+        request.body(body);
+        return request.post("/{p}", path);
+    }
 }

@@ -881,4 +881,5 @@ enum PersonEnum {
 }
 ```
 
-
+When you have breakpoint, you can call "Evaluate expression" on line where you paused, and try to run some methods of
+the debagging variables.

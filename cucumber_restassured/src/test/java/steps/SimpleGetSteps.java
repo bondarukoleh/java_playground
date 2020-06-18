@@ -4,6 +4,7 @@ package steps;
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
+import utilities.BDDRest;
 
 public class SimpleGetSteps {
     private String path;

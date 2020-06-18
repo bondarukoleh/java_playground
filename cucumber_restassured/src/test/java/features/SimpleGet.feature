@@ -21,5 +21,7 @@ Feature:
     Then I should see the post object
 
   Scenario: Get with TDD style
-    Given I send TDD GET to "posts" endpoint
-    Then I should get posts
+    Given Sending GET to "posts" endpoint
+    And Post id is "2"
+    When GET request is send
+    Then I should get post with author "Oleh"

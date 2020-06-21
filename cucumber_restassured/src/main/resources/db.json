@@ -29,6 +29,12 @@
       "text": "This is a new post 1",
       "title": "This is post title 1",
       "id": 6
+    },
+    {
+      "author": "Oleh (Me) 1",
+      "text": "This is a new post 1",
+      "title": "This is post title 1",
+      "id": 7
     }
   ],
   "comments": [
@@ -48,9 +54,12 @@
       "postId": 3
     }
   ],
-  "profile": {
-    "name": "Some profile"
-  },
+  "profile": [
+    {
+      "profileName": "Oleh something something",
+      "id": 2
+    }
+  ],
   "address": {
     "street": "Some Street"
   }

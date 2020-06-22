@@ -1,14 +1,13 @@
-// Got damn peace of shit this cucumber is. Lord what a poor crap :(
-package steps;
+// Got damn peace of *** this cucumber is. Lord what a poor crap :(
+package steps.get;
 
 import cucumber.api.java.en.And;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
+import steps.BaseSteps;
 import utilities.BDDRest;
 
-public class SimpleGetSteps {
-    private String path;
-    private int postId;
+public class SimpleGetSteps extends BaseSteps {
     private BDDRest bddRest = new BDDRest();
 
     @Given("^I send GET to \"([^\"]*)\" endpoint$")

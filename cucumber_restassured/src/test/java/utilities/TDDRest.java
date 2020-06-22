@@ -64,8 +64,7 @@ public class TDDRest {
     }
 
     public Response post(String path,  HashMap<String, String> pathParams, HashMap<String, String> body) throws URISyntaxException {
-        request.pathParams(pathParams);
         request.body(body);
-        return request.post(path);
+        return request.post("/{path}", path);
     }
 }

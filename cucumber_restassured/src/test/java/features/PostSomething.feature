@@ -9,9 +9,9 @@ Feature: Post scenarios
 
 # what the hell is this, omg...
   Scenario: Posting to a different entities
-    Given POST for "/profile"
+    Given POST for "profile"
     And message body is
       | profileName | id |
-      | Oleh something 2 | 2 |
+      | Oleh something 3 | 3 |
     When I'm send POST request
-    Then I should GET the profile with ID: "2" and check that Profile name is "Oleh something 2"
+    Then I should GET the profile with ID: "3" and check that Profile name is "Oleh something 3"

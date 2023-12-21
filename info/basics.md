@@ -66,59 +66,59 @@ Remember primitives passed by value, mean they passed by a copy, don't forget th
 ##### boolean char byte short int long float double
 
 Type       Bit Depth    Value Range
-boolean and char
-boolean   (NM-specific) true or false
-char        16 bits     O to 65535
-numeric (all are signed)
-integer
-byte        8 bits      -128 to 127
-short      16 bits      -32768 to 32767
-int        32 bits      -2147483648 to 2147483647
-long       64 bits      -huge to huge
+boolean and char \
+boolean   (NM-specific) true or false \
+char        16 bits     O to 65535 \
+numeric (all are signed) \
+integer \
+byte        8 bits      -128 to 127 \
+short      16 bits      -32768 to 32767 \
+int        32 bits      -2147483648 to 2147483647 \
+long       64 bits      -huge to huge 
 
-floating point
-float       32 bits    varies
-double      64 bits    varies
-Primitive declarations with assignments:
-int x;
-x = 234;
-int z = x;
-byte b = 89;
-boolean isFun = true;
-double d = 3456.98;
-char c = 'f';
-boolean isPunkRock;
-isPunkRock = false;
-boolean powerOn;
-powerOn = isFun;
-long big = 3456789;
+floating point \
+float       32 bits    varies \
+double      64 bits    varies \
+
+Primitive declarations with assignments: \
+int x; \
+x = 234; \
+int z = x; \
+byte b = 89;  \
+boolean isFun = true;  \
+double d = 3456.98;  \
+char c = 'f';  \
+boolean isPunkRock;  \
+isPunkRock = false;  \
+boolean powerOn;  \
+powerOn = isFun;  \
+long big = 3456789;  \
 float f = 32.5f; Gotta have ‘f’ with a float, Java thinks anything with a floating point is a double, unless you use ‘f’.
 
-A primitive byte: x = 7; The bits representing 7 are go into the variable. (actual value will be placed - 00000111).
+A primitive byte: x = 7; The bits representing 7 are go into the variable. (actual value will be placed - 00000111). \
 A reference type: Dog myDog = new Dog(); The bits representing a way to get to the Dog object go into the variable.
 
 final variable like const in js cannot be reassigned, even for a new object.
 
-`instance variable` - declared in class, gets default value.
-`local variable` - declared in method, and doesn't get default value, need to be initialized before used.
+`instance variable` - declared in class, gets default value. \
+`local variable` - declared in method, and doesn't get default value, need to be initialized before used. \
 A method uses `parameters`. Parameter - same as local variable with type and name, (it's declared in argument list of
-the method), and doesn't need to e initiated, since a compiler won't let you call the method without the arguments.
-A caller passes `arguments`. Argument - value. 
-You can return anything that can be implicitly promoted as `returned type`. You must use an explicit cast when the
-declared type is smaller than what you're trying to return.
+the method), and doesn't need to e initiated, since a compiler won't let you call the method without the arguments. \
+A caller passes `arguments`. Argument - value. \
+You can return anything that can be implicitly promoted as `returned type`. You must use an explicit cast when the declared type is smaller than what you're trying to return.
 
 ##### Encapsulation
 About hide the data and make some checks (set the appropriate boundary values for the field, or security check)
 or changes (round, set the nearest acceptable value, make some action) before saving it in an instance, or make some
 checks or changes before you return the data from the instance.     
 
-Point of getters setters, is an ability to change the behaviour of the instance without changes the code what interacts
-with it, so the API of the instance will remain the same while behaviour will change. 
+Point of getters setters, is an ability to change the behavior of the instance without changes the code what interacts
+with it, so the API of the instance will remain the same while behavior will change. 
 
-Default values for variables:
-Number primitives byte,short,int,long,Char/float,double   0/0.0
-boolean                                                   false
-reference                                                 null
+Default values for variables: \
+Number primitives byte,short,int,long,Char/float,double   **0/0.0** \
+boolean                                                   **false** \
+reference                                                 **null**
 
 ##### Comparing variables.  
 == used only for comparing bits in variables, they either equal or not.
@@ -133,14 +133,14 @@ a == b looks at the bits in a and b and returns true if the bit pattern is the s
 the variable, so all the extra zeroes on the left end don't matter.
 
 Creation of the class:
-□   Figure out what the class is supposed to do.
-□   List the instance variables and methods.
-□   Write pseudocode for the methods. (You'll see this in just a moment.)
-□   Write test code for the methods.
-□   Implement the class.
-□   Test the methods.
-□   Debug and reimplement as needed.
-□   Express gratitude that we don't have to test our so-called learning experience app on actual live users.
+*   Figure out what the class is supposed to do.
+*   List the instance variables and methods.
+*   Write pseudocode for the methods. (You'll see this in just a moment.)
+*   Write test code for the methods.
+*   Implement the class.
+*   Test the methods.
+*   Debug and reimplement as needed.
+*   Express gratitude that we don't have to test our so-called learning experience app on actual live users.
 
 Cast
 To force the compiler to jam the value of a bigger primitive variable into a smaller one, you can use the cast operator.
@@ -160,14 +160,14 @@ int x = (int) f;   //  3
 ```
 
 ##### Collection
-ArrayList
-add(Object elem) - add object parameter
-remove(Object elem) - remove object parameter
-remove(int index) - remove object at an index
-contains(Object elem) - return true if there's a match for the object parameter 
-isEmpty() - return true if list has no elements
-indexOf(Object elem) - returns either index of elem in list or -1
-size() - returns list length
+ArrayList \
+add(Object elem) - add object parameter \
+remove(Object elem) - remove object parameter \
+remove(int index) - remove object at an index \
+contains(Object elem) - return true if there's a match for the object parameter  \
+isEmpty() - return true if list has no elements \
+indexOf(Object elem) - returns either index of elem in list or -1 \
+size() - returns list length \
 get(int index) returns object at index parameter
 
 ArrayList comparing to Array:
@@ -220,33 +220,34 @@ But when classes are related, not inherited from each other, they have a HAS-A r
 Wolf IS-A WolfPride - no, WolfPride IS-A Wolf, nah, but WolfPride HAS-A wolf -> yes, means WolfPride has a reference to
 wolf.
 
-Access Modifier 	within class	within package	  outside package by subclass only	   outside package
-Private	                  Y	              N	                        N	                       N
+<pre>
+Access Modifier    within class	   within package	outside package by subclass only	  outside package
+Private	                  Y	              N	                        N	                      N
 Default	                  Y	              Y	                        N                          N
-Protected	              Y	              Y	                        Y                          N
+Protected                Y	              Y	                        Y                          N
 Public	                  Y	              Y	                        Y                          Y
-
-private - can be used with nested classes, state, behavior 
-default - can be used with nested classes, state, behavior, class declaration
+</pre>
+private - can be used with nested classes, state, behavior \
+default - can be used with nested classes, state, behavior, class declaration \
 protected - can be used with nested classes, state, behavior. Also, subclass cannot invoke protected superclass stuff,
-    it has to inherit them only. 
+    it has to inherit them only. \
 public - can be used with nested classes, state, behavior.
 
-DO use inheritance when one class is a more specific type of superclass.
-DO use inheritance when behavior that should be shared among multiple classes of the same general type.
+DO use inheritance when one class is a more specific type of superclass. \
+DO use inheritance when behavior that should be shared among multiple classes of the same general type. \
 DO NOT use inheritance so child can reuse code from another class, if the relationship between the superclass and
-    subclass violate either of the above two rules.
+    subclass violate either of the above two rules. \
 DO NOT use inheritance if the subclass and superclass do not pass the IS-A test. Always ask yourself subclass IS-A more
     specific type of the superclass.
 
 Methods can be overridden with same signature but variables - cannot. Means, if you put in parent class type variable
-child class type instance it will have behaviour of the child but state of the parent. Parent field hides re-declared
+child class type instance it will have behavior of the child but state of the parent. Parent field hides re-declared
 field in the child class. This has several reasons:
 1. Because overriding variables can break code in the superclass. e.g. if an override changes the variable's type,
 that is likely to change the behavior of methods declared in the parent class that used the original variable.
-2. If fields that were overridden were not private, it would be even worse. That would break the Liskov Substitutability
+1. If fields that were overridden were not private, it would be even worse. That would break the Liskov Substitutability
 Principle (LSP) in a pretty fundamental way. That removes the basis for polymorphism.
-3. On the flipside, overriding fields would not achieve anything that cannot be done better in other ways. e.g. a good
+1. On the flipside, overriding fields would not achieve anything that cannot be done better in other ways. e.g. a good
 design declares all instance variables as private and provides getters/setters for them as required.
 The getters/setters can be overridden, and the parent class can "protect" itself against undesirable overrides by
 using the private fields directly, or declaring the getters/setters final.
@@ -254,7 +255,7 @@ using the private fields directly, or declaring the getters/setters final.
 Some cases when you cannot inherit from class:
 1. default, or package-private, non-public class can be subclassed only by in the same package. It's not visible outside. 
 2. final class means that it's the end of the inheritance line. Nobody, ever, can extend a final class.
-    This can be done with security reasons, when you want your method should have one behaviour, because methods cannot
+    This can be done with security reasons, when you want your method should have one behavior, because methods cannot
     be overridden. Method can be final too, means it cannot be overriden.
 3. If a class has only private constructors, it can't be subclassed.
 
@@ -510,7 +511,7 @@ Some methods don't depend on object state, so they need no instance of the class
 - Non-static behavior CAN use static state and behavior.
 - You can call static methods not via class but via an instance - but this is a bad tone.
 - static variable is same for all instances of the class, it initialized when class is first time loaded, and not when
-an instance is created. Static state and behaviour lives inside a class, same and shared for all instances. Typically,
+an instance is created. Static state and behavior lives inside a class, same and shared for all instances. Typically,
 the JVM loads a class because somebody's trying to make a new instance of the class, for the first time, or use a static
 method or variable of the class.
 - All static variables in a class are initialized before any object of that class can be created.

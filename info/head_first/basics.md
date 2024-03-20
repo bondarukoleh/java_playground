@@ -105,7 +105,8 @@ final variable like const in js cannot be reassigned, even for a new object.
 A method uses `parameters`. Parameter - same as local variable with type and name, (it's declared in argument list of
 the method), and doesn't need to e initiated, since a compiler won't let you call the method without the arguments. \
 A caller passes `arguments`. Argument - value. \
-You can return anything that can be implicitly promoted as `returned type`. You must use an explicit cast when the declared type is smaller than what you're trying to return.
+You can return anything that can be implicitly promoted as `returned type`. You must use an explicit cast when the
+declared type is smaller than what you're trying to return.
 
 ##### Encapsulation
 About hide the data and make some checks (set the appropriate boundary values for the field, or security check)

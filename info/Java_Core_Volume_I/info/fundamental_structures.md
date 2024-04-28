@@ -77,6 +77,116 @@ int a = 2 * ++m; // now a is 16, m is 8
 int b = 2 * n++; // now b is 14, n is 8
 ```
 
+### Parentheses and Operator Hierarchy
+If no parentheses are used, operations are performed in the hierarchical order indicated.
+For example, `&&` has a higher precedence than `||`, so the expression
+```java
+a && b || c
+// means
+(a && b) || c
+```
+
+![operator_hierarchy](/info/Java_Core_Volume_I/info/media/Operator_hierarchy.PNG)
+
+## Strings
+Java does not have a built-in string type, instead the standard Java library contains a predefined class **String**.
+Each quoted string is an instance of the String class. \
+_Strings Are Immutable_, the String class gives **no** methods that let you change a character in an existing string. \
+Immutable strings have one great advantage: The compiler can arrange that strings are _shared_.
+
+### Testing Strings for Equality
+To test whether two strings are equal, use the `equals` method. `s.equals(t)` \
+You could use the `==` operator, but only string literals are shared, not strings that are the result of operations
+like `+` or `substring`. Never use == to compare strings. \
+If you need to test that a string is neither `null` nor empty. Then use `if (str != null && str.length() != 0)`
 
 
+### Code Points and Code Units
+The `length` method yields the number of code units required for a given string in the UTF-16 encoding, not number of `chars`
+
+### Building Strings
+Every time you concatenate strings, a new String object is constructed. **StringBuilder** class avoids this problem.
+```java
+StringBuilder builder = new StringBuilder();
+builder.append(ch); // appends a single character
+builder.append(str); // appends a string
+String completedString = builder.toString();
+```
+
+### Text Blocks
+The white space before the closing """ is significant.
+```java
+String greeting = """
+Hello
+World
+""";
+// the same as
+String greeting = "Hello\nWorld\n";
+```
+
+## Input and Output
+To read console input, you first construct a Scanner that is attached to System.in:
+```java
+Scanner in = new Scanner(System.in);
+System.out.print("What is your name? ");
+String name = in.nextLine(); /* to read one word only .next() */
+System.out.print("How old are you? ");
+int age = in.nextInt();
+System.out.println("Hello, " + name + ". Next year, you'll be " + (age + 1));
+```
+
+### Formatting Output
+```java
+System.out.printf("Hello, %s. Next year, you'll be %d", name, age);
+```
+![operator_hierarchy](/info/Java_Core_Volume_I/info/media/Formatting_output.PNG)
+
+### File Input and Output
+To read from a file, construct a Scanner object like this:
+```java
+Scanner in = new Scanner(Path.of("myfile.txt"), StandardCharsets.UTF_8);
+```
+To write to a file, construct a PrintWriter object:
+```java
+PrintWriter out = new PrintWriter("myfile.txt", StandardCharsets.UTF_8);
+```
+
+## Control Flow
+A **block**, or compound _statement_, consists of a number of Java statements, surrounded by a pair of braces. Blocks define
+the _scope_ of your variables. A block can be _nested_ inside another block. \
+You may not declare identically named local variables in two nested blocks, _shadowing_ is not allowed.
+
+Conditionals, loops, all works the same.
+
+To use statements in a branch of a `switch` expression without fallthrough, you must use braces and `yield` or `break` without braces.
+```java
+switch (something) {
+    case "Spring" ->
+        {
+            System.out.println("spring time!");
+            yield 6;
+        }    
+}
+// or
+switch (something) {
+    case "Summer", "Winter" -> 6;
+}
+// or
+switch (something) {
+    case 1:
+        // ...
+        break;
+}
+```
+
+Java also offers a _labeled break_.
+
+## Big Numbers
+If the precision of the basic integer and floating-point types is not sufficient, you can use **BigInteger** and **BigDecimal**
+from _java.math_. Unfortunately, you cannot use the familiar operators such as `+` and `*` to combine big numbers.
+```java
+BigInteger c = a.add(b); // c = a + b
+BigInteger d = c.multiply(b.add(BigInteger.valueOf(2))); // d = c * (b + 2)
+```
+## Arrays
 

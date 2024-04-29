@@ -121,7 +121,7 @@ contents of **any parameter variables passed** to it. Also, object **references 
 There are, however, two kinds of method parameters:
 - Primitive types (numbers, boolean values)
 - Object references
-
+                        
 ## Object Construction
 ### Overloading
 _overloading_ - occurs if several methods that have the **same name** but **different parameters**. The compiler must
@@ -150,8 +150,9 @@ the same class.
 You have already seen two ways to initialize an _instance field_:
 - By setting a value in a constructor 
 - By assigning a value in the declaration
-Third mechanism in Java, called an _initialization block_.
-
+Third mechanism in Java, called an _initialization block_. \
+It's legal to do opposite, but you should always place initialization blocks after the field definitions. \
+Static initialization occurs when the class is first loaded, once in a program run.
 ```java
 class Employee
 {
@@ -163,6 +164,86 @@ private String name;
     id = nextId;
     nextId++;
 }
+// static initialization block
+static {
+  nextId = generator.nextInt(10000);
+}
 public Employee(String name)
     ...
 ```
+
+### Object Destruction and the finalize Method
+Since Java does automatic garbage collection, Java does not support destructors. \
+If a resource needs to be closed as soon as you have finished using it, supply a _close_ method that does the necessary
+cleanup. \
+If you can wait until the virtual machine exits, add a “shutdown hook” with the method **Runtime.addShutdownHook**. \
+Also you can use the **Cleaner** class to register an action that is carried out when an object is no longer reachable. \
+Do not use the _finalize_ method for cleanup, you don't know exactly when it will be called, and it is **deprecated**.
+
+## Records
+### The Record Concept
+A _record_ is a special form of a class whose state is **immutable and readable** by the public.
+```java
+record Point(double x, double y) {
+    private final double x;
+    private final double y;
+    
+    Point(double x, double y){}
+    
+    public double x(){}
+    public double y(){}
+}
+```
+In the Java specification, the instance fields of a record are called its _components_. \
+Record has a constructor with parameters, and accessor methods. \
+In addition every record has three methods defined automatically: toString, equals, and hashCode. \
+You can define your own methods, and redefine automatically provided, as long as you keep signature and return type. \
+You can add a static field to the Record. \
+You cannot add instance fields to a record, they are automatically _final_ \
+
+Use a _record_ instead of a _class_ for **immutable** data that is completely represented by a set of variables.
+Use a class if the data is mutable, or if the representation may evolve over time. Records are easier to read, more
+efficient, and safer in concurrent programs.
+                        
+### Constructors: Canonical, Custom, and Compact
+The automatically defined constructor that sets all instance fields is called the _canonical_ constructor. \
+Compact, it's when you don't mention the parameters in the _records_ constructor.
+
+## Packages
+Java allows you to group classes in a collection called a _package_.
+
+### Package Names
+The main reason for using packages is to guarantee the uniqueness of class names.
+
+### Class Importation
+A class can use **all** classes **from its own** package and **all public** classes **from other** packages. \
+You can access the public classes in another package in two ways. Use the fully qualified name or the `import` statement. \
+Note that you can only use the `*` notation to import a single package. You cannot use import `java.*` or import `java.*.*`
+
+### Static Imports
+The `import` statement permits the importing of static methods and fields. \
+You can use the static methods and fields of the _System_ class without the class name prefix. \
+```java
+import static java.lang.System.*;
+out.println("Goodbye, World!"); // i.e., System.out
+```
+
+### Addition of a Class into a Package
+```java
+package com.horstmann.corejava;
+public class Employee {}
+```
+If you don’t put a `package` statement in the source file, then the classes in that source file belong to the unnamed
+package.
+```shell
+javac PackageTest.java                                       
+```
+The compiler search the Employee file com/horstmann/corejava/Employee.java and compiles it. \
+The compiler does not check the directory structure when it compiles source files, but the virtual machine won’t find
+the classes if the packages don’t match the directories.
+
+### Package Access
+If you don’t specify either _public_ or _private_, the feature (class, method, or variable) can be accessed by all 
+methods in the same package.
+
+### The Class Path

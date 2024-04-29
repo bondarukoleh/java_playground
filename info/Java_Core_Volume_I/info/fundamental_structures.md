@@ -1,3 +1,24 @@
+### Preface
+In late 1995, the Java programming language burst onto the Internet scene. \
+Java is Simple, Object-Oriented, Distributed, Robust, Secure, Architecture-Neutral, Portable, Interpreted,
+High-Performance,  Multithreaded,  Dynamic.
+
+Java Applets - The idea here is simple: Users will download Java bytecodes from the Internet and run them on their own
+machines. Java programs that work on web pages are called applets.
+
+In the early days of Java, the language was interpreted. Nowadays, the Java virtual machine uses a just-in-time compiler.
+
+## Java Programming environment
+```shell
+javac Welcome.java
+java Welcome
+```
+The `javac` program is the Java compiler. It compiles the file Welcome.java into the file Welcome.class.
+The `java` program launches the Java virtual machine. It executes the bytecodes that the compiler placed in the **class** file.
+
+The `JShell` program provides a “read-evaluate-print loop,” or REPL. To start JShell, simply type `jshell` in a terminal.
+Tab completion is a useful feature.
+
 # Fundamental Programming Structures in Java
 
 The Java virtual machine always starts execution with the code in the main method in the class you indicate.
@@ -7,13 +28,13 @@ Java is a _strongly typed language_. There are **eight** primitive types in Java
 byte, int, short, long, float, double, char, boolean. 
 
 ### Integer Types
-![integer_types](/info/Java_Core_Volume_I/info/media/Integer_types.PNG)
+![integer_types](/info/Java_Core_Volume_I/info/media/fundamentals/Integer_types.PNG)
 
 In most situations, the `int` type is the most practical. `long` integer numbers have a suffix **L** or **l** (e.g. 4000000000L).
 You can add underscores to number literals, the underscores are for human eyes only.
 
 ### Floating-Point Types
-![floating_types](/info/Java_Core_Volume_I/info/media/Floating_types.PNG)
+![floating_types](/info/Java_Core_Volume_I/info/media/fundamentals/Floating_types.PNG)
 
 `float` have a suffix **F** or **f** (e.g. 3.14F). Floatingpoint numbers without an F suffix considered to be `double`.
 You can optionally supply the **D** or **d** suffix.
@@ -50,7 +71,7 @@ The `Math` class provides quietly return wrong results when a computation overfl
 
 ### Conversions between Numeric Types
 Legal conversions between numeric types
-![numeric_conversions](/info/Java_Core_Volume_I/info/media/Numeric_conversions.PNG)
+![numeric_conversions](/info/Java_Core_Volume_I/info/media/fundamentals/Numeric_conversions.PNG)
 
 1. If either of the operands is of type `double`, the other one will be converted to a `double`.
 2. Otherwise, if either of the operands is of type `float` other converted to `float`
@@ -86,7 +107,7 @@ a && b || c
 (a && b) || c
 ```
 
-![operator_hierarchy](/info/Java_Core_Volume_I/info/media/Operator_hierarchy.PNG)
+![operator_hierarchy](/info/Java_Core_Volume_I/info/media/fundamentals/Operator_hierarchy.PNG)
 
 ## Strings
 Java does not have a built-in string type, instead the standard Java library contains a predefined class **String**.
@@ -139,7 +160,7 @@ System.out.println("Hello, " + name + ". Next year, you'll be " + (age + 1));
 ```java
 System.out.printf("Hello, %s. Next year, you'll be %d", name, age);
 ```
-![operator_hierarchy](/info/Java_Core_Volume_I/info/media/Formatting_output.PNG)
+![operator_hierarchy](/info/Java_Core_Volume_I/info/media/fundamentals/Formatting_output.PNG)
 
 ### File Input and Output
 To read from a file, construct a Scanner object like this:
@@ -189,4 +210,29 @@ BigInteger c = a.add(b); // c = a + b
 BigInteger d = c.multiply(b.add(BigInteger.valueOf(2))); // d = c * (b + 2)
 ```
 ## Arrays
+```java
+int[] a;
+// or
+int a[];
+// or
+int[] a = new int[100];
+// or
+var a = new int[100];
+// or
+int[] smallPrimes = { 2, 3, 5, 7, 11, 13 };
+```
+Once you create an array, you cannot change its length. It is legal to have arrays of length 0. \
+When you create an array of numbers, all elements are initialized with `0`. Arrays of boolean with `false`. Arrays of
+objects with `null`, that includes array of Strings.
 
+### The “for each” Loop
+```java
+for (int element : a)
+    System.out.println(element);
+```
+
+### Array Copying
+use the `copyOf` method in the Arrays class.
+```java
+int[] copiedLuckyNumbers = Arrays.copyOf(luckyNumbers, luckyNumbers.length);
+```

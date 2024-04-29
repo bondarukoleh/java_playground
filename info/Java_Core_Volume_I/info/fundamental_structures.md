@@ -7,6 +7,8 @@ Java Applets - The idea here is simple: Users will download Java bytecodes from 
 machines. Java programs that work on web pages are called applets.
 
 In the early days of Java, the language was interpreted. Nowadays, the Java virtual machine uses a just-in-time compiler.
+JIT - helping to execute a Java bytecode, JIT compiles bytecode in machine instructions, this increases execution speed.
+But _JIT_ is not _javac_ - those have two different functions.
 
 ## Java Programming environment
 ```shell

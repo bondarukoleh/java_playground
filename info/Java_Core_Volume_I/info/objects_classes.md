@@ -45,14 +45,124 @@ The bytecode interpreter starts running the code in the `main` method.
 
 ### First Steps with Constructors
 Constructors:
-• A constructor has the same name as the class.
-• A class **can have more than one** constructor.
-• A constructor can take zero, one, or more parameters.
-• A constructor **has no return value**.
-• A constructor is always called with the new operator.
+- A constructor has the same name as the class.
+- A class **can have more than one** constructor.
+- A constructor can take zero, one, or more parameters.
+- A constructor **has no return value**.
+- A constructor is always called with the new operator.
 
 ### Declaring Local Variables with var
 The `var` keyword can only be used with local variables inside methods. You must always declare the types of parameters
 and fields.
 
 ### Implicit and Explicit Parameters
+
+```java
+employee1.raiseSalary(5);
+```
+The `raiseSalary` method has two parameters. The first parameter, called the _implicit_ parameter, is the **object** of
+type Employee that appears before the method name. The second parameter, the number inside the parentheses after the
+method name, is an _explicit_ parameter. (implicit parameter also called the _target_ or _receiver_). \
+In every method, the keyword `this` refers to the implicit parameter.
+
+### Benefits of Encapsulation
+1. You can change the internal implementation without affecting any code. \
+2. Mutator methods can perform error checking. Be careful not to write accessor methods that return references to mutable 
+objects, if you need to return a reference to a mutable object, you should _clone_ it first.
+
+### Class-Based Access Privileges
+A method can access the _private_ data of **all objects of its class**.
+
+### Private Methods
+As long as the method is private - you can do whatever you like with it. If a method is public, you cannot simply drop
+it because other code might rely on it.
+
+### Final Instance Fields
+_final_ - a field must be initialized when the object is constructed. Afterwards, the field may not be modified again.
+The `final` is useful for fields whose type is primitive or an _immutable_ class. (A class is immutable if none of its
+methods ever mutate its objects. For example, the String class is immutable.)
+
+## Static Fields and Methods
+### Static Fields
+_static_ field is not present in the objects of the class. There is only a single copy of each static field.
+
+### Static Constants
+A _native_ method, it is not implemented in the Java programming language. Native methods can bypass the access control
+mechanisms of the Java language.
+
+### Static Methods
+Static methods do not operate on objects, don’t have a _this_ parameter. It is legal to use an object to call a static
+method, but not recommended.
+
+### Factory Methods
+```java
+NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance();
+NumberFormat percentFormatter = NumberFormat.getPercentInstance();
+```
+Use static factory methods that construct objects. Why?
+- You can’t give names to constructors, but we want two different names to get the _currency_ instance and the _percent_
+instance. 
+- When you use a constructor, you can’t vary the type of the constructed object. But with factory you can provide different
+types of instances, as long as they share some common parent or an interface.
+
+### The main Method
+The `main` method does not operate on any objects. In fact, when a program starts, there aren’t any objects yet. The 
+static main method executes, and constructs the objects that the program needs.
+
+## Method Parameters
+How parameters can be passed?
+- _call by value_ - the method gets just the value that the caller provides;
+- _call by reference_ - the method gets the location of the variable that the caller provides;
+  Thus, a method can modify the value stored in a variable passed by reference but not in one passed by value.
+
+**Java always uses call by value**, the method gets a copy of all parameter values. The **method cannot modify** the
+contents of **any parameter variables passed** to it. Also, object **references are passed by value**.
+
+There are, however, two kinds of method parameters:
+- Primitive types (numbers, boolean values)
+- Object references
+
+## Object Construction
+### Overloading
+_overloading_ - occurs if several methods that have the **same name** but **different parameters**. The compiler must
+sort out which method to call. The process of finding a match is called _overloading resolution_.
+Java allows you to overload **any** method, (incl. constructor). Overloaded methods should have different *signature*
+**name and parameter types**. The **return type** is **not part** of the method signature, it alone cannot be used
+to distinguish overloaded methods. When calling a method, you specify the method name and arguments. The compiler uses
+this information to determine which method to call. The return type is not considered during this process.
+
+### Default Field Initialization
+Difference between fields and local variables, you must always explicitly initialize local variables in a method.
+But in a class, if you don’t initialize a field, it is automatically initialized to a default (0, false, or null).
+
+### The Constructor with No Arguments
+If a class has no constructors, then a no-argument constructor is provided for you. This constructor sets all the
+instance fields to their default values.
+
+### Explicit Field Initialization
+Class **field assignments** are carried out **before the constructor executes**.
+
+### Calling Another Constructor
+If the first statement of a constructor has the form `this(. . .)`, then the constructor calls another constructor of
+the same class.
+
+### Initialization Blocks
+You have already seen two ways to initialize an _instance field_:
+- By setting a value in a constructor 
+- By assigning a value in the declaration
+Third mechanism in Java, called an _initialization block_.
+
+```java
+class Employee
+{
+private static int nextId;
+private int id;
+private String name;
+// object initialization block
+{
+    id = nextId;
+    nextId++;
+}
+public Employee(String name)
+    ...
+```

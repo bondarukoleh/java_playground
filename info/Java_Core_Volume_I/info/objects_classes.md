@@ -284,3 +284,96 @@ You can import nonpublic classes from the current package the compiler searches 
 to see which one defines the class.
 
 ### Setting the Class Path
+Using the _-classpath_ option is the preferred approach for setting the class path. Another is the **CLASSPATH** 
+environment variable.
+```shell
+java -classpath c:\classdir;.;c:\archives\archive.jar MyProg
+```
+
+## JAR Files
+When you package your application, you want to give your users a single file, not a directory structure filled with 
+class files. Java Archive (JAR) files were designed for this purpose.
+
+### Creating JAR files
+Use the jar tool to make JAR files.
+
+### The Manifest
+Each JAR file contains a _manifest_ file that describes special features of the archive. Complex manifests can have many
+entries, grouped into sections. The first section is called the _main section_. Subsequent entries can specify properties
+of named entities such as individual files, packages, or URLs. Those entries must begin with a _Name_ entry. Sections
+are separated by blank lines. The last line in the manifest must end with a newline character.
+```text
+Manifest-Version: 1.0
+_lines describing this archive_
+Name: Woozle.class
+_lines describing this file_
+Name: com/mycompany/mypkg/
+_lines describing this package_
+Main-Class: com.mycompany.mypkg.MainAppClass
+```
+
+### Executable JAR Files
+_e_ option of the _jar_ command to specify the entry point of your program. Alternatively, you can specify the main
+class of your program in the manifest. Users can simply start the program as: 
+```shell
+java -jar MyProgram.jar
+
+```
+You can use third-party wrapper utilities that turn JAR files into Windows executables. A wrapper is a Windows program
+with the familiar _.exe_ extension that locates and launches the JVM or tells the user what to do when no JVM is found.
+
+### Multi-Release JAR Files
+In package if some previously accessible internal APIs are no longer available library providers distribute different 
+code for different Java versions. Java 9 introduces multi-release JARs for this purpose.
+
+Multi-release JARs are not intended for different versions of a program or library. The public API of all classes should
+stay the same for the same version of the library. The sole purpose of multi-release JARs is to enable a particular
+version of your program or library to work with multiple JDK releases. When you use multi-release JARs, you're
+essentially providing different versions of certain classes or resources within your JAR, each tailored for specific
+JDK versions. If you add functionality or change an API, you should provide a new version of the JAR instead.
+
+## Documentation Comments
+### Comment Insertion
+Each `/** . . . */` documentation comment contains free-form text followed by tags. A tag starts with an `@`, such as
+`@since` or `@param`. The first sentence of the free-form text should be a _summary statement_.
+
+In the free-form text, you can use HTML modifiers such as `<em>. . .</em>` for emphasis, <strong>, <ul>/<li>, <img . . ./>
+monospaced code - {@code . . . }.
+
+### Class Comments
+The class comment must be placed _after_ any `import` statements, **directly before** the class definition.
+Same goes for method comments. You only need to document public fields — generally that means _static constants_.
+```java
+/**
+* A {@code Card} object represents a playing card, such as "Queen of Hearts". A card has a suit (Diamond, Heart, Spade
+* or Club) and a value (1 = Ace, 2 . . . 10, 11 = Jack, 12 = Queen, 13 = King)
+*/
+public class Card
+{
+  /**
+   * The "Hearts" card suit
+   */
+  public static final int HEARTS = 1;
+  
+  /**
+   * Raises the salary of an employee.
+   * @param byPercent the percentage by which to raise the salary (e.g., 10 means 10%)
+   * @return the amount of the raise
+   */
+  public double raiseSalary(double byPercent)
+  {
+    ...
+  }
+}
+```
+
+### Class Design Hints
+1. Always keep data private.
+2. Always initialize data.
+3. Don’t use too many basic types in a class. The idea is to replace multiple related uses of basic types with other 
+classes.
+4. Not all fields need individual field accessors and mutators. You need to get and set an employee’s salary, but not
+the hiring date.
+5. Break up classes that have too many responsibilities.
+6. Make the names of your classes and methods reflect their responsibilities.
+7. Prefer immutable classes. If there are threads it is a good idea to make classes immutable when you can.

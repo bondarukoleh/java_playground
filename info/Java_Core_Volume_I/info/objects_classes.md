@@ -230,13 +230,13 @@ out.println("Goodbye, World!"); // i.e., System.out
 
 ### Addition of a Class into a Package
 ```java
-package com.horstmann.corejava;
+package com.horstmann.corejava; 
 public class Employee {}
 ```
 If you don’t put a `package` statement in the source file, then the classes in that source file belong to the unnamed
 package.
 ```shell
-javac PackageTest.java                                       
+javac PackageTest.java
 ```
 The compiler search the Employee file com/horstmann/corejava/Employee.java and compiles it. \
 The compiler does not check the directory structure when it compiles source files, but the virtual machine won’t find
@@ -247,3 +247,40 @@ If you don’t specify either _public_ or _private_, the feature (class, method,
 methods in the same package.
 
 ### The Class Path
+So the path to the class must match the package name. Class files can also be stored in a JAR (Java archive) file. A JAR
+file contains multiple class files and subdirectories in a compressed format, saving space and improving performance. \
+To share classes among programs, you need to do the following:
+1. Place your class files inside a directory — e.g. /home/user/classdir. Note that this directory is the base directory
+for the package tree. If you add the class _com.horstmann.corejava.Employee_, then the _Employee.class_ file must be located
+in the subdirectory _/home/user/classdir/com/horstmann/corejava_. 
+2. Place any JAR files inside a directory — for example _/home/user/archives_. 
+3. Set the _class path_. The class path is the collection of all locations that can contain class files.
+
+The _javac_ compiler always looks for files in the current directory, but the _java virtual machine_ launcher only looks
+into the current directory if the _“.”_ directory is on the class path. If you have no class path set, it’s not a problem
+— the default class path consists of the “.” directory. But if you have **set the class path without “.” included**
+directory, your programs **will compile** without error, but they **won’t run**.
+
+The class path lists all directories and archive files that are _starting points_ for locating classes
+```shell
+/home/user/classdir:.:/home/user/archives/archive.jar
+#[ this is one path]:[current dir]:[another path]
+```
+Suppose the _virtual machine_ searches for the class file of the com.horstmann.corejava.Employee class. It first looks
+in the Java API classes. It won’t find the class file there, so it turns to the _class path_. 
+- /home/user/classdir/com/horstmann/corejava/Employee.class 
+- com/horstmann/corejava/Employee.class starting from the current directory 
+- com/horstmann/corejava/Employee.class inside /home/user/archives/archive.jar
+
+The compiler has to locate files without you specified their package, it consults all `import` directives as possible
+sources for the class. e.g. `import java.util.*; import com.horstmann.corejava.*;` in source file that also refers to a
+class Employee, The compiler then tries to find java.lang.Employee (java.lang package imported by default),
+java.util.Employee, com.horstmann.corejava.Employee, and Employee in the current package. It searches for each of these
+classes in all of the locations of the class path. It is a compile-time error if more than one class is found. The order
+of import doesn't matter. \
+You can import only public classes from other packages. A source file can only contain one public class, and the names of
+the file and the public class must match. \
+You can import nonpublic classes from the current package the compiler searches all source files of the current package
+to see which one defines the class.
+
+### Setting the Class Path

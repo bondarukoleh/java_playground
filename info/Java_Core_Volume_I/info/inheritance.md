@@ -189,3 +189,186 @@ the _Object_ class but defines a completely unrelated method. Correct way is:
 @Override public boolean equals(Object other)
 ```
 
+### The hashCode Method
+A hash code is an integer that is derived from an object. The _hashCode_ method is defined in the Object class, Object's
+hash code is basically the object’s _address in memory_.
+
+The string builders has no overridden _hashCode_ method, but _String_ has a _hashCode_ that returns `int` basic on content
+of the String. If you redefine the _equals_ method, you will also need to redefine the _hashCode_ method for objects that
+users might insert into a hash table.
+
+To override a _hashCode_, use the null-safe method _Objects.hashCode_:
+```java
+public int hashCode() {
+    return 7 * Objects.hashCode(name) 
+            + 11 * Double.hashCode(salary)
+            + 13 * Objects.hashCode(hireDay);
+}
+
+// if you need to combine a few values
+public int hashCode() {
+    return Objects.hash(name, salary, hireDay);
+}
+```
+Your definitions of equals and hashCode must be compatible.
+> If you have fields of an array type, you can use the static _Arrays.hashCode_, based on elements. \
+> A record type automatically provides a hashCode method from the fields values
+
+### The toString Method
+`toString` method that returns a string representing the value of the object. \
+Whenever an object is concatenated with a _string_ by the “+” operator, the Java compiler automatically invokes the
+_toString_ method to obtain a string representation of the object.
+
+> Instead of writing `x.toString()`, you can write `"" + x`. Even works if x is of primitive type. \
+> For _record_ types, a _toString_ method is already provided
+
+The Object class defines the _toString_ method to print the class name and the hash code of the object.
+```java
+System.out.println(System.out) // java.io.PrintStream@2f6684
+// if array
+System.out.println(arr) // "[I@1a46e30" where "[I" stands for Integer 
+// but
+String s = Arrays.toString(arr); // "[2, 3, 5, 7, 11, 13]"
+```
+
+## Generic Array Lists
+You can set the size of an array at runtime.
+```java
+int actualSize = /* calculation */;
+var staff = new Employee[actualSize];
+```
+Once you set the array size, you cannot change it easily. The _ArrayList_ class is similar to an array, but it
+automatically adjusts its capacity as you add and remove elements, without any additional code. \
+_ArrayList_ is a _generic class_ with a _type parameter_.
+
+Use the _add_ method to add new elements to an array list. \
+The array list manages an **internal array** of object references.
+```java
+staff.add(new Employee("Harry Hacker", . . .));
+```
+
+### Accessing Array List Elements
+
+Instead of the pleasant `[]` syntax to access or change the element of an array, you use the _get_ and _set_ methods.
+>Use the _add_ method instead of _set_ to fill up an array, and use _set_ **only to replace** a previously added **element**.
+
+> The raw ArrayList is also a bit dangerous. Its add and set methods accept objects of any type, and you will get an error
+> only in runtime. So better type your arraylists.
+
+## Object Wrappers and Autoboxing
+Occasionally, you need to convert a primitive type like _int_ to an _object_. **All primitive types have class** counterparts.
+These kinds of classes are usually called _wrappers_, Integer, Long, Float, Double, Short, Byte, Character, and Boolean.
+The first six inherit from the common superclass Number.) \
+**The wrapper classes are immutable and final** \
+The type parameter inside the angle brackets <> cannot be a primitive type, so it's only `new ArrayList<Integer>();` 
+(far less efficient than an _int[]_ array because each value is separately wrapped inside an object.)
+
+It's easy to add `int` to an ArrayList<Integer>
+```java
+list.add(3);
+// is automatically translated to
+list.add(Integer.valueOf(3));
+```
+This conversion is called _autoboxing_. Conversely, when you assign an _Integer_ object to an _int_ value, it is
+automatically unboxed
+```java
+int n = list.get(i);
+// same as
+int n = list.get(i).intValue();
+```
+You can get the illusion that the primitive types and their wrappers are one and the same. There is just one point in
+which **they differ** considerably: **_identity_**. The == operator, applied to wrapper objects, only tests whether
+the objects have identical memory locations, **use** `equals` method when **comparing wrappers**.
+
+> The autoboxing specification requires that boolean, byte, char <= 127, short, and int between -128 and 127 are
+> wrapped into fixed objects, and those wrappers could be compared with ==. But that's not obvious.
+
+> Don’t use wrappers as locks. Don’t use the wrapper class constructors. They are deprecated. \
+> Use `Integer.valueOf(1000)`, never `new Integer(1000)`. Or, simply rely on auto-boxing: `Integer a = 1000`.
+
+A couple of other subtleties about autoboxing:
+- Wrapper class references can be null, it is possible for autounboxing to throw a NullPointerException.
+- If you mix Integer and Double types in a conditional expression, then the Integer value is unboxed, promoted to double
+and boxed into a Double
+- boxing and unboxing is a courtesy of the compiler, not the virtual machine.
+
+Java found the wrappers a convenient place to put certain basic methods, such as those for converting strings of digits
+to numbers, e.g. `int x = Integer.parseInt(s);` \
+The other number classes implement corresponding methods.
+
+## Methods with a Variable Number of Parameters
+It is possible to provide methods that can be called with a variable number of parameters, called “_varargs_” methods.
+
+```java
+public PrintStream printf(String fmt, Object... args) {
+    return format(fmt, args);
+}
+```
+The printf method actually receives two parameters: the format string and an Object[] array that holds all other
+parameters. (If the caller supplies integers or other primitive type values, autoboxing turns them into objects.)
+
+## Abstract Classes
+
+If you want to have a method with various implementation by subclasses, you can use the `abstract` keyword, and you do
+not need to implement the method in the current class. A **class with** one or more **abstract methods** must itself be
+**declared abstract**. \
+Abstract classes can have fields and concrete methods.
+
+```java
+public abstract String getDescription();
+// no implementation required
+```
+
+**Abstract methods** act as **_placeholders_ for methods** that **are implemented in the subclasses**. When you
+extend an abstract class, you have two choices. You can **leave** some or all of the **abstract methods undefined**;
+then, you **must tag** the **subclass as abstract** as well. Or, you can define all methods, and the subclass is no
+longer abstract. \
+Abstract classes cannot be instantiated. But you can declare an _abstract type object variables_, but such a variable
+must refer to an object of a **nonabstract** subclass.
+```java
+Person p = new Student("Vince Vu", "Economics");
+// Person is an abstract class, but p is an object of nonabstract Student class
+```
+
+## Enumeration Classes
+```java
+public enum Size { SMALL, MEDIUM, LARGE, EXTRA_LARGE }
+```
+The type defined by this declaration is actually a class. \
+The constructor of an enumeration is always private \
+All enumerated types are subclasses of the abstract class Enum.
+
+## Sealed Classes
+In Java, a sealed class controls which classes may inherit from it. \
+The permitted subclasses of a sealed class must be accessible, permitted subclasses that are public - must be in the
+same package as the sealed class. If you use modules - in the same module.
+
+> A sealed class can be declared without a permits clause. Then all of its direct subclasses must be declared in the
+> same file. File can have at most one public class.
+
+An important motivation for sealed classes is compile-time checking. JSONValue is a sealed class, that can have only
+certain amount of children. \
+A subclass of a sealed class must specify whether it is sealed, final, or open for subclassing. In the latter case,
+it must be declared as non-sealed.
+```java
+public abstract sealed class Node permits Element, Text, Comment, ...
+public non-sealed class Element extends Node...
+```
+
+## Reflection
+The _reflection_ library gives you a very rich and elaborate toolset to write programs that manipulate Java code
+dynamically. Using reflection, Java can support user interface builders, object-relational mappers, and many other
+development tools that dynamically inquire about the capabilities of classes.
+
+- Analyze the capabilities of classes at runtime 
+- Inspect objects at runtime—for example, to write a single toString method that works for all classes 
+- Implement generic array manipulation code 
+- Take advantage of Method objects that work just like function pointers in languages such as C++
+
+### The Class Class
+While your program is running, the Java runtime system always maintains what is called _runtime type identification_ on
+all objects. This information keeps track of the class to which each object belongs. Runtime type information is used
+by the virtual machine to select the correct methods to execute.
+
+You can also access this information special Java class _Class_. The `getClass()` method in the Object class returns an
+instance of _Class_ type.

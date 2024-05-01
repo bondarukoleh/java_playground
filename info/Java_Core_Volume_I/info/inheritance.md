@@ -365,10 +365,38 @@ development tools that dynamically inquire about the capabilities of classes.
 - Implement generic array manipulation code 
 - Take advantage of Method objects that work just like function pointers in languages such as C++
 
-### The Class Class
+### The _Class_ Class
 While your program is running, the Java runtime system always maintains what is called _runtime type identification_ on
 all objects. This information keeps track of the class to which each object belongs. Runtime type information is used
 by the virtual machine to select the correct methods to execute.
 
 You can also access this information special Java class _Class_. The `getClass()` method in the Object class returns an
 instance of _Class_ type.
+
+### A Primer on Declaring Exceptions
+There are two kinds of exceptions: **unchecked** exceptions and **checked** exceptions. With checked exceptions, the
+compiler checks that you, the programmer, are aware of the exception and are prepared to deal with the consequences. \
+Unchecked - the compiler does not expect that you provide a handler — after all, you should spend your mental energy
+on avoiding these mistakes rather than coding handlers for them. \
+You only need to supply a throws clause for checked exceptions.
+
+### Resources
+Classes often have associated data files, such as:
+- Image and sound files 
+- Text files with message strings and button labels
+
+In Java, such an associated file is called a _resource_.
+
+### Invoking Arbitrary Methods and Constructors
+Use _Method_ objects in your own programs only when absolutely necessary. Using interfaces and lambda expressions
+is almost always a better idea. In particular, I echo the developers of Java and suggest not using Method objects
+for callback functions.
+
+### Design Hints for Inheritance
+1. Place common operations and fields in the superclass.
+2. Don’t use protected fields. (you cannot change them harmlessly, and anyone form the same package also could use 'em)
+3. Use inheritance to model the “is–a” relationship.
+4. Don’t use inheritance unless all inherited methods make sense. (think over consequences)
+5. Don’t change the expected behavior when you override a method.
+6. Use polymorphism, not type information. If you see conditionals depend on the type to call some action - use polymorphism.
+7. Don’t overuse reflection.

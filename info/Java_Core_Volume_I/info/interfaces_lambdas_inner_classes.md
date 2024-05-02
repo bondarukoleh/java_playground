@@ -84,4 +84,124 @@ Suppose we want to sort strings by increasing length, not in dictionary order. T
 method whose parameters are an _array_ and a _comparator_ — an instance of a class that implements the _Comparator_ interface.
 
 ### Object Cloning
+_Cloneable_ interface that indicates that a class has provided a safe `clone` method. \
+If you would like _copy_ to be a new object that begins its life being identical to original but whose state can diverge
+over time, use the `clone` method.
+```java
+var original = new Employee("John Public", 50000);
+Employee copy = original.clone();
+copy.raiseSalary(10); // OK--original unchanged
+```
+But default `clone` copies only values. If all instance fields are primitives - `clone` is just fine. But if the object
+contains references to subobjects, then copying the field gives you another reference to the same subobject.
 
+Does it matter if the copy is shallow? If the subobject shared between the _original_ and the _shallow clone_ is
+_immutable_, then the sharing is safe. This certainly happens if the subobject belongs to an immutable class, such as
+String. Alternatively, the subobject may simply remain constant.
+
+Quite frequently, however, subobjects are mutable, and you must **redefine** the `clone` method to make a **deep copy** that
+clones the subobjects as well.
+
+For every class, you need to decide whether:
+1. The default clone method is good enough;
+2. The default clone method can be patched up by calling clone on the mutable subobjects; or
+3. clone should not be attempted.
+
+The third option is actually the default. To choose either the first or the second option, a class must:
+1. Implement the _Cloneable_ interface; and
+2. Redefine the `clone` method with the `public` access modifier.
+
+> A subclass can call a protected clone method only to clone its own objects. You must redefine clone to be public
+> to allow objects to be cloned by any method.
+
+The appearance of the _Cloneable_ interface has nothing to do with the normal use of interfaces. In particular, it does
+not specify the clone method — that method is inherited from the Object class. **The interface merely serves as a tag**,
+indicating that the class designer understands the cloning process. Objects are so paranoid about cloning that they
+generate a checked exception.
+
+> The _Cloneable_ interface is one of **tagging** interfaces that Java provides. (called them _marker_ interfaces.)
+
+Be careful about cloning of subclasses, anyone can use it to clone Manager objects. There is no guarantee that the
+implementor of the subclass has fixed clone to do the right thing. For that reason, the clone method is declared as
+protected in the Object class.
+
+
+## Lambda Expressions
+A _lambda expression_ is a block of code that you can pass around so it can be executed later, once or multiple times.
+
+### The Syntax of Lambda Expressions
+If a method has a single parameter with inferred type, you can even omit the parentheses:
+```java
+ActionListener listener = event -> System.out.println("The time is " + Instant.ofEpochMilli(event.getWhen()));
+  // instead of (event) -> . . .
+  // or (ActionEvent event) -> . . .
+```
+You **never specify** the result **type of a lambda** expression. It is always inferred from context.
+
+> It is illegal for a lambda expression to return a value in some branches but not in others. For example: \
+> `(int x) -> { if (x >= 0) return 1; }` is invalid.
+
+### Functional Interfaces
+
+You can **supply a lambda** expression **whenever** an object of an interface with **a single abstract method is
+expected**. Such an interface is called a _functional interface_.
+
+To demonstrate the conversion to a functional interface, consider `Arrays.sort` method, it's second parameter requires
+an instance of _Comparator_.
+```java
+Arrays.sort(words, (first, second) -> first.length() - second.length());
+```
+Behind the scenes, the `Arrays.sort` method receives an _object_ of some class that implements _Comparator<String>_.
+**Invoking** the `compare` **method** on that object **executes the body of the lambda** expression. It is best to
+think of a lambda expression as a function, not an object, and to accept that it can be passed to a functional interface. \
+In fact, conversion to a functional interface is the only thing that you can do with a lambda expression in Java.
+
+The _ArrayList_ class has a `removeIf` method whose parameter is a _Predicate_. It is specifically designed to pass a lambda
+expression. \
+Another useful functional interface is _Supplier<T>_, yields a value of type _T_ when it is called. Suppliers are used 
+for _lazy evaluation_, like:
+```java
+LocalDate hireDay = Objects.requireNonNullElseGet(day, () -> new LocalDate.of(1970, 1, 1));
+```
+The `requireNonNullElseGet` method only calls the supplier when the value is needed (because the `day` was `null`).
+
+### Method References
+Sometimes a lambda expression involves a single method.
+```java
+var timer = new Timer(1000, event -> System.out.println(event));
+// or you can pass a method reference
+var timer = new Timer(1000, System.out::println);
+```
+The expression _System.out::println_ is a method reference. It directs the compiler to produce an instance of a functional
+interface, overriding the single abstract method of the interface to call the given method.
+
+> Like a lambda expression, **a method reference is not an object**. It produces a Functional Interface Object. \
+
+The :: operator separates the method name from the name of an object or class
+1. object::instanceMethod
+   The **method** reference is equivalent to a lambda expression whose **parameters are passed** to the method
+2. Class::instanceMethod
+   The **first parameter becomes the implicit parameter** of the method
+3. Class::staticMethod
+   All **parameters are passed** to the static method.
+
+Note that a **lambda** expression **can only be** rewritten as a **method reference if** the body of the **lambda**
+expression **calls a single method** and doesn’t do anything else.
+
+You can capture the _this_ parameter in a method reference. For example, `this::equals` is the same as `x -> this.equals(x)`.
+It is also valid to use `super`. `super::instanceMethod`
+
+### Constructor References
+Constructor references are just like method references, except that the name of the method is `new`. \
+```java
+Stream<Person> stream = names.stream().map(Person::new);
+```
+You can form constructor references with array types. Array constructor references are useful to overcome a limitation 
+of Java. The _Stream_ interface has a `toArray` method that returns an _Object_ array.
+```java
+Object[] people = stream.toArray();
+// but more sufficient
+Person[] people = stream.toArray(Person[]::new);
+```
+
+### Variable Scope

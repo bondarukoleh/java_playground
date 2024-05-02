@@ -14,7 +14,7 @@ super.getSalary();
 > The return type is not part of the signature. However, **when you override** a method, you **need to keep the
 > return type** compatible. A subclass may change the return type to a subtype of the original type.
 
-> When you override a method, the subclass method could have more visibility not less. parent is package-private child
+> When you override a method, the subclass method could have more visibility not less. Parent is package-private - child
 > must be the same or public.
 
 ### Subclass Constructors

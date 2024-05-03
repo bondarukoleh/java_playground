@@ -205,3 +205,192 @@ Person[] people = stream.toArray(Person[]::new);
 ```
 
 ### Variable Scope
+**Lambda expressions are closures**, just like JS. A lambda expression has three ingredients:
+1. A block of code 
+2. Parameters 
+3. Values for the _free variables_ (captured) — that is, the variables that are not parameters and not defined inside the
+code, but came from outside the lambda.
+
+The data structure representing the lambda expression must store the values for the _free variables_. We say that such
+values have been _captured_ by the lambda expression.
+
+>**In a lambda** expression, you can only **reference variables** whose value **doesn’t change**. \
+> You **can't mutate captured** variable.
+
+Mutating variables in a lambda expression is not safe when multiple actions are executed concurrently. It is also illegal
+to refer, in a lambda expression, to a variable that is mutated outside.
+
+**Any captured variable** in a lambda expression **must be effectively final**. An effectively final variable is a
+variable that is never assigned a new value after it has been initialized.
+
+The body of a lambda expression has the same scope as a nested block. The same rules for name conflicts and shadowing apply.
+
+When you use the `this` keyword in a lambda expression, you refer to the `this` parameter of the method that **creates** the lambda.
+
+### Processing Lambda Expressions
+The point of using lambdas is _deferred execution_. \
+There are many reasons for executing code later, such as - Running the code in a separate thread, multiple times, at the
+right point in an algorithm, on some specific event, only when necessary, etc. \
+To accept the lambda, we need to pick (or, in rare cases, provide) a functional interface. (Runnable, Supplier, Predicate, etc.) \
+It is more efficient to use these specializations than the generic interfaces:
+```java
+public interface IntConsumer {
+    void accept(int value);
+}
+
+public static void repeat(int n, IntConsumer action) {
+   for (int i = 0; i < n; i++) action.accept(i);
+}
+```
+If you design your own interface with a single abstract method, you can tag it with the _@FunctionalInterface_ annotation.
+
+Some programmers love chains of method calls
+```java
+String input = " 618970019642690137449562111 ";
+boolean isPrime = input.strip().transform(BigInteger::new).isProbablePrime(20);
+```
+
+The _transform_ method of the String class applies a Function to the string and yields the result.
+
+### More about Comparators
+The _Comparator_ interface has a number of convenient static methods for creating comparators. These methods are intended
+to be used with _lambda expressions_ or _method references_. \
+The static _comparing_ method takes a “key extractor” - function that maps a type `T` to a comparable type (e.g. String).
+
+```java
+Arrays.sort(people, Comparator.comparing(Person::getLastName).thenComparing(Person::getFirstName));
+```
+If two people have the same last name, then the second comparator is used. \
+You can specify a _comparator_ to be used for the keys that the _comparing_ and _thenComparing_ methods extract.
+```java
+Arrays.sort(people, Comparator.comparing(Person::getName, (s, t) -> Integer.compare(s.length(), t.length())));
+```
+If your key function can return `null`, you could use _nullsFirst_ and _nullsLast_ adapters. These static methods take
+an existing comparator and modify it so that it doesn’t throw an exception when encountering `null` values but ranks
+them as smaller or larger than regular values. \
+The _nullsFirst_ method needs a comparator, the `naturalOrder` method makes a comparator for any class implementing _Comparable_.
+Comparator.<String>naturalOrder() is what needed here.
+```java
+Arrays.sort(people, comparing(Person::getMiddleName, nullsFirst(naturalOrder())));
+```
+
+### Inner Classes
+An _inner class_ is a class that is defined inside another class. There are two reasons:
+- Inner classes can be hidden from other classes in the same package. 
+- Inner class methods can access the data from the scope in which they are defined — including the data that would
+otherwise be private.
+- A lot of things require some objects/classes that implements some Interface. Instead of doing it somewhere else, you
+can create those instance internally, and have muc more compact and hidden implementation.
+
+### Use of an Inner Class to Access Object State
+An inner class method gets to access both its own instance fields and those of the outer object creating it. \
+The **outer** class **reference** is **set in** the **constructor**. The compiler modifies all inner class constructors,
+adding a parameter for the outer class reference.
+
+> Only **inner classes** can be **private**. **Regular classes** always have either **package or public access**.
+
+### Special Syntax Rules for Inner Classes
+`OuterClass.this` - denotes the outer class reference. \
+You can write the inner object constructor more explicitly, using the syntax:
+```java
+// outerObject.new InnerClass(construction parameters)
+ActionListener listener = this.new TimePrinter();
+```
+Here, the outer class reference of the newly constructed TimePrinter object is set to the `this` reference of the
+method that creates the inner class object. \
+This is the most common case. As always, the `this` qualifier is redundant. However, it is also possible to set the
+outer class reference to another object by explicitly naming it. For example, since TimePrinter is a public inner
+class, you can construct a TimePrinter for any talking clock:
+```java
+var jabberer = new TalkingClock(1000, true);
+TalkingClock.TimePrinter listener = jabberer.new TimePrinter();
+```
+> Inner classes can have `static` fields, they can access their static fields and enclosed parent ones.
+
+### Local Inner Classes
+You **can define the class** locally **in** a single **method**:
+```java
+public void start()  {
+    class TimePrinter implements ActionListener {
+        public void actionPerformed(ActionEvent event) {
+            System.out.println("At the tone, the time is " + Instant.ofEpochMilli(event.getWhen()));
+            if (beep) Toolkit.getDefaultToolkit().beep() 
+        }
+    }
+    var listener = new TimePrinter();
+    var timer = new Timer(interval, listener);
+    timer.start();
+}
+```
+Local classes are never declared with an access specifier. Their scope is always restricted to the block in which they
+are declared. \
+Local classes have one great advantage: They are completely hidden from the outside world—not even other code in the
+TalkingClock class can access them. No method except start has any knowledge of the TimePrinter class.
+
+### Accessing Variables from Outer Methods
+Local classes even access and enclose local (method arguments) variables! However, those local variables must be
+effectively final.
+
+### Anonymous Inner Classes
+If you want to make only a single object of this class, you don’t even need to give the class a name. Such a class is
+called an _anonymous inner class_.
+```java
+public void start(int interval, boolean beep) {
+    var listener = new ActionListener() {
+        public void actionPerformed(ActionEvent event) {
+            System.out.println("At the tone, the time is " + Instant.ofEpochMilli(event.getWhen()));
+            if (beep) Toolkit.getDefaultToolkit().beep();
+        }
+    };
+    var timer = new Timer(interval, listener);
+    timer.start();
+}
+```
+What it means is this: Create a new object of a class that implements the _ActionListener_ interface.
+```text
+new SuperType(construction parameters) {
+        inner class methods and data
+    }
+```
+_SuperType_ can be an interface, such as ActionListener, or one that implements that interface. SuperType can also be
+a class or inner class extends that class. \
+An anonymous inner class cannot have constructors because the name of a constructor must be the same as the name of a
+class, and the class has no name. Instead, the construction parameters are given to the superclass constructor. In
+particular, whenever an inner class implements an interface, it cannot have any construction parameters. Nevertheless,
+you must supply a set of parentheses
+
+Even though an anonymous class cannot have constructors, you can provide an object initialization block.
+```java
+var count = new Person("Dracula") {
+    { initialization }
+    . . .
+};
+```
+
+The object constructed with `new Object() { String name = "Bob"; }` has type “Object with a Sting name field”. This
+is a _non-denotable type_ — a type that you cannot express with Java syntax. Nevertheless, the compiler understands the type.
+
+The following trick, called double brace initialization:
+```java
+// instead of
+var friends = new ArrayList<String>();
+friends.add("Harry");
+friends.add("Tony");
+invite(friends);
+// you can
+invite(new ArrayList<String>() {{ add("Harry"); add("Tony");}});
+```
+Note the double braces. The outer braces make an anonymous subclass of ArrayList. The inner braces are an object 
+initialization block.
+
+When you produce logging or debugging messages you often want to include the name of the current class:
+```java
+System.err.println("Something awful happened in " + getClass());
+```
+But that fails in the `static` methods. Use this:
+```java
+new Object(){}.getClass().getEnclosingClass() // gets class of static method
+```
+`new Object(){}` makes an anonymous object inside the desired class, and you can get his parent.
+
+### Static Inner Classes

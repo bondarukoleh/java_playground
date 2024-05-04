@@ -305,7 +305,8 @@ class, you can construct a TimePrinter for any talking clock:
 var jabberer = new TalkingClock(1000, true);
 TalkingClock.TimePrinter listener = jabberer.new TimePrinter();
 ```
-> Inner classes can have `static` fields, they can access their static fields and enclosed parent ones.
+> **Regular inner classes cannot have `static` fields**. They belong to the instance of the parent, so they cannot
+> access enclosed static parent fields.
 
 ### Local Inner Classes
 You **can define the class** locally **in** a single **method**:
@@ -394,3 +395,36 @@ new Object(){}.getClass().getEnclosingClass() // gets class of static method
 `new Object(){}` makes an anonymous object inside the desired class, and you can get his parent.
 
 ### Static Inner Classes
+If you need an _inner class_ — but you don’t need it to have a reference to the parent object? You can suppress the
+generation of that reference by declaring the inner _class static_. Some programmers use the term _nested class_.
+It will belong to the parent class itself, not to his object.
+
+> Only **inner classes can be** declared **_static_**. A static inner class is exactly like any other inner class,
+> except that an **object** of a static inner class does not have a reference to the outer parent that generated it.
+
+> **Unlike regular** inner classes, **static inner classes** can **have static fields and methods**.
+
+> Classes that are declared inside an interface are automatically static and public. This helps to organize code better.
+
+> Interfaces, records, and enumerations that are declared inside a class are automatically static. For encapsulation,
+> and code organization.
+
+### Service Loaders
+Sometimes, you develop an application with a service architecture. There are platforms that encourage this approach,
+such as OSGi (http://osgi.org), the JDK also offers a simple mechanism for loading services, supported by Java Platform
+Module System. The _ServiceLoader_ class makes it easy to load services that conform to a common interface.
+
+The implementing Service Interface classes can be in any package.
+
+## Proxies
+You can use a proxy to create, at runtime, new classes that implement a given set of interfaces. Proxies are only 
+necessary when you don’t yet know at compile time which interfaces you need to implement.
+
+Proxy is good for:
+- Remote Communication: enable communication between distributed components or systems. For example, in a client-server
+architecture, a proxy can act as an intermediary between the client and the server, handling communication details.
+- Security: Proxies can enforce access control and security policies by intercepting requests to access sensitive resources.
+For example, a security proxy can authenticate users and enforce authorization rules.
+- Logging and Monitoring: Proxies can be used to log method invocations or monitor the behavior of objects at runtime.
+- Lazy Initialization: Proxies can defer the creation or initialization of expensive objects until they are actually needed.
+- Aspect-Oriented Programming (AOP): Proxies are a fundamental building block in AOP frameworks.

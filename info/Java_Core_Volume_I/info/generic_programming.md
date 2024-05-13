@@ -181,3 +181,39 @@ related, and that Manager is a child of Employee. \
 You can always convert a parameterized type to a raw type.
 
 ## Wildcard Types
+In a _wildcard type_, a type parameter is allowed to vary. That's a convenient and shorter type declaration.
+```java 
+public static void printBuddies(Pair<Employee> pair)
+```
+No corruption is possible, because the compiler knows that the `pair` parameter has some specific type, which extends
+_Employee_ There is no way for the compiler to know exact type. \
+This is the key idea behind _bounded wildcards_. We now have a way of **distinguishing** between the **safe accessor** methods 
+**and** the **unsafe mutator** methods, and since **compiler** doesn't know what is the type - he **prevents any call to 
+mutator**.
+
+### Supertype Bounds for Wildcards
+Wildcard bounds are similar to type variable bounds, but they have an added capability - you can specify a _supertype
+bound_, like this:
+```java
+? super Manager
+```
+This wildcard is restricted to all supertypes of Manager. With a wildcard with a _supertype bound_ - you can supply
+parameters to methods, but you can’t use the return values. `void setFirst(? super Manager)` \
+It is only possible to pass an object of type _Manager_ or a subtype such as Executive. Conversely, if you call _getFirst_,
+there is no guarantee about the type of the returned object. \
+Wildcards with _supertype bounds_ let you **write to a generic object**, you can work with `T` and all supertypes of `T` \  
+Wildcards with _subtype bounds_ let you **read from a generic object**, you can work with `T` and all subtypes of `T`
+
+Manager \
+   | \
+Employee \
+   | \
+Object
+
+```java
+<? super Employee> /* Supertype bound. Employee, Object and lower */
+<? extends Employee> /* Subtype bound. Employee, Manager and upper */
+```
+
+### Unbounded Wildcards
+

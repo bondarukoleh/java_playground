@@ -251,3 +251,9 @@ and the compiler can infer that the method returns a _Pair<Employee>_.
 Sometimes, you want to drive program behavior by the type of a value. You can capture an instance of the Type interface
 that you encountered in the preceding section.
 
+```java
+var type = new TypeLiteral<ArrayList<Integer>>(){} // note the {}
+```
+The _TypeLiteral_ constructor captures the generic supertype. \
+We can’t get a generic type from an object - it's erased, generic types of fields and method parameters survive in the
+virtual machine.

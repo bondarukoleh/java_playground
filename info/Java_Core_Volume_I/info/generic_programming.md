@@ -216,4 +216,38 @@ Object
 ```
 
 ### Unbounded Wildcards
+You can even use wildcards with no bounds at all `Pair<?>`. \
+```java
+? getFirst()
+void setFirst(?)
+```
+The return value of getFirst can only be assigned to an Object. The setFirst method can never be called, not even with
+an Object. It is useful for very simple operations, when you don't care about the type, and want to check if the object
+is not null for instance.
+
+### Wildcard Capture
+A wildcard is not a type variable, so we can’t write code that uses ? as a type. \
+Wildcard capture is only legal in very limited circumstances. The compiler must be able to guarantee that the wildcard
+represents a single, definite type. e.g. the `T` in `ArrayList<Pair<T>>` can never capture the wildcard in `ArrayList<Pair<?>>`
+because compiler doesn't know what exact type is in that list.
+
+## Reflection and Generics
+### The Generic Class Class
+The _Class_ class is now generic. e.g. String.class is actually an object of the class `Class<String>`. 
+> The Class class, describing concrete types
+
+### Using Class<T> Parameters for Type Matchingc
+```java
+public static <T> Pair<T> makePair(Class<T> c) throws InstantiationException, IllegalAccessException {
+    return new Pair<>(c.newInstance(), c.newInstance());
+}
+// call
+makePair(Employee.class)
+```
+_Employee.class_ is an object of type `Class<Employee>`. The type parameter `T` of the _makePair_ method matches _Employee_,
+and the compiler can infer that the method returns a _Pair<Employee>_.
+
+### Type Literals
+Sometimes, you want to drive program behavior by the type of a value. You can capture an instance of the Type interface
+that you encountered in the preceding section.
 

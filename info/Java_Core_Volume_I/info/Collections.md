@@ -100,7 +100,7 @@ The Java collections framework defines a number of interfaces for different type
 
 ![collections](/info/Java_Core_Volume_I/info/media/collections/collections.PNG)
 
-> Queue - FIFO, adding to the end of the queue and removing from the beginning
+> Queue - FIFO, adding to the end of the queue and removing from the beginning \
 > Dequeue - adding and removing from any end
 
 There are two fundamental interfaces for collections: _Collection_ and _Map_. \
@@ -130,4 +130,55 @@ Interfaces _NavigableSet_ and _NavigableMap_ that contain additional methods for
 maps. The _TreeSet_ and _TreeMap_ classes implement these interfaces.
 
 ## Concrete Collections
+![collections](/info/Java_Core_Volume_I/info/media/collections/collection_scheme.PNG)
+![collections](/info/Java_Core_Volume_I/info/media/collections/collection_implementations.PNG)
 
+### Linked Lists
+Arrays and array lists suffer from removing or inserting an element from the middle being too expensive. _Linked list_,
+solves this problem. It stores each object in a separate link. Each link stores a reference to the next link in the 
+sequence and to its predecessor. Linked lists are _doubly linked_.
+
+A difference between _linked lists_ and generic collections - a linked list is an **ordered collection** in which the
+**position** of the objects **matters**. The _LinkedList.add_ method adds the object to the end of the list. The 
+position-dependent _add_ method is the responsibility of an _iterator_, since iterators describe positions in collections.
+Using iterators to add elements makes sense only for collections that have a natural ordering. The _set_ data type
+does not impose any ordering. Therefore, there is no _add_ method in the _Iterator_ interface. Instead, the collections 
+library supplies a subinterface _ListIterator_ that contains an _add_ method:
+```java
+interface ListIterator<E> extends Iterator<E> {
+    void add(E element);
+    . . .
+}
+```
+Unlike _Collection.add_, this method does not return a boolean — it is assumed that the _add_ operation always modifies
+the list. \
+_ListIterator_ has backwards traversing methods: `E previous()` and `boolean hasPrevious()`
+
+> The _add_ method **adds** the new element **before the iterator position** for any _List_ iterator.
+
+> Be careful with the “cursor” analogy. The _remove_ operation does not work exactly like _add_. After a call to _next_,
+> the _remove_ method indeed removes the element to the left of the iterator, but if you have just called _previous_, the
+> element to the right will be removed. Unlike the _add_ method, which depends only on the iterator position, the
+> _remove_ method depends on the iterator state.
+
+A _set_ method replaces the last element, returned by a call to _next_ or _previous_, with a new element.
+
+If an iterator traverses a collection while another iterator is modifying it, and an iterator finds that its collection
+has been modified by another iterator it throws a ConcurrentModificationException. \
+To avoid this, follow this simple rule:
+You can attach as many iterators to a collection as you like, provided that all of them are only **readers**. \
+Alternatively, you can attach a single iterator that can both read and write.
+
+Concurrent modification detection - collection keeps track of the number of mutating operations and _Iterator_ keeps his
+count. Before the operation Iterator checks that its track with the collection track.
+
+> The _linked list_ only keeps track of _structural_ modifications (add/remove). The _set_ method does not count as a
+> structural modification - because it changes the existing one.
+
+Linked lists do not support random access, but there is `get(index)`. If you find yourself using it, you are probably
+using a wrong data structure.
+
+The only reason to use a linked list is to minimize the cost of insertion and removal in the middle of the list, so with 
+linked collection stay away from all methods that use an integer.
+
+### Array Lists

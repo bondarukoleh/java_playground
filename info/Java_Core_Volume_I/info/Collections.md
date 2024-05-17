@@ -40,8 +40,8 @@ public interface Iterator<E> {
     default void forEachRemaining(Consumer<? super E> action);
 }
 ```
-By repeatedly calling the _next_ method, you can visit the elements from the collection one by one. However, if you reach
-the end of the collection, the next method throws a _NoSuchElementException_. Therefore, you need to call the _hasNext_
+By repeatedly calling the `next` method, you can visit the elements from the collection one by one. However, if you reach
+the end of the collection, the `next` method throws a _NoSuchElementException_. Therefore, you need to call the `hasNext`
 method before calling next. \
 You might use `while (iter.hasNext())` but also “for each” loop:
 ```java
@@ -57,7 +57,7 @@ public interface Iterable<E> {
 }
 ```
 The _Collection_ interface extends the _Iterable_ interface. Therefore, you can use the “for each” loop with any collection. \
-Instead of writing a loop, you can call the _forEachRemaining_ method with a _lambda_ expression that consumes an element.
+Instead of writing a loop, you can call the `forEachRemaining` method with a _lambda_ expression that consumes an element.
 ```java
 iterator.forEachRemaining(element -> do something with element);
 ```
@@ -68,7 +68,7 @@ _next_, and that lookup advances the position.
 > Think of **Java iterators** as **being between elements**. When you call _next_, the iterator jumps over the next
 > element, and it **returns** a **reference** to the element that **it just passed**.
 
-The _remove_ method of the _Iterator_ interface removes the element that was returned by the last call to _next_. That
+The `remove` method of the _Iterator_ interface removes the element that was returned by the last call to _next_. That
 makes sense — you need to see the element before you can decide that it is the one that should be removed. \
 It is illegal to call _remove_ if it wasn’t preceded by a call to _next_.
 
@@ -92,7 +92,7 @@ To make life easier for implementors, the library supplies a class _AbstractColl
 _size_ and _iterator_ abstract but implements the routine methods.
 
 A concrete collection class can now extend the _AbstractCollection_ class. It is up to the concrete collection class
-to supply an _iterator_ method, but the _contains_ method has been taken care of by the _AbstractCollection_ superclass.
+to supply an _iterator_ method, but the `contains` method has been taken care of by the _AbstractCollection_ superclass.
 This approach is a bit outdated. It would be nicer if the methods were default methods of the _Collection_ interface.
 
 ## Interfaces in the Collections Framework
@@ -100,12 +100,9 @@ The Java collections framework defines a number of interfaces for different type
 
 ![collections](/info/Java_Core_Volume_I/info/media/collections/collections.PNG)
 
-> Queue - FIFO, adding to the end of the queue and removing from the beginning \
-> Dequeue - adding and removing from any end
-
 There are two fundamental interfaces for collections: _Collection_ and _Map_. \
 You **insert** elements **into a _collection_** with a method `boolean add(E element)` \
-But, _Maps_ hold _key/value pairs_, and you use the put method `V put(K key, V value)`
+But, _Maps_ hold _key/value pairs_, and you use the `put` method `V put(K key, V value)`
 
 A _List_ is an _ordered collection_. Elements are added into a particular position in the container.
 An element can be **accessed** in two ways: by an ****iterator** or by an integer **index**. Access by index is called
@@ -123,7 +120,7 @@ if (c instanceof RandomAccess) {
     use sequential access algorithm
 }
 ```
-The _Set_, it's _add_ method rejects duplicates. The _equals_ and _hashCode_ method of a _set_ should be defined for
+The _Set_, it's `add` method rejects duplicates. The `equals` and `hashCode` method of a _set_ should be defined for
 that purpose. \
 The _SortedSet_ and _SortedMap_ interfaces expose the _comparator_ object used for sorting. \
 Interfaces _NavigableSet_ and _NavigableMap_ that contain additional methods for searching and traversal in sorted sets and
@@ -139,29 +136,29 @@ solves this problem. It stores each object in a separate link. Each link stores 
 sequence and to its predecessor. Linked lists are _doubly linked_.
 
 A difference between _linked lists_ and generic collections - a linked list is an **ordered collection** in which the
-**position** of the objects **matters**. The _LinkedList.add_ method adds the object to the end of the list. The 
-position-dependent _add_ method is the responsibility of an _iterator_, since iterators describe positions in collections.
+**position** of the objects **matters**. The `LinkedList.add` method adds the object to the end of the list. The 
+position-dependent `add` method is the responsibility of an _iterator_, since iterators describe positions in collections.
 Using iterators to add elements makes sense only for collections that have a natural ordering. The _set_ data type
-does not impose any ordering. Therefore, there is no _add_ method in the _Iterator_ interface. Instead, the collections 
-library supplies a subinterface _ListIterator_ that contains an _add_ method:
+does not impose any ordering. Therefore, there is no `add` method in the _Iterator_ interface. Instead, the collections 
+library supplies a subinterface _ListIterator_ that contains an `add` method:
 ```java
 interface ListIterator<E> extends Iterator<E> {
     void add(E element);
     . . .
 }
 ```
-Unlike _Collection.add_, this method does not return a boolean — it is assumed that the _add_ operation always modifies
+Unlike _Collection.add_, this method does not return a boolean — it is assumed that the `add` operation always modifies
 the list. \
 _ListIterator_ has backwards traversing methods: `E previous()` and `boolean hasPrevious()`
 
-> The _add_ method **adds** the new element **before the iterator position** for any _List_ iterator.
+> The `add` method **adds** the new element **before the iterator position** for any _List_ iterator.
 
-> Be careful with the “cursor” analogy. The _remove_ operation does not work exactly like _add_. After a call to _next_,
-> the _remove_ method indeed removes the element to the left of the iterator, but if you have just called _previous_, the
-> element to the right will be removed. Unlike the _add_ method, which depends only on the iterator position, the
-> _remove_ method depends on the iterator state.
+> Be careful with the “cursor” analogy. The _remove_ operation does not work exactly like `add`. After a call to _next_,
+> the `remove` method indeed removes the element to the left of the iterator, but if you have just called _previous_, the
+> element to the right will be removed. Unlike the `add` method, which depends only on the iterator position, the
+> `remove` method depends on the iterator state.
 
-A _set_ method replaces the last element, returned by a call to _next_ or _previous_, with a new element.
+A `set` method replaces the last element, returned by a call to _next_ or _previous_, with a new element.
 
 If an iterator traverses a collection while another iterator is modifying it, and an iterator finds that its collection
 has been modified by another iterator it throws a ConcurrentModificationException. \
@@ -172,7 +169,7 @@ Alternatively, you can attach a single iterator that can both read and write.
 Concurrent modification detection - collection keeps track of the number of mutating operations and _Iterator_ keeps his
 count. Before the operation Iterator checks that its track with the collection track.
 
-> The _linked list_ only keeps track of _structural_ modifications (add/remove). The _set_ method does not count as a
+> The _linked list_ only keeps track of _structural_ modifications (add/remove). The `set` method does not count as a
 > structural modification - because it changes the existing one.
 
 Linked lists do not support random access, but there is `get(index)`. If you find yourself using it, you are probably
@@ -209,3 +206,75 @@ new object with all objects in that bucket to see if it is already present.
 If you want more control over performance, you can specify the _initial bucket count_. The bucket count gives the number
 of buckets used to collect objects with identical hash values.
 
+If the hash table gets too full, it needs to be _rehashed_. To rehash the table, another table with more buckets is
+created, all elements are inserted into the new table, and the original table is discarded. The _load factor_ determines
+when a hash table is _rehashed_. i.e. if the _load factor_ is 0.75 (default) and the table is more than 75% full,
+it is automatically rehashed with twice as many buckets.
+
+Hash tables can be used to implement several important data structures. The simplest - _set_ type. A _set_ is a
+**collection** of elements **without duplicates**. The `add` method of a _set_ first tries to find the object to be added,
+and **adds** it **only if** it is **not yet present**.
+
+You would only **use** a _HashSet_ if you **don’t care about the ordering** of the elements in the collection.
+
+### Tree Sets
+The _TreeSet_ class is similar to the hash set, but it is a **sorted collection**. You insert elements there in any
+order. When you iterate, the values are automatically presented in sorted order. The **sorting** is accomplished **by 
+red-black tree data structure**. \
+Adding an element to a tree is slower than adding it to a hash table, but still faster than checking for duplicates in
+an array or linked list.
+
+> In order to use a _tree set_, you must be able to **compare** the elements. The **elements must implement** the **Comparable**
+> interface, **or** you must **supply a Comparator** when constructing the set.
+
+If you don’t need the data sorted, there is no reason to pay for the sorting overhead.
+
+### Queues and Deques
+> Queue - FIFO, adding to the end of the queue and removing from the beginning. \
+> Dequeue - adding and removing from any end.
+
+With _queue_ adding elements in the middle is **not supported**.
+
+### Priority Queues
+A _priority queue_ retrieves elements in sorted order after they were inserted in arbitrary order. Whenever you call
+the `remove` method, you get the smallest element currently in the priority queue. However, the priority queue does not
+sort all its elements. If you iterate over the elements, they are not necessarily sorted. The priority queue makes use
+of data structure called a _heap_. A _heap_ is a self-organizing binary tree in which the _add_ and _remove_ operations
+cause the smallest element to gravitate to the root, without wasting time on sorting all elements.
+
+Like a _TreeSet_, a _priority queue_ can either hold elements of a class that implements the _Comparable_ interface or
+a _Comparator_ object you supply in the constructor. \
+A typical use for a priority queue is job _scheduling_. Each job has a priority. Whenever a new job can be started, the
+highest priority job is removed from the queue. (for priority 1 to be on top, `remove` yields the minimum element)
+
+### Maps
+A _set_ is a collection that lets you quickly find an existing element. However, to look up an element, you need to have
+an exact copy of the element to find. Usually, you have some key information, and a _map_ stores _key/value_ pairs.
+You can find a value if you provide the key.
+
+### Basic Map Operations
+There are two general-purpose implementations for maps: _HashMap_ and _TreeMap_. Both implement the _Map_ interface. \
+A _hash map_ hashes the keys, and a _tree map_ uses an ordering on the keys to organize them in a search tree. The _hash_
+or _comparison_ function is applied _only to the keys_. The values are not hashed or compared.
+What you choose? As with sets, hashing is usually a bit faster, and if you don’t need to visit the keys in sorted order.
+Whenever you add an object to a map, you must supply a key as well. \
+To retrieve an object, you must use (and, therefore, remember) the key.
+```java
+var id = "987-98-9996";
+Employee e = staff.get(id); // gets harry. If nothing is there - returns null
+```
+If the `null` return value can be inconvenient, then use the `getOrDefault` method.
+```java
+Map<String, Integer> scores = . . .;
+int score = scores.getOrDefault(id, 0); // gets 0 if the id is
+not present
+```
+Keys must be unique. If you call the `put` method twice with the same key, the second value replaces the first one.
+In fact, put returns the previous value associated with its key parameter.
+
+The easiest way of iterating over the keys and values of a map is the `forEach` method. Provide a lambda.
+```java
+scores.forEach((k, v) -> System.out.println("key=" + k + ", value=" + v));
+```
+
+### Updating Map Entries

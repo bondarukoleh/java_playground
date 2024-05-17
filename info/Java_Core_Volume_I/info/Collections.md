@@ -182,3 +182,30 @@ The only reason to use a linked list is to minimize the cost of insertion and re
 linked collection stay away from all methods that use an integer.
 
 ### Array Lists
+The _List_ interface describes an **ordered on insertion collection** in which the position of elements matters. With random
+access. _ArrayList_ class also implements the _List_ interface.
+
+> All methods of the Vector class are synchronized. It is safe to access a Vector object from two threads. But if you
+> access a vector from only a single thread I recommend that you use an ArrayList instead of a Vector whenever you don’t
+> need synchronization.
+
+### Hash Sets
+If you are looking for a particular element and don’t remember its position, you need to visit all elements until you
+find a match. If you don’t care about the ordering, there are data structures that let you find elements much faster.
+The drawback is that those data structures give you no control over the order in which the elements appear. These data
+structures organize the elements in an order that is convenient for their own purposes. \
+A well-known data structure for finding objects quickly is the _hash table_. A hash table computes an integer, called
+the _hash code_, for each object. \
+If you define your own classes, you are responsible for implementing your own _hashCode_. \
+
+In Java, _hash tables_ are implemented as arrays of linked lists. Each list is called a _bucket_. HashSet computes a hash
+from the object and make an index from it. Depends on the object hash - it places this object in the bucket.
+
+Sometimes you will hit a _bucket_ that is already filled. This is called a _hash collision_. Then, hashset compares the
+new object with all objects in that bucket to see if it is already present.
+
+> For better performance, the keys of a hash table should belong to a class that implements the _Comparable_ interface.
+
+If you want more control over performance, you can specify the _initial bucket count_. The bucket count gives the number
+of buckets used to collect objects with identical hash values.
+

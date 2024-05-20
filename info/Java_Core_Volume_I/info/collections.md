@@ -426,3 +426,123 @@ the actual collection object.
 > is not well defined at this level of the hierarchy.
 
 ### Subranges
+Use the `subList` method to obtain a _view_ into the subrange of the list:
+```java
+List<Employee> group2 = staff.subList(10, 20);
+```
+The first index is inclusive, the second exclusive, like in `substring`. You can apply any operations to the subrange,
+and they automatically reflect the entire list.
+
+For sorted sets and maps:
+```java
+SortedSet<E> subSet(E from, E to)
+SortedMap<K, V> subMap(K from, K to)
+```
+The _NavigableSet_ interface has more control over these subrange operations. You can specify whether the bounds are included:
+```java
+NavigableSet<E> subSet(E from, boolean fromInclusive, E to, boolean toInclusive)
+```
+ 
+### Checked Views
+Checked views are intended as debugging support for a problem that can occur with generic types. It is actually possible
+to smuggle elements of the wrong type into a generic collection.
+```java
+var strings = new ArrayList<String>();
+ArrayList rawList = strings; // warning only, not an error, for compatibility with legacy code
+rawList.add(new Date()); // now strings contains a Date object!
+```
+A checked view can detect this problem. Define a safe list as follows:
+```java
+List<String> safeStrings = Collections.checkedList(strings, String.class);
+```
+The view’s `add` method checks that the inserted object belongs to the given class.
+>The checked views **are limited** i.e. ArrayList<Pair<String>> will allow you to insert a Pair<Date> since the virtual
+> machine has a single “raw” Pair class.
+
+### Synchronized Views
+If you access a collection from multiple threads instead of implementing thread-safe collection classes, the library
+designers used the _view_ mechanism to make regular collections thread-safe. i.e. the static _synchronizedMap_ method in
+the _Collections_ class can turn any map into a _Map_ with synchronized access methods:
+```java
+var map = Collections.synchronizedMap(new HashMap<String, Employee>());
+```
+The methods such as `get` and `put` are synchronized — each method call must be finished completely before another
+thread can call another method.
+
+## Algorithms
+### Sorting and Shuffling
+The `sort` method in the _Collections_ class sorts a collection that implements the _List_ interface.
+```java
+var staff = new LinkedList<String>();
+// fill collection
+Collections.sort(staff);
+```
+This method assumes that the list elements implement the _Comparable_ interface. If you want to sort the list in some
+other way, you can use the `sort` method of the _List_ interface and pass a _Comparator_ object. 
+```java
+staff.sort(Comparator.comparingDouble(Employee::getSalary));
+```
+It simply dumps all elements into an array, sorts the array, and then copies the sorted sequence back into the list.
+
+### Binary Search
+To find something in an array, you can look at the middle element and check whether it is larger than the element that
+you are trying to find. If so, keep looking in the first half of the array; otherwise, look in the second half.
+That cuts the problem in half, and you keep going in the same way. \
+The _binarySearch_ of the _Collections_ class implements this algorithm. Note that the collection must already be sorted.
+To be worthwhile, binary search requires random access.
+
+### Bulk Operations
+There are several operations that copy or remove elements “in bulk.”
+```java
+coll1.removeAll(coll2); // removes all elements from coll1 that are present in coll2
+// find the intersection of two sets
+var result = new HashSet<String>(firstSet);
+result.retainAll(secondSet); //It retains all elements that occur in both sets.
+staffMap.keySet().removeAll(terminatedIDs); // remove all IDs of terminated employees
+relocated.addAll(staff.subList(0, 10));
+```
+
+### Converting between Collections and Arrays
+If you have an array that you need to turn into a collection the `List.of`
+```java
+String[] names = . . .;
+List<String> staff = List.of(names);
+```
+Obtaining an array from a collection is a bit trickier. You can use the `toArray` method:
+```java
+Object[] names = staff.toArray();
+```
+But the result is an **array of objects**, and you cannot use a cast, because array remembers that it was created from
+_Object_ type. \
+Instead, pass an array constructor expression to the `toArray` method. 
+```java
+String[] values = staff.toArray(String[]::new);
+```
+
+### Writing Your Own Algorithms
+If you write your own algorithm, you should work with interfaces, not concrete implementations. Receive the Interface and
+return the Interface.
+
+## Legacy Collections
+![legacy_collections](/info/Java_Core_Volume_I/info/media/collections/legacy_collection.PNG)
+
+### The Hashtable Class
+The classic _Hashtable_ class serves the same purpose as the _HashMap_ class and has essentially the same interface.
+Just like methods of the _Vector_ class, the _Hashtable_ methods are synchronized. If you do not require compatibility
+with legacy code, you should use a HashMap instead. If you need concurrent access, use a ConcurrentHashMap
+
+### Enumerations
+Legacy collections use the _Enumeration_ interface for traversing sequences of elements.
+
+### Property Maps
+A property map is a map structure of a special type. It has three particular characteristics:
+- The keys and values are strings.
+- The map can easily be saved to a file and loaded from a file.
+- There is a secondary table for default values.
+
+The Java platform class that implements a property map is called Properties. Property maps are useful in specifying
+configuration options for programs, `System.getProperties()`
+
+### Bit Sets
+_BitSet_ class stores a sequence of bits. The _BitSet_ class gives you a convenient interface for reading, setting, and
+resetting individual bits. Could be flags or something.

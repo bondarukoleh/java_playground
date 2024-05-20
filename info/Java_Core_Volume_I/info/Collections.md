@@ -278,3 +278,151 @@ scores.forEach((k, v) -> System.out.println("key=" + k + ", value=" + v));
 ```
 
 ### Updating Map Entries
+NullPointerException if get returns null
+```java
+counts.put(word, counts.get(word) + 1);
+```
+The remedy is to use the `getOrDefault`
+```java
+counts.put(word, counts.getOrDefault(word, 0) + 1);
+```
+Another approach is to first call the `putIfAbsent` method. Puts a value if the key was previously absent or null
+```java
+counts.putIfAbsent(word, 0);
+counts.put(word, counts.get(word) + 1); // now we are sure
+```
+The `merge` method simplifies this common operation. The call
+```java
+counts.merge(word, 1, Integer::sum);
+```
+associates `word` with `1` if the key wasn’t previously present, and otherwise combines the previous value and `1`,
+using the _Integer::sum_ function.
+
+### Map Views
+The _collections framework_ does not consider a _map_ itself as a collection. However, you can obtain views of the map 
+objects that implement the _Collection_ interface or one of its subinterfaces. There are three views:
+- the _set of keys_ `Set<K> keySet()`
+- the _collection of values_ (which is not a set) `Collection<V> values()`
+- the _set_ of _key/value_ pairs. `Set<Map.Entry<K, V>> entrySet()`
+
+Note that the _keySet_ is not a _HashSet_ or _TreeSet_, but an object of some other class that implements the _Set_ interface.
+
+```java
+for (Map.Entry<String, Employee> entry : staff.entrySet()) {
+    String k = entry.getKey();
+    Employee v = entry.getValue();
+    // do something with k, v
+}
+```
+You can avoid the cumbersome `Map.Entry` by using a `var` declaration.
+```java
+for (var entry : map.entrySet()) {
+    // do something with entry.getKey(), entry.getValue()
+} 
+// Or simply use the forEach method:
+map.forEach((k, v) -> {
+    do something with k, v
+});
+```
+> You **cannot add an element** to the `keySet` view. Adding a new key directly to the view will throw 
+> UnsupportedOperationException, since you need to provide an associated value). However, modifying the _map_ through
+> the keySet by removing keys is supported.
+
+### Weak Hash Maps
+_WeakHashMap_ cooperates with the garbage collector to remove key/value pairs when the only reference to the key is the
+one from the hash table entry.
+
+### Linked Hash Sets and Maps
+A linked hash map can alternatively use access order, not insertion order, to iterate through the map entries. Every
+time you call `get` or `put`, the affected entry is removed from its current position and placed at the end of the linked
+list of entries. (Only the position in the linked list of entries is affected, not the hash table bucket. _Access order_ 
+is useful for implementing a “least recently used” discipline for a cache.
+
+### Enumeration Sets and Maps
+The _EnumSet_ is an efficient _set_ implementation with elements that belong to an enumerated type. Since an enumerated
+type has a finite number of instances, the _EnumSet_ is internally implemented simply as a sequence of bits. A bit is
+turned on if the corresponding value is present in the _set_. The _EnumSet_ class **has no public constructors**.
+
+An _EnumMap_ is a _map_ with keys that belong to an enumerated type.
+
+### Identity Hash Maps
+The _IdentityHashMap_ has a quite specialized purpose. Here, the hash values for the **keys** should **not be computed**
+by the `hashCode` method but by the `System.identityHashCode` method. That’s the method that `Object.hashCode` uses to
+compute a _hash_ code from the object’s memory address. Also, for comparison of objects, the IdentityHashMap uses ==, not
+equals.
+
+In other words, different key objects are considered distinct even if they have equal contents. This class is useful for
+implementing object traversal algorithms, such as object serialization, in which you want to keep track of which objects
+have already been traversed. It can distinguish the identity of the objects, avoid the indefinite loops.
+
+_Serialization_ - making the stream bytes from an object. You can store it in DB, and afterwards pass it via internet and
+deserialize somewhere else.
+
+### Copies and Views
+`keySet` method of the map classes returns an _object_ of a class that implements the _Set_ interface and whose methods
+manipulate the original _map_. Such a collection is called a **view**. \
+**Modifiable Views** created using methods like `subList` and `keySet`. These views allow modifications, which directly
+affect the underlying collection.
+
+### Small Collections
+Java 9 introduces static methods yielding a _set_ or _list_ with given elements, and a _map_ with given _key/value_ pairs \
+
+```java
+List<String> names = List.of("Peter", "Paul", "Mary");
+Set<Integer> numbers = Set.of(2, 3, 5);
+Map<String, Integer> scores = Map.of("Peter", 2, "Paul", 3, "Mary", 5);
+```
+
+> The _elements_, _keys_, or _values_ **may not be null**. Set and map keys may not be duplicated. \
+> **No guarantee** is made about the **iteration order** of these sets and maps.
+
+The _List_ and _Set_ interfaces have an `of` method with a variable number of arguments. For the `.of` _Map_ up to 10
+known arguments. However, for variable arguments - method `ofEntries` that accepts an arbitrary number of `Map.Entry<K, V>`
+objects, which you can create with the static `entry` method.
+```java
+Map<String, Integer> scores = ofEntries(entry("Peter", 2), entry("Paul", 3), entry("Mary", 5));
+```
+These collection objects are _unmodifiable_. Any attempt to change their contents results in an _UnsupportedOperationException_.
+If you want a _mutable_ collection, you can pass the _unmodifiable_ collection to the constructor:
+```java
+var names = new ArrayList<>(List.of("Peter", "Paul", "Mary"));
+// A mutable list of names
+```
+The method call `Collections.nCopies(n, anObject)` returns an immutable object.
+> Previously, there was a static `Arrays.asList` method that returns a list that is mutable but not resizable.
+
+### Unmodifiable Copies and Views
+To make an _unmodifiable copy_ of a collection, use the static _copyOf_. **Immutable Views** are created using methods
+like `Collections.unmodifiableList`. These views do not allow any modifications. Any attempt to modify will result in
+UnsupportedOperationException.
+```java
+ArrayList<String> names = ...;
+Set<String> nameSet = Set.copyOf(names); // The names as an unmodifiable set
+List<String> nameList = List.copyOf(names); // The names as an unmodifiable list
+```
+If the original collection changes, the view reflects those changes. That is what makes views different from copies.
+You obtain unmodifiable views by eight methods:
+- Collections.unmodifiableCollection
+- Collections.unmodifiableList
+- Collections.unmodifiableSet
+- ...
+
+```java
+var staff = new LinkedList<String>();
+lookAt(Collections.unmodifiableList(staff));
+```
+The `Collections.unmodifiableList` returns an object of a class implementing the _List_ interface. Its accessor methods
+retrieve values from the staff collection. All mutator methods (such as add) have been redefined to throw an
+_UnsupportedOperationException_.
+
+The _unmodifiable view_ does not make the collection itself _immutable_. You can still modify the collection **through
+its original reference**, and those changes will reflect on _unmodifiable view_. The _views_ wrap the interface and not
+the actual collection object.
+
+> The _unmodifiableCollection_ method (as well as the _synchronizedCollection_ and _checkedCollection_ methods) returns
+> a collection whose _equals_ method does not invoke the _equals_ method of the underlying collection. Instead, it inherits
+> the _equals_ method of the _Object_ class (ests whether the objects are identical). If you turn a set or list into
+> just a collection, you **can no longer test for equal contents**. The view acts in this way because equality testing
+> is not well defined at this level of the hierarchy.
+
+### Subranges

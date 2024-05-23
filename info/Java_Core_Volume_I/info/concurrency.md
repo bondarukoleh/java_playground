@@ -264,3 +264,101 @@ In general, you will want to protect blocks of code that update or inspect a sha
 > Even if you use a fair lock, you have no guarantee that the thread scheduler is fair.
 
 ### Condition Objects
+Often, a thread enters a critical section only to discover that it can’t proceed until a condition is fulfilled. Use a
+_condition object_ to manage threads that have acquired a lock but cannot do useful work, _condition objects_ are often
+called _condition variables_.
+
+```java
+class Bank
+{
+    private Condition sufficientFunds;
+    public Bank(){
+        sufficientFunds = bankLock.newCondition();
+    }
+        
+    public void transfer(int from, int to, int amount) {
+        bankLock.lock();
+        try {
+            while (accounts[from] < amount) { 
+                sufficientFunds.await();
+                // transfer funds . . .
+                sufficientFunds.signalAll();
+            }
+        }
+        finally {
+            bankLock.unlock();
+       }
+    }
+}
+```
+
+If a thread gains the exclusive access to a resource and waits for another thread to change something there, this is where
+_condition objects_ come in. A _lock object_ can have one or more associated _condition objects_. You obtain _a condition
+object_ with the `newCondition` method. It is smart to give each condition object a name.
+
+If the condition not match thread conditions, a thread calls `await()`, in this way the current thread is deactivates
+and gives up the lock.
+
+There is a difference between a thread that is waiting to acquire a lock and a thread that has called await. Once a
+thread calls the `await` method, it enters a _wait set_ for that condition. The thread is not made runnable when the
+lock is available. Instead, it stays _deactivated_ until another thread has called the `signalAll` method on the same
+condition.
+
+This call reactivates all threads waiting for the condition. When the threads are removed from the _wait set_, they are
+again _runnable_ and the _scheduler_ will eventually activate them again. As soon as the lock is available, one of them
+will acquire the lock and continue where it left off, returning from the call to await. \
+At this time, the thread should test the condition again. There is no guarantee that the condition is now fulfilled the
+`signalAll` method merely signals to the waiting threads that it may be fulfilled.
+
+> In general, a call to `await` should be inside a loop of the form
+```java
+while (!(OK to proceed))
+    condition.await();
+```
+It is crucially that _some other_ thread calls the `signalAll` method eventually. When a thread calls `await`, **it has no
+way of reactivating itself**. If no other thread bothers to reactivate the waiting thread, it will never run again.
+This can lead to unpleasant _deadlock situations_, the program might hang.
+
+When should you call `signalAll`? The rule of thumb is to **call** `signalAll` whenever the **state** of an object 
+**changes** in a way that might be advantageous to waiting threads.
+
+> If a thread was awaited in the `while` loop body, after it awakes - it checks the condition once again before continue \
+> if there was a regular block of the code with a `lock` - it just continue
+
+`signalAll` does not immediately activate a waiting thread. It only unblocks the waiting threads. \
+Another method, `signal`, unblocks only a single thread from the wait set, chosen at random. That is more efficient than
+unblocking all threads, but there is a danger. If the randomly chosen thread finds that it still cannot proceed, it
+becomes blocked again. If no one can wake up another thread - deadlock.
+
+### The `synchronized` Keyword
+Key points about locks and conditions:
+- A lock protects sections of code, allowing only one thread to execute the code at a time. 
+- A lock manages threads that are trying to enter a protected code segment. 
+- A lock can have one or more associated condition objects. 
+- Each condition object manages threads that have entered a protected code section but that cannot proceed.
+
+The _Lock_ and _Condition_ interfaces give programmers a high degree of control over locking. However, in most
+situations, you don’t need that control — you can use an out-of-the-box mechanism in Java. _everything_ inherited from
+_Object_ (so basically everything) in Java has an inner lock. If a method is declared with the `synchronized` keyword,
+the object’s lock protects the entire method the same as we did in the _Lock Objects_ section.
+
+The _intrinsic_ object lock also has a single _associated condition_. The `wait` method adds a thread to the _wait set_,
+and the `notifyAll/notify` methods unblock waiting threads. Calling `wait` or `notifyAll` is the equivalent of `await` and
+`signalAll`
+
+> The `wait`, `notifyAll`, and `notify` methods are **final** methods of the _Object_ \
+> The _Condition_ methods had to be named `await`, `signalAll`, and `signal` to avoid conflicts
+
+It is legal to declare static methods as `synchronized`. It has the intrinsic lock of the associated _class_ object. \
+The intrinsic locks and conditions have some limitations:
+- You cannot interrupt a thread that is trying to acquire a lock.
+- You cannot specify a timeout when trying to acquire a lock.
+- Having a single condition per lock can be inefficient.
+
+What should you use in your code — _Lock_ and _Condition_ objects or `synchronized` methods?
+- It is best to use neither _Lock/Condition_ nor the `synchronized` keyword. In many situations, you can use one of the
+mechanisms of the java.util.concurrent package that do all the locking for you. i.e. Blocking Queues and Parallel streams.
+- If the `synchronized` keyword works for your situation, by all means, use it.
+- Use _Lock/Condition_ if you really know what are you doing.
+
+### Synchronized Blocks

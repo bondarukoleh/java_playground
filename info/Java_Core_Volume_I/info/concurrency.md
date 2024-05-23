@@ -362,3 +362,304 @@ mechanisms of the java.util.concurrent package that do all the locking for you. 
 - Use _Lock/Condition_ if you really know what are you doing.
 
 ### Synchronized Blocks
+So every Java object has a _lock_. A thread can acquire the lock by calling a `synchronized` method. There is a second
+mechanism for acquiring the lock: by entering a _synchronized block_. When a thread enters a  block of the form:
+```java
+synchronized (obj) // this is the syntax for a synchronized block
+{
+    critical section
+}
+```
+then it acquires the lock for `obj`.
+
+> With `synchronized` blocks, be careful about the lock object. Don't lock on string literal, or primitive type wrappers,
+> they could be shared with the same piece of code in some other place, and shared lock leads to deadlock.
+> If you must use `synchronized` blocks, _know your lock object_! You must use the same lock for all protected access
+> paths, and nobody else must use your lock.
+
+As you can see, client-side locking is very fragile and not generally recommended.
+
+### The Monitor Concept
+Researchers have looked for ways to make multithreading safe without forcing programmers to think about explicit locks. \
+The Java designers loosely adapted the monitor concept. Every object in Java has an intrinsic lock and an intrinsic
+condition. If a method is declared with the `synchronized` keyword, it acts like a monitor method. The condition variable
+is accessed by calling `wait/notifyAll/notify`. However, a Java object differs from a monitor in three important ways,
+compromising thread safety:
+- Fields are not required to be private.
+- Methods are not required to be synchronized.
+- The intrinsic lock is available to clients.
+
+### Volatile Fields
+The `volatile` keyword offers a lock-free mechanism for synchronizing access to an instance field. If you declare a
+field as `volatile`, then the compiler and the virtual machine take into account that the field may be concurrently
+updated by another thread.
+
+The compiler will insert the appropriate code to ensure that a change to the `volatile` variable in one thread is
+visible from any other thread that reads the variable.
+
+`volatile` variable will be always read and wrote form the memory, not from the thread cache. That makes all changes
+visible for every other thread. Without it changes from one thread not always instantly visible for another thread due
+to caching of the VM.
+
+### Final Variables
+There is one other situation in which it is safe to access a shared field — when it is declared `final`.
+
+### Atomics
+There are a number of classes in the `java.util.concurrent.atomic` package that guarantee atomicity of other operations
+without using `locks`. For example, the _AtomicInteger_ class has methods `incrementAndGet` and `decrementAndGet`, that
+atomically make this operation.
+
+```java
+public static AtomicLong nextNumber = new AtomicLong();
+// in some thread. . .
+long id = nextNumber.incrementAndGet();
+```
+That is, the operations of getting the value, adding 1, setting it, and producing the new value cannot be interrupted.
+It is guaranteed that the correct value is computed and returned, even if multiple threads access the same instance
+concurrently. There are methods for atomically setting, adding, and subtracting values, but if you want to make a more
+complex update, you have to use the `compareAndSet` method. 
+```java
+largest.updateAndGet(x -> Math.max(x, observed));
+largest.accumulateAndGet(observed, Math::max);
+```
+When you have a very large number of threads accessing the same atomic values, performance suffers because the optimistic
+updates require too many retries. The _LongAdder_ and _LongAccumulator_ classes solve this problem.
+
+### Deadlocks
+It is possible that all threads get blocked because each is waiting for some resource. Such a situation is called a _deadlock_.
+
+> When the program hangs, press _Ctrl+\_ for a thread dump. Alternatively, run `jconsole`, and consult the Threads panel.
+
+Unfortunately, there is nothing in the Java programming language to avoid or break these deadlocks. You must design
+your program.
+
+### Why the stop and suspend Methods Are Deprecated
+The `stop` and `suspend` methods both attempt to control the behavior of a given thread without the thread’s cooperation.
+The `stop`, `suspend`, and `resume` methods have been deprecated.
+
+### On-Demand Initialization
+Sometimes, you want to ensure that initialization happens exactly once. The virtual machine executes a static initializer
+exactly once and ensures this with a lock, so you don’t have to program your own.
+```java
+public class OnDemandData {
+    // private constructor to ensure only one object is constructed
+    private OnDemandData() {/* Initialization */}
+    public static OnDemandData getInstance() {
+        return Holder.INSTANCE;
+    }
+    // only initialized on first use, i.e. in the first call to getInstance
+    // This should work form first try, won't be any second attempt, this happens at most once
+    private static Holder {
+        static final OnDemandData INSTANCE = new OnDemandData();
+    }
+}
+```
+
+### Thread-Local Variables
+Sometimes, you can avoid sharing variables by giving each thread its own instance, using the _ThreadLocal_ helper class.
+To construct one instance per thread, use the following code:
+```java
+public static final ThreadLocal<SimpleDateFormat> dateFormat =
+        ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd"));
+```
+To access the actual formatter, call
+```java
+String dateStamp = dateFormat.get().format(new Date());
+```
+The _java.util.Random_ class is thread-safe. But it is still inefficient if multiple threads need to wait for a single
+shared generator to share. You could use the ThreadLocal helper to give each thread a generator:
+```java
+int random = ThreadLocalRandom.current().nextInt(upperBound);
+```
+The call `ThreadLocalRandom.current()` returns a random number generator instance that is unique to the current thread.
+
+Thread-local variables are also sometimes used to make objects available to all methods that collaborate on a task, without
+having to pass the object from one caller to another. Suppose you want to share a database connection. Declare a variable
+```java
+public static final ThreadLocal<Connection> connection = ThreadLocal.withInitial(() -> null);
+```
+When the task starts, initialize the connection for this thread: 
+```java
+connection.set(connect(url, username, password));
+```
+The task calls some methods, all within the same thread, and eventually one of them needs uses the connection.
+
+## Thread-Safe Collections
+If multiple threads concurrently modify a data structure, such as a hash table, it is easy to damage that data structure.
+You can supply a lock, but it is usually easier to choose a thread-safe implementation instead.
+
+### Blocking Queues
+_Producer threads_ insert items into the queue, and _consumer threads_ retrieve them. This type of collection is handy
+in scenarios where you need to manage the flow of tasks or data between producer and consumer threads, ensure thread-safe
+operations, and handle situations where threads should wait for certain conditions. These scenarios include the producer
+-consumer problem, thread pool executors, bounded buffers, and task scheduling systems.
+
+Instead of accessing the bank resource directly, the _transfer threads_ insert _transfer instruction_ objects into a queue.
+Another thread removes the instructions from the queue and carries out the transfers. Only that thread has access to the
+internals of the bank resource.
+
+A _blocking queue_ causes a thread to block when you try to _add_ an element when the queue is currently full or to _remove_
+an element when the queue is empty.
+
+If you use the _queue_ as a thread management tool, use the `put` and `take` methods. The `add`, `remove`, and element
+operations throw an exception when you try to `add` to a full queue or `get` the head of an empty queue. Of course,
+in a multithreaded program, the queue might become full or empty at any time, so you will instead want to use the `offer`,
+`poll`, and `peek` methods.
+
+> The `poll` and `peek` methods return `null` to indicate failure. Therefore, it is illegal to insert `null` values into
+> these queues.
+
+There are also variants of the `offer` and `poll` methods with a _timeout_.
+```java
+boolean success = q.offer(x, 100, TimeUnit.MILLISECONDS);
+```
+tries for 100 milliseconds to insert an element to the tail of the _queue_.
+
+The _java.util.concurrent_ package supplies several variations of _blocking queues_. The _LinkedBlockingQueue_ has no 
+upper bound on its capacity, (max capacity can be specified). The _ArrayBlockingQueue_ is constructed with a given capacity.
+The _PriorityBlockingQueue_ is a priority queue, not a first-in/first-out queue.
+
+### Efficient Maps, Sets, and Queues
+The _java.util.concurrent_ package supplies efficient implementations for maps, sorted sets, and queues: _ConcurrentHashMap,
+ConcurrentSkipListMap, ConcurrentSkipListSet, and ConcurrentLinkedQueue._ Unlike most collections, the `size` method of
+these classes does not necessarily operate in constant time, to get the size - it needs to traverse the collection \ 
+The collections return _weakly consistent iterators_. That means that the iterators may or may not reflect all
+modifications that are made after they were constructed, but they will not return a value twice and they will not
+throw a _ConcurrentModificationException_.
+
+> A hash map keeps all entries with the same hash code in the same “bucket.” \
+> To the elements with the same hash _resolving collision mechanism_ adds some special keys so, they can be distinguished 
+> among others and puts the into the bucket. 
+
+### Atomic Update of Map Entries
+You often need to do something special when a key is added for the first time. The `merge` method makes this particularly
+convenient.
+```java
+map.merge(word, 1L, (existingValue, newValue) -> existingValue + newValue);
+//or simply
+map.merge(word, 1L, Long::sum);
+```
+### Bulk Operations on Concurrent Hash Maps
+The Java API provides bulk operations on concurrent hash maps that can safely execute even while other threads operate
+on the map.
+There are three kinds of operations:
+- search (like find in JS)
+- reduce
+- forEach
+
+Each operation has four versions:
+- operationKeys: operates on keys.
+- operationValues: operates on values.
+- operation: operates on keys and values.
+- operationEntries: operates on Map.Entry objects
+
+With each of the _operations_, you need to specify a _parallelism threshold_. The _threshold_ parameter specifies a
+minimum size for the number of elements that should be processed by a single task before it is split into smaller tasks.
+This influences the level of parallelism and performance efficiency. If you want the bulk operation to run in a single
+thread, use a threshold of `Long.MAX_VALUE`. If you want the maximum number of threads to be made available for the
+bulk operation, use a threshold of 1.
+
+Suppose we want to find the first word that occurs more than 1,000 times. We need to `search` keys and values:
+```java
+String result = map.search(threshold, (k, v) -> v > 1000 ? k : null);
+// or
+map.search(10, (k, v) -> {
+    if(v > 1000) {
+        // end search with this value
+        return k
+    }
+    // or continue search
+    return null; 
+})
+```
+Then result is set to the _first match_, or to `null` if the search function returns `null` for all inputs.
+
+The `forEach` methods have two variants. The first one simply applies a consumer function for each map entry:
+```java
+map.forEach(threshold, (k, v) -> System.out.println(k + " -> " + v));
+```
+The second variant takes an additional _transformer_ function, which is applied first, and its result is passed to the
+consumer:
+```java
+map.forEach(threshold,
+(k, v) -> k + " -> " + v, // transformer
+System.out::println); // consumer
+```
+The _transformer_ can be used as a _filter_. Whenever the transformer returns `null`, the value is silently skipped.
+For example, here we only print the entries with large values:
+```java
+map.forEach(threshold,
+(k, v) -> v > 1000 ? k + " -> " + v : null, // filter and transformer
+System.out::println); // the nulls are not passed to the consumer
+```
+The `reduce` operations combine their inputs with an accumulation function. i.e, here we compute the sum of all values:
+```java
+Long sum = map.reduceValues(threshold, Long::sum);
+```
+As with `forEach`, you can also supply a transformer function.
+```java
+Integer maxlength = map.reduceKeys(threshold,
+String::length, // transformer
+Integer::max); // accumulator
+```
+The transformer can act as a filter, by returning `null` to exclude unwanted inputs.
+```java
+Long count = map.reduceValues(threshold, v -> v > 1000 ? 1L : null, Long::sum);
+```
+
+> If the map is empty, or all entries have been filtered out, the reduce operation returns `null`. If there is only
+> one element, its transformation is returned, and the accumulator is not applied.
+
+### Concurrent Set Views
+There is no _ConcurrentHashSet_ class. The static `newKeySet` method yields a _Set<K>_ that is actually a wrapper around
+a _ConcurrentHashMap<K, Boolean>_.
+```java
+Set<String> words = ConcurrentHashMap.<String>newKeySet();
+```
+
+### Copy on Write Arrays
+The _CopyOnWriteArrayList_ and _CopyOnWriteArraySet_ are thread-safe collections in which all mutators make a copy of
+the underlying array. This arrangement is useful if the threads that iterate over the collection greatly outnumber the
+threads that mutate it. When you construct an iterator, it contains a reference to the current array. If the array is
+later mutated, the iterator still has the old array, but the collection’s array is replaced. As a consequence, the older
+iterator has a consistent (but potentially outdated) view that it can access without any synchronization expense.
+
+### Parallel Array Algorithms
+The _Arrays_ class has a number of parallelized operations. Good methods for logs array's data, starting form thousands
+of elements, or to sort them (i.e. with _Arrays.parallelSort_)
+
+### Older Thread-Safe Collections
+This is an old mechanism, with worse intrinsic (synch) locks and mechanisms of traversing. You should use Concurrent 
+collections from above sections. 
+
+Ever since the initial release of Java, the _Vector_ and _Hashtable_ classes provided thread-safe implementations of a
+dynamic array and a hash table. These classes are now considered obsolete, having been replaced by the _ArrayList_ and
+_HashMap_ classes. Those classes are not thread-safe. Instead, a different mechanism is supplied in the collections
+library. Any collection class can be made thread-safe by means of a synchronization wrapper:
+```java
+List<E> synchArrayList = Collections.synchronizedList(new ArrayList<E>());
+Map<K, V> synchHashMap = Collections.synchronizedMap(new HashMap<K, V>());
+```
+The methods of the resulting collections are protected by a lock, providing thread-safe access. \
+You should make sure that no thread accesses the data structure through the original _unsynchronized_ methods. The easiest
+way to ensure this is not to save any reference to the original object. Simply construct a collection and immediately
+pass it to the wrapper, as we did in our examples. \
+You still need to use “client-side” locking if you want to iterate over the collection while another thread has the
+opportunity to mutate it:
+```java
+synchronized (synchHashMap)
+{
+    Iterator<K> iter = synchHashMap.keySet().iterator();
+    while (iter.hasNext())
+        . . .;
+}
+```
+The synchronization is still required so that the concurrent modification can be reliably detected.
+
+You are usually better off using the collections defined in the _java.util.concurrent_ package instead of the
+synchronization wrappers. In particular, the _ConcurrentHashMap_ has been carefully implemented so that multiple threads
+can access it without blocking each other, provided they access different buckets. One exception is an array list that
+is frequently mutated. In that case, a synchronized ArrayList can outperform a _CopyOnWriteArrayList_.
+
+## Tasks and Thread Pools
+

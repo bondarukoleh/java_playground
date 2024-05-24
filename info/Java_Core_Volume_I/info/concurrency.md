@@ -662,4 +662,152 @@ can access it without blocking each other, provided they access different bucket
 is frequently mutated. In that case, a synchronized ArrayList can outperform a _CopyOnWriteArrayList_.
 
 ## Tasks and Thread Pools
+Constructing a new thread is somewhat expensive because it involves interaction with the operating system. If your
+program creates a large number of short-lived threads, you should not map each task to a separate thread, but use a
+_thread pool_ instead. A _thread pool_ contains a number of threads that are ready to run. You give a Runnable to the
+pool, and one of the threads calls the run method. When the run method exits, the thread doesn’t die but stays around
+to serve the next request.
 
+### Callables and Futures
+A _Runnable_ encapsulates a task that runs asynchronously; you can think of it as an asynchronous method with no
+parameters and no return value. A _Callable_ is similar to a _Runnable_, but it **returns a value**. The _Callable_
+interface is a parameterized type, with a single method call. \
+
+_Callable_, _Runnable_ and _Future_ do not run tasks asynchronously by themselves. \
+- _Callable_ is used to define, specify the tasks that return a result and can throw exceptions.
+- _Future_ is used to retrieve the result (defined by _Callable_ or _Runnable_), represent it once it has been executed 
+asynchronously. 
+- _ExecutorService_ or _Thread_ is responsible for the asynchronous execution of tasks.
+You submit _Callable_ tasks to an _ExecutorService_, which returns a _Future_ to represent the task's result.
+```java
+public class FutureExample {
+    public static void main(String[] args) {
+        // Create an executor service with a thread pool
+        ExecutorService executor = Executors.newFixedThreadPool(1);
+        
+        // Define a callable task
+        Callable<Integer> callableTask = () -> {
+            // Simulate some computation
+            Thread.sleep(2000); // Simulate delay
+            return 42;
+        };
+
+        // Submit the callable task to the executor for asynchronous execution
+        Future<Integer> future = executor.submit(callableTask);
+
+        try {
+            // Retrieve the result of the computation (blocking call)
+            Integer result = future.get();
+            System.out.println("Result: " + result);
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        } finally {
+            // Shutdown the executor
+            executor.shutdown();
+        }
+    }
+}
+```
+
+_Runnable_, _Callable_ those could be used to define the task that might be executed by extra threads. \
+_Future_ is to get the results form them also from separate threads.
+```java
+public interface Callable<V> {
+    V call() throws Exception;
+}
+```
+A _Future_ holds the result of an asynchronous computation. You start a computation, give someone the _Future_ object,
+and forget about it. The owner of the _Future_ object can obtain the result when it is ready. \
+The _Future<V>_ interface has the following methods:
+```text
+V get()
+V get(long timeout, TimeUnit unit)
+void cancel(boolean mayInterrupt)
+boolean isCancelled()
+boolean isDone()
+```
+A call to the first `get` method blocks the execution (sort of like `await` with Promise) until async the computation is
+finished. The second `get` method also blocks the execution, but it throws a _TimeoutException_ if the call timed out
+before the computation finished.
+
+The `isDone` returns `true/false` if the computation is _finished_ or still _in progress_. \
+You can cancel the computation with the `cancel` method. If the computation has not yet started, it is _canceled_ and
+will never start. If the computation is currently in progress, it is interrupted if the `mayInterrupt` parameter is `true`.
+
+> If a _Future_ object does not know on which thread the task is executed, or if the task does not monitor the interrupted
+> status of the thread on which it executes, cancellation will have no effect.
+
+One way of executing a _Callable_ is to use a _FutureTask_, which implements both the _Future_ and _Runnable_ interfaces,
+so that you can construct a thread for running it:
+```java
+Callable<Integer> task = . . .;
+var futureTask = new FutureTask<Integer>(task);
+var t = new Thread(futureTask); // it's a Runnable t.start();
+. . .
+Integer result = futureTask.get(); // it's a Future
+```
+However, more commonly, you will pass a _Callable_ to an executor.
+
+### Executors
+The _Executors_ class has a number of static factory methods for constructing _thread pools_.
+
+- The `newCachedThreadPool` method constructs a thread pool that executes each task immediately.
+- The `newFixedThreadPool` method constructs a thread pool with a fixed size. 
+- The `newSingleThreadExecutor` size 1 pool where a single thread executes the submitted tasks, one after another.
+These three methods return an object of the _ThreadPoolExecutor_ class that implements the _ExecutorService_ interface.
+
+Use a _cached thread_ pool when you have threads that are short-lived or spend a lot of time blocking. However, if you
+have threads that are working hard without blocking, you don’t want to run a large number of them together. \
+For optimum speed, the number of concurrent threads is the number of processor cores. In such a situation, you should use
+a _fixed thread_ pool that bounds the total number of concurrent threads. \
+The _single-thread_ executor is useful for performance analysis. If you temporarily replace a cached or fixed thread
+pool with a single-thread pool, you can measure how much slower your application runs without the benefit of concurrency.
+
+You can submit a _Runnable_ or _Callable_ to an _ExecutorService_ with one of the following methods:
+```java
+Future<T> submit(Callable<T> task)
+Future<?> submit(Runnable task)
+Future<T> submit(Runnable task, T result)
+```
+When you call `submit`, you get back a Future object that you can use to get the result or cancel the task. \
+The second `submit` method returns an odd-looking Future<?>. You can use such an object to call `isDone`, `cancel`, or
+`isCancelled`, but the `get` method simply returns `null` upon completion. \
+The third version of `submit` yields a Future whose get method returns the given result object upon completion.
+
+When you are done with a thread pool, call `shutdown`. This method initiates the shutdown sequence for the pool.
+When all tasks are finished, the pool dies. If you call `shutdownNow` - pool then cancels all tasks that have not yet begun.
+
+The _newScheduledThreadPool_ and _newSingleThreadScheduledExecutor_ methods of the _Executors_ class return objects that
+implement the _ScheduledExecutorService_ interface. You can schedule a _Runnable_ or _Callable_ to run once, after an
+initial delay. You can also schedule a _Runnable_ to run periodically.
+
+### Controlling Groups of Tasks
+Sometimes, an _executor_ is used for a more tactical reason — simply to control a group of related tasks. with `shutdownNow`
+method or with `invokeAny` method that submits all objects in a collection of Callable objects. You don’t know which task
+that is presumably, it is the one that finished most quickly. Use this method for a search problem in which you are 
+willing to accept any solution.
+
+The `invokeAll` method submits all objects in a collection of Callable objects, blocks until all of them complete, and
+returns a list of `Future` objects that represent the solutions to all tasks.
+
+```java
+List<Callable<T>> tasks = . . .;
+List<Future<T>> results = executor.invokeAll(tasks);
+
+for (Future<T> result : results)
+    processFurther(result.get());
+```
+In the for loop, the first call `result.get()` blocks execution until the first result is available. That is not a
+problem if all tasks finish in about the same time. However, it may be worth obtaining the results in the order in
+which they are available. This can be arranged with the _ExecutorCompletionService_.
+
+```java
+var service = new ExecutorCompletionService<T>(executor);
+for (Callable<T> task : tasks) service.submit(task);
+for (int i = 0; i < tasks.size(); i++)
+processFurther(service.take().get());
+```
+The `invokeAny` method terminates as soon as any task `returns`.
+> You should use executor services to manage threads instead of launching threads individually.
+
+### The Fork-Join Framework

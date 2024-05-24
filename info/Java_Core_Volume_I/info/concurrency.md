@@ -811,3 +811,273 @@ The `invokeAny` method terminates as soon as any task `returns`.
 > You should use executor services to manage threads instead of launching threads individually.
 
 ### The Fork-Join Framework
+Some apps use a large number of threads that are mostly idle, not active. i.e. A web server that uses one thread per
+connection, other applications use one thread per processor core to heavy computations. The _fork-join_ framework, is
+designed to support the latter.
+
+To put the recursive computation in a form that is usable by the framework, supply a class that extends _RecursiveTask<T>_
+(if the computation produces a result of type T) or _RecursiveAction_ (if it doesn’t produce a result). Override the `compute`
+method to generate and invoke subtasks, and to combine their results.
+
+```java
+class Counter extends RecursiveTask<Integer> {
+    protected Integer compute() {
+        if (to - from < THRESHOLD) {
+            // solve problem directly
+        }
+        else {
+            int mid = from + (to - from) / 2;
+            var first = new Counter(values, from, mid, filter);
+            var second = new Counter(values, mid, to, filter); invokeAll(first, second);
+            return first.join() + second.join();
+        }
+    }
+}
+```
+
+Here, the `invokeAll` method receives a number of tasks and blocks until all of them have completed. The `join` method 
+yields the result. \
+Behind the scenes, the fork-join framework uses an effective heuristic, called _work stealing_, for balancing the workload
+among available threads. Each worker thread has a _deque_ for tasks. A worker thread pushes subtasks onto the head of its
+own deque. (Only one thread accesses the head, so no locking is required.) When a worker thread is idle, it “steals” a
+task from the tail of another deque.
+
+## Asynchronous Computations
+So far, we break up work into tasks, and then wait until all pieces have completed. If we don't want to wait - 
+_asynchronous computations_ is up for it.
+
+### Completable Futures
+When you have a _Future_ object, `get` is blocking until the value is available. The _CompletableFuture_ class implements
+the _Future_ interface, and it provides a second mechanism for obtaining the result. You register a _callback_ that will
+be invoked (in some thread) with the result once it is available. 
+```java
+CompletableFuture<String> f = . . .;
+f.thenAccept(s -> Process the result string s);
+```
+A few API methods that return _CompletableFuture_ objects. i.e., you can fetch a web page asynchronously with the
+_HttpClient_. \
+To run a task _asynchronously_ and obtain a _CompletableFuture_, you don’t `submit` it directly to an _executor service_.
+Instead, you call the static method `CompletableFuture.supplyAsync`.
+```java
+public CompletableFuture<String> readPage(URL url) {
+    return CompletableFuture.supplyAsync(() -> {
+        try {
+            return new String(url.openStream().readAllBytes(), "UTF-8");
+        }
+        catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }, executor);
+}
+```
+A _CompletableFuture_ can complete in two ways: either with a _result_, or with an _uncaught exception_. In order to
+handle both cases, use the `whenComplete` method. The supplied function is called with the result (or null if none) and
+the exception (or null if none).
+
+```java
+f.whenComplete((s, t) -> {
+    if (t == null) {
+        // Process the result s;
+    }
+    else {
+        // Process the Throwable t;
+    }
+});
+```
+The _CompletableFuture_ is called completable because you can manually set a completion value. (In other concurrency 
+libraries, such an object is called a **promise**.) Of course, when you create a _CompletableFuture_ with `supplyAsync`,
+the completion value is implicitly set when the task has finished. But setting the result explicitly gives you
+additional flexibility.
+```java
+var f = new CompletableFuture<Integer>();
+executor.execute(() -> {
+    int n = workHard(arg);
+    f.complete(n);
+});
+executor.execute(() -> {
+    int n = workSmart(arg);
+    f.complete(n);
+});
+```
+To instead complete a future with an exception, call
+```java
+Throwable t = . . .;
+f.completeExceptionally(t);
+```
+> It is safe to call `complete` or `completeExceptionally` on the same future in multiple threads. If the future is
+> already `completed`, these calls have no effect.
+
+The `isDone` method tells you whether a _Future_ object has been completed (normally or with an exception).
+
+> Unlike a plain _Future_, the computation of a _CompletableFuture_ is **not interrupted with its `cancel`** method. \
+> Canceling simply sets the _Future_ object to be _completed exceptionally_.
+
+### Composing Completable Futures
+_Nonblocking calls_ are implemented through _callbacks_. The programmer registers a _callback_ for the action that should
+occur after a task completes. Of course, if the next action is also asynchronous, the next action after that is in a
+different callback. It might create a “callback hell.”
+
+The _CompletableFuture_ class solves this problem by providing a mechanism for composing asynchronous tasks into a
+_processing pipeline_.
+
+```java
+public CompletableFuture<String> readPage(URL url);
+public List<URL> getImageURLs(String page);
+CompletableFuture<String> contents = readPage(url); // get the page content
+CompletableFuture<List<URL>> imageURLs = contents.thenApply(this::getImageURLs); // get all images
+```
+The `thenApply` method doesn’t block. It returns another _future_. When the first future has completed, its result is
+fed to the `getImageURLs` method, and the return value of that method becomes the final result.
+```java
+CompletableFuture<Integer> future = CompletableFuture.supplyAsync(() -> 42);
+CompletableFuture<String> transformedFuture = future.thenApply(result -> "Result: " + result);
+transformedFuture.thenAccept(System.out::println); // Output: Result: 42
+```
+The calls
+```text
+CompletableFuture<U> future.thenApply(f);
+CompletableFuture<U> future.thenApplyAsync(f, executor);
+```
+return a _future_ that applies the function `f` to the result of _future_ when it is available. The second call runs
+`f` with yet another executor.
+
+The `thenCompose` method is used for chaining asynchronous tasks where the second task depends on the result of the first.
+It flattens the nested _CompletionStage_ into a single _CompletableFuture_
+```java
+CompletableFuture<Integer> future = CompletableFuture.supplyAsync(() -> 42);
+CompletableFuture<String> composedFuture = future.thenCompose(result ->
+        CompletableFuture.supplyAsync(() -> "Result: " + result)));
+composedFuture.thenAccept(System.out::println); // Output: Result: 42
+```
+There is also a `handle` method that requires a function processing the result or exception and computing a new result.
+In many cases, it is simpler to call the `exceptionally` method instead. That method computes a dummy value when an
+exception occurs
+```java
+CompletableFuture<List<URL>> imageURLs = readPage(url)
+    .exceptionally(ex -> "<html></html>")
+    .thenApply(this::getImageURLs);
+```
+Finally, the static `allOf` and `anyOf` methods take a variable number of completable futures and yield a
+_CompletableFuture<Void>_ that completes when all of them, or any one of them, completes. The `allOf` method does not
+yield a result. The `anyOf` method does not terminate the remaining tasks.
+
+### Long-Running Tasks in User Interface Callbacks
+One of the reasons to use threads is to make your programs more responsive. This is particularly important in an
+application with a user interface. When your program needs to do something time-consuming, you cannot do the work in the
+user-interface thread, or the user interface will be frozen. Instead, fire up another worker thread.
+
+However, you cannot directly update the user interface from the worker thread that executes the long-running task.
+User interfaces such as Swing, JavaFX, or Android are not thread-safe. \
+Therefore, you need to schedule any UI updates to happen on the UI thread.
+
+## Processes
+Up to now, you have seen how to execute Java code in separate threads within the same program. Sometimes, you need to
+execute another program. For this, use the _ProcessBuilder_ and _Process_ classes. The _Process_ class executes a
+command in a _separate operating system process_ and lets you interact with its standard input, output, and error streams.
+The _ProcessBuilder_ class lets you configure a _Process_ object.
+> The ProcessBuilder class is a more flexible replacement for the Runtime.exec calls.
+
+### Building a Process
+Start by specifying the command that you want to execute.
+```java
+var builder = new ProcessBuilder("gcc", "myapp.c");
+```
+> The first string must be an executable command, not a shell builtin. i.e., to run the `dir` command in Windows, you
+> need to build a process with strings "cmd.exe", "/C", and "dir".
+
+Each process has a working _directory_, which is used to resolve relative directory names. By default, a process has the
+same working directory as the virtual machine, which is typically the directory from which you launched the java program.
+You can change it with the `directory` method:
+```java
+builder = builder.directory(path.toFile());
+```
+> Each of the methods for configuring a _ProcessBuilder_ returns itself, so that you can chain commands
+
+Next, you will want to specify what should happen to the _standard input, output_, and _error streams_ of the process.
+
+Note that the input stream of the process is an output stream in the JVM! What you write to that stream becomes the 
+input of the process.
+
+You can specify that the input, output, and error streams of the new process should be the same as the JVM. `builder.inheritIO()` \
+For all three streams, to inherit some of the streams, pass the value `ProcessBuilder.Redirect.INHERIT`
+```java
+builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+```
+Redirect the process streams to files by supplying `File` objects:
+```java
+builder.redirectInput(inputFile)
+    .redirectOutput(outputFile)
+    .redirectError(errorFile)
+```
+The files for output and error are created or truncated when the process starts.
+```java
+builder.redirectOutput(ProcessBuilder.Redirect.appendTo(outputFile));
+```
+It is often useful to merge the output and error streams. To activate the merging:
+```java
+builder.redirectErrorStream(true)
+```
+You may also want to modify the environment variables of the process. You need to get the _builder’s environment_ (which
+is initialized by the environment variables of the process running the JVM), then put or remove entries.
+```java
+Map<String, String> env = builder.environment();
+env.put("LANG", "fr_FR");
+env.remove("JAVA_HOME");
+Process p = builder.start();
+```
+If you want to _pipe_ the output of one process into the input of another (as `|` in a shell), there is a `startPipeline`
+method. Pass a list of process builders and read the result from the last process.
+
+### Running a Process
+After you have configured the builder, invoke its start method to start the process.
+```java
+Process process = new ProcessBuilder("/bin/ls", "-l")
+    .directory(Path.of("/tmp").toFile())
+    .start();
+try (var in = new Scanner(process.getInputStream())) {
+    while (in.hasNextLine())
+        System.out.println(in.nextLine());
+}
+```
+> There is limited buffer space for the process streams. You should not flood the input, or read the output promptly.
+> If there is a lot of input and output, you may need to produce and consume it in separate threads.
+
+To wait for the process to finish, call:
+```java
+int result = process.waitFor();
+```
+or, if you don’t want to wait indefinitely,
+```java
+long delay = . . .;
+if (process.waitFor(delay, TimeUnit.SECONDS)) {
+    int result = process.exitValue(); . . .
+} else {
+    process.destroyForcibly();
+}
+```
+The first call to `waitFor` returns the exit value of the process. The second call returns `true` if the process didn’t
+time out. Retrieve the exit value by calling the `exitValue` method.
+
+Instead of waiting for the process to finish, you can occasionally call `isAlive` to see whether it is still alive.
+To _kill_ the process, call `destroy` or `destroyForcibly`. The difference between these calls is platform-dependent.
+
+Finally, you can receive an asynchronous notification when the process has completed. The call `process.onExit()` yields
+a _CompletableFuture<Process>_ that you can use to schedule any action.
+```java
+process.onExit().thenAccept(p -> System.out.println("Exit value: " + p.exitValue()));
+```
+
+### Process Handles
+To get more information about a process use the _ProcessHandle_ \
+You can obtain a _ProcessHandle_ in four ways:
+1. Given a _Process_ object `p`, `p.toHandle()` yields its _ProcessHandle_.
+2. Given a long operating system process ID, `ProcessHandle.of(id)` yields the handle of that process.
+3. `ProcessHandle.current()` is the handle of the process that runs this Java virtual machine.
+4. `ProcessHandle.allProcesses()` yields a _Stream<ProcessHandle>_ of all operating system processes that are visible to
+the current process.
+
+The `info` method yields a _ProcessHandle.Info_ object.
+All info methods (`arguments`, `command`, ...) return _Optional_ values since it is possible that a particular operating
+system may not be able to report the information.
+
+

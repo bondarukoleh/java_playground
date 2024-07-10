@@ -468,4 +468,468 @@ algorithm:
 > enumerations and records, are safe to serialize.
 
 ### Understanding the Object Serialization File Format
+Object serialization saves object data in a particular file format. \
+When an object is saved, the class of that object must be saved as well. \
+The class descriptor has the following format:
+```text
+72
+2-byte length of class name
+Class name
+8-byte fingerprint
+1-byte flag
+2-byte count of instance field descriptors
+Instance field descriptors
+78 (end marker)
+Superclass descriptor (70 if none)
+```
+
+### Modifying the Default Serialization Mechanism
+Java has an easy mechanism to prevent fields from ever being serialized: Mark them with the keyword transient. You also
+need to tag fields as transient if they belong to nonserializable classes. `@Serial` notation. \
+Then, the instance fields are no longer automatically serialized—these methods are called instead.
+
+### Versioning
+If you use serialization to save objects, you need to consider what happens when your program evolves.
+
+> Before you add a `serialVersionUID` field to a class, ask yourself why you made your class serializable. If serialization
+> is used only for short-term persistence, such as distributed method calls in an application server, there is no need 
+> to worry about versioning and the `serialVersionUID`.
+
+### Using Serialization for Cloning
+Serialization mechanism gives you an easy way to clone an object, provided the class is serializable. Simply serialize
+it to an output stream and then read it back in. The result is a new object that is a deep copy of the existing object.
+You can use a `ByteArrayOutputStream` to save the data into a byte array. To get clone for free, simply extend the
+`SerialCloneable` class, and you are done. \
+You should be aware that this method, although clever, will usually be much slower than a clone method that explicitly 
+constructs a new object and copies or clones the instance fields.
+
+### Deserialization and Security
+During deserialization of a serializable class, objects are created without invoking any constructor of the class.
+
+Bypassing constructors is a security risk. An attacker can craft bytes describing an invalid object that could have never
+been constructed.
+
+But, it is not difficult to inspect the bytes for a serialized object and modify some of them. By doing so, one can craft
+bytes for an employee with a negative salary and then deserialize them.
+
+A serializable class can optionally implement the ObjectInputValidation interface and define a validateObject method to
+check whether its objects are properly deserialized.
+
+Any application that receives serialized data from untrusted sources over a network connection is vulnerable to such
+attacks. In the example of session data, the server should sign the data, and only deserialize data with a valid signature.
+
+## Working with Files
+The `Path` interface and Files class encapsulate the functionality required to work with the file system on the user’s
+machine.
+
+### Paths
+A Path is a sequence of directory names, optionally followed by a file name. A path that starts with a root component
+is _absolute_. Otherwise, it is _relative_. For example, here we construct an absolute and a relative path.
+
+```java
+Path absolute = Path.of("/home", "harry");
+Path relative = Path.of("myprog", "conf", "user.properties");
+```
+
+The static `Path.of` method receives one or more strings, which it joins with the path separator of the default file
+system, throwing an `InvalidPathException` if the result is not a valid path in the given file system. The result is a
+_Path object_.
+
+```java
+String baseDir = props.getProperty("base.dir");
+// May be a string such as /opt/myprog or c:\Program Files\myprog
+Path basePath = Path.of(baseDir); // OK that baseDir has separators
+```
+_resolve_ paths - `p.resolve(q)`
+
+- If q is absolute, then the result is q.
+- Otherwise, the result is “p then q,” according to the rules of the file system.
+
+There is a convenience method `resolveSibling` that resolves against a path’s parent, yielding a sibling path.
+For example, if _workPath_ is _/opt/myapp/work_, the call 
+```java
+Path tempPath = workPath.resolveSibling("temp");
+```
+creates /opt/myapp/temp.
+
+The opposite of resolve is `relativize`. The call `p.relativize(r)` yields the path `q` which, when resolved with `p`,
+yields `r`. For example, relativizing _/home/harry_ against _/home/fred/input.txt_ yields _../fred/input.txt_. \
+
+The `normalize` method removes any redundant `.` and `..` components. For example, normalizing the path
+_/home/harry/../fred/./input.txt_ yields _/home/fred/input.txt._
+
+The `toAbsolutePath` method yields the absolute path, as _/home/fred/input.txt_
+
+### Reading and Writing Files
+The Files class makes quick work of common file operations. You can easily read the entire contents of a file as a byte
+array, string, list of lines, or stream of lines:
+```java
+byte[] bytes = Files.readAllBytes(path);
+String content = Files.readString(path, charset);
+List<String> lines = Files.readAllLines(path, charset);
+Stream<String> lineStream = Files.lines(path, charset);
+```
+Conversely, for writing:
+```java
+Files.write(path, bytes);
+Files.writeString(path, content, charset);
+Path.write(path, lines, charset);
+```
+To append to a given file, use
+```java
+Files.write(path, content, charset, StandardOpenOption.APPEND);
+```
+The call
+```java
+long pos = Files.mismatch(path1, path2);
+```
+yields the position of the first byte where the file contents differ.
+
+The following methods allow you to interact with an API that uses the
+classic input/output streams or readers/writers:
+```java
+InputStream in = Files.newInputStream(path);
+OutputStream out = Files.newOutputStream(path);
+Reader in = Files.newBufferedReader(path, charset);
+Writer out = Files.newBufferedWriter(path, charset);
+```
+
+### Creating Files and Directories
+To create a new directory, call
+```java
+Files.createDirectory(path);
+```
+All but the last component in the path must already exist. To create intermediate directories as well, use
+```java
+Files.createDirectories(path);
+```
+You can create an empty file with
+```java
+Files.createFile(path);
+```
+The call throws an exception if the file already exists.
+
+For creating a temporary file or directory in a given or system-specific location.
+```java
+Path newPath = Files.createTempFile(dir, prefix, suffix);
+Path newPath = Files.createTempFile(prefix, suffix);
+Path newPath = Files.createTempDirectory(dir, prefix);
+Path newPath = Files.createTempDirectory(prefix);
+```
+
+The call `Files.createTempFile(null, ".txt")` might return a path such as _/tmp/1234405522364837194.txt._
+
+### Copying, Moving, and Deleting Files
+```java
+Files.copy(fromPath, toPath);
+Files.move(fromPath, toPath);
+```
+The copy or move will fail if the target exists. If you want to overwrite:
+```java
+Files.copy(fromPath, toPath, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.COPY_ATTRIBUTES);
+Files.move(fromPath, toPath, StandardCopyOption.ATOMIC_MOVE); // specify that a move should be atomic
+```
+You can also copy an input stream to a Path
+```java
+Files.copy(inputStream, toPath);
+Files.copy(fromPath, outputStream);
+Files.delete(path);
+boolean deleted = Files.deleteIfExists(path);
+```
+Can also be used to remove an empty directory.
+
+There is a bunch of options available for operations:
+READ, WRITE, APPEND, TRUNCATE_EXISTING, CREATE_NEW, CREATE, DELETE_ON_CLOSE, SPARSE, etc.
+
+### Getting File Information
+The following static methods return a boolean value to check a property of a path:
+- exists
+- isHidden
+- isReadable, isWritable, isExecutable
+- isRegularFile, isDirectory, isSymbolicLink
+
+The `size` method returns the number of bytes in a file. 
+```java
+long fileSize = Files.size(path);
+```
+All file systems report a set of basic attributes, encapsulated by the BasicFileAttributes interface.
+The basic file attributes are:
+- The times at which the file was created, last accessed, and last modified, as instances of the class 
+java.nio.file.attribute.FileTime
+- Whether the file is a regular file, a directory, a symbolic link, or none of these
+- The file size
+- The file key—an object of some class, specific to the file system, that may or may not uniquely identify a file
+
+To get these attributes, call 
+```java
+BasicFileAttributes attributes = Files.readAttributes(path, BasicFileAttributes.class);
+```
+### Visiting Directory Entries
+The static Files.list method returns a Stream<Path> that reads the entries of a directory.
+
+```java
+try (Stream<Path> entries = Files.list(pathToDirectory)) {
+. . .
+}
+```
+
+The list method does not enter subdirectories. To process all descendants of a directory, use the Files.walk method instead.
+```java
+try (Stream<Path> entries = Files.walk(pathToRoot)) {
+// Contains all descendants, visited in depth-first order
+}
+```
+You can limit the depth of the tree that you want to visit by calling Files.walk(pathToRoot, depth).
+
+> If you filter the paths returned by walk and your filter criterion involves the file attributes stored with a directory,
+> such as size, creation time, or type, then use the find method instead of walk. Call that method with a predicate
+
+### Using Directory Streams
+Sometimes, you need more fine-grained control over the traversal process. In that case, use the Files.newDirectoryStream
+object instead. It yields a DirectoryStream, an interface that is specialized for directory traversal.
+```java
+try (DirectoryStream<Path> entries = Files.newDirectoryStream(dir)) {
+    for (Path entry : entries)
+        Process entries
+}
+```
+You can filter the files with a glob pattern:
+```java
+try (DirectoryStream<Path> entries = Files.newDirectoryStream(dir, "*.java"))
+```
+
+![glob_patterns](/info/Java_Core_Volume_I/info/media/input_output/glob_patterns.PNG)
+
+If you want to visit all descendants of a directory, call the `walkFileTree` (more powerful and flexible that `walk`)
+method instead and supply an object of type `FileVisitor`.
+That object gets notified
+- When a file is encountered: FileVisitResult visitFile(T path, BasicFileAttributes attrs)
+- Before a directory is processed: FileVisitResult preVisitDirectory(T dir, IOException e)
+- After a directory is processed: FileVisitResult postVisitDirectory(T dir, IOException e)
+- When an error occurred trying to visit a file or directory, such as trying to open a directory without the necessary
+permissions: FileVisitResult visitFileFailed(T path, IOException e)
+
+In each case, you can specify whether you want to
+- Continue visiting the next file: FileVisitResult.CONTINUE
+- Continue the walk, but without visiting the entries in this directory: FileVisitResult.SKIP_SUBTREE
+- Continue the walk, but without visiting the siblings of this file: FileVisitResult.SKIP_SIBLINGS
+- Terminate the walk: FileVisitResult.TERMINATE
+
+```java
+Files.walkFileTree(Path.of("/"), new SimpleFileVisitor<Path>() {
+    public FileVisitResult preVisitDirectory(Path path, BasicFileAttributes attrs) throws IOException {
+        System.out.println(path);
+        return FileVisitResult.CONTINUE;
+    }
+    public FileVisitResult postVisitDirectory(Path dir, IOException e) {
+        return FileVisitResult.CONTINUE;
+    }
+    public FileVisitResult visitFileFailed(Path path, IOException e) throws IOException {
+        return FileVisitResult.SKIP_SUBTREE;
+    }
+});
+```
+
+### ZIP File Systems
+The Paths class looks up paths in the default file system. You can have other file systems. One of the more useful ones
+is a _ZIP file system_.
+
+It’s an easy matter to copy a file out of that archive:
+```java
+Files.copy(fs.getPath(sourceName), targetPath);
+```
+
+## Memory-Mapped Files
+Most operating systems can take advantage of a virtual memory implementation to “map” a file, or a region of a file, 
+into memory. Then the file can be accessed as if it were an in-memory array, which is much faster than the traditional
+file operations.
+
+### Memory-Mapped File Performance
+First, get a _channel_ for the file. A channel is an abstraction for a disk file that lets you access operating system
+features such as memory mapping, file locking, and fast data transfers between files.
+```java
+FileChannel channel = FileChannel.open(path, options);
+```
+Then, get a `ByteBuffer` from the channel by calling the `map` method of the `FileChannel` class. Specify the area of
+the file that you want to map and a _mapping mode_.
+```java
+MappedByteBuffer buffer = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
+```
+Once you have the buffer, you can read and write data using the methods of the `ByteBuffer` class and the `Buffer` superclass.
+
+### The Buffer Data Structure
+When you use memory mapping, you make a single buffer that spans the entire file or the area of the file that you're
+interested in. The Buffer class is an abstract class with concrete subclasses ByteBuffer, CharBuffer, DoubleBuffer,
+FloatBuffer, IntBuffer, LongBuffer, and ShortBuffer.
+
+> The StringBuffer class is not related to these buffers.
+
+In practice, you will most commonly use ByteBuffer and
+CharBuffer. A buffer has
+- A _capacity_ that never changes
+- A _position_ at which the next value is read or written
+- A _limit_ beyond which reading and writing is meaningless
+- Optionally, a _mark_ for repeating a read or write operation
+
+![glob_patterns](/info/Java_Core_Volume_I/info/media/input_output/buffer.PNG)
+
+These values fulfill the condition `0 ≤ mark ≤ position ≤ limit ≤ capacity` \
+The principal purpose of a buffer is a “write, then read” cycle.
+
+```java
+ByteBuffer buffer = ByteBuffer.allocate(RECORD_SIZE);
+channel.read(buffer);
+channel.position(newpos);
+buffer.flip();
+channel.write(buffer);
+```
+
+## File Locking
+When multiple simultaneously executing programs need to modify the same file, they need to communicate in some way, or
+the file can easily become damaged. File locks can solve this problem. A file lock controls access to a file or a range
+of bytes within a file.
+
+To lock a file, call either the lock or tryLock methods of the FileChannel class.
+```java
+FileChannel channel = FileChannel.open(path);
+FileLock lock = channel.lock();
+// or
+FileLock lock = channel.tryLock();
+```
+You can also lock a portion of the file with the call
+```java
+FileLock lock(long start, long size, boolean shared)
+FileLock tryLock(long start, long size, boolean shared)
+```
+A _shared_ lock, which allows multiple processes to read from the file, while preventing any process from acquiring an
+exclusive lock.
+
+> If you lock the tail portion of a file and the file subsequently grows beyond the locked portion, the additional area
+> is not locked. To lock all bytes, use a size of Long.MAX_VALUE.
+
+Be sure to unlock the lock when you are done. As always, this is best done with a try-with-resources statement:
+```java
+try (FileLock lock = channel.lock()) {
+    access the locked file or segment
+}
+```
+Keep in mind that file locking is system-dependent.
+
+## Regular Expressions
+You can use regular expressions whenever you need to locate strings that match a particular pattern.
+
+### Matching an Entire String
+Generally, there are two ways to use a regular expression: Either you want to find out whether a string conforms to the
+expression, or you want to find all matches of a regular expressions in a string. In the first case, simply use the
+static matches method:
+```java
+String regex = "-]?\\d+";
+CharSequence input = . . .;
+if (Pattern.matches(regex, input)) {
+    . . .
+}
+```
+If you need to use the same regular expression many times, it is more efficient to compile it. Then, create a Matcher 
+for each input:
+```java
+Pattern pattern = Pattern.compile(regex);
+Matcher matcher = pattern.matcher(input);
+if (matcher.matches()) . . .
+```
+If you want to match elements in a collection or stream, turn the pattern into a predicate:
+```java
+Stream<String> strings = . . .;
+List<String> result =
+strings.filter(pattern.asPredicate()).toList();
+```
+The result contains all strings that contain a match of the regular expression. \
+To match the entire string, use `pattern.asMatchPredicate()` instead.
+
+### Finding All Matches in a String
+You can call the `results` method to get a `Stream<MatchResult>`. The `MatchResult` interface has methods `group`, `start`,
+and `end`, just like `Matcher`.
+```java
+List<String> matches = pattern.matcher(input).results().map(Matcher::group).toList();
+```
+If you have the data in a file
+```java
+Scanner in = new Scanner(path, "UTF_8");
+Stream<String> words = in.findAll("\\pL+").map(MatchResult::group);
+```
+
+### Groups
+It is common to use groups for extracting components of a match.
+```java
+Matcher matcher = pattern.matcher(input);
+if (matcher.matches()) {
+    item = matcher.group(1);
+    currency = matcher.group(3);
+    price = matcher.group(4);
+}
+```
+you can use a noncapturing group
+```java
+(\p{Alnum}+(?:\s+\p{Alnum}+)*)\s+([A-Z]{3})([0-9.]*)
+```
+Or, even capture by name:
+```java
+(?<item>\p{Alnum}+(\s+\p{Alnum}+)*)\s+(?<currency>[A-Z]{3})(?<price>[0-9.]*)
+```
+Then
+```java
+item = matcher.group("item");
+```
+> Retrieving groups by name only works with a Matcher, not with a MatchResult.
+
+### Splitting along Delimiters
+Sometimes, you want to break an input along matched delimiters and keep everything else. The Pattern.split method 
+automates this task. You obtain an array of strings, with the delimiters removed:
+```java
+String input = . . .;
+Pattern commas = Pattern.compile("\\s*,\\s*");
+String[] tokens = commas.split(input);
+// "1, 2, 3" turns into ["1", "2", "3"]
+```
+If there are many tokens, you can fetch them lazily:
+```java
+Stream<String> tokens = commas.splitAsStream(input);
+```
+If you don't care about precompiling the pattern or lazy fetching, you can just use the String.split method:
+```java
+String[] tokens = input.split("\\s*,\\s*");
+```
+If the input is in a file, use a scanner:
+```java
+Scanner in = new Scanner(path, "UTF_8");
+in.useDelimiter("\\s*,\\s*");
+Stream<String> tokens = in.tokens();
+```
+
+### Replacing Matches
+If you want to replace all matches of a regular expression with a string, call replaceAll on the matcher:
+```java
+Matcher matcher = commas.matcher(input);
+String result = matcher.replaceAll(","); // Normalizes the commas
+// Or, if you don't care about precompiling
+String result = input.replaceAll("\\s*,\\s*", ",");
+```
+The replacement string can contain group numbers $n or names ${name}. They are replaced with the contents of the
+corresponding captured groups.
+```java
+String result = "3:45".replaceAll( "(\\d{1,2}):(?<minutes>\\d{2})", "$1 hours and ${minutes} minutes");
+// Sets result to "3 hours and 45 minutes"
+```
+you can provide a replacement function instead
+```java
+String result = Pattern.compile("\\pL{4,}").matcher("Mary had a little lamb").replaceAll(m -> m.group().toUpperCase());
+// Yields "MARY had a LITTLE LAMB"
+```
+
+### Flags
+Several flags change the behavior of regular expressions. 
+```java
+Pattern pattern = Pattern.compile(regex,
+Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CHARACTER_CLASS);
+```
+There is a bunch of flags available.
 

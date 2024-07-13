@@ -99,4 +99,71 @@ When creating a JAR file, you can optionally specify a version number.
 > The module equivalent to a class loader is a layer. The Java Platform Module System loads the JDK modules and
 > application modules into the boot layer. A program can load other modules, using the layer API
 
+## Automatic Modules
+Almost all projects rely on third-party libraries. Of course, you can wait until the providers of all libraries have
+turned them into modules, and then modularize your own code. \
+But what if you don't want to wait? The Java Platform Module System provides two mechanisms for crossing the chasm that
+separates today’s premodular world and fully modular applications: automatic modules and the unnamed module.
 
+For migration purposes, you can turn any JAR file into a module simply by placing it onto a directory in the module path
+instead of the class path. A JAR without a _module-info.class_ on the module path is called an automatic module. An
+automatic module has the following properties:
+1. The module implicitly has a requires clause for all other modules.
+2. All of its packages are exported and opened.
+3. If there is an entry with key Automatic-Module-Name in the JAR file manifest META-INF/MANIFEST.MF, its value becomes
+   the module name.
+4. Otherwise the module name is obtained from the JAR file name, dropping any trailing version number and replacing
+   sequences of nonalphanumeric characters with a dot.
+
+## The Unnamed Module
+Any class that is not on the module path is part of an _unnamed module_. Technically, there may be more than one unnamed
+module, but all of them together act as if they are a single module which is called the unnamed module. As with automatic
+modules, the unnamed module can access all other modules, and all of its packages are exported and opened. However, no
+explicit module can access the _unnamed module_. (An explicit module is a module that is neither automatic nor unnamed 
+that is, a module with a _module-info.class_ on the module path.) In other words, explicit modules are always free from 
+the “class path hell.”
+
+## Transitive and Static Requirements
+Module declares the requirement with the transitive modifier:
+```java
+module java.desktop {
+    requires java.prefs;
+    requires transitive java.datatransfer;
+    requires transitive java.xml;
+    . . .
+}
+```
+
+Any module that declares a requirement on that transitive user module _java.desktop_ now automatically requires these two
+modules.
+
+One compelling use of the requires transitive statement is an aggregator module—a module with no packages and only
+transitive requirements.
+
+Finally, there is an uncommon requires static variant that declares that a module must be present at compile time but
+is optional at runtime.
+
+## Qualified Exporting and Opening
+```text
+exports sun.net to
+java.net.http,
+jdk.naming.dns;
+```
+Such a statement is called a _qualified export_. The listed modules can access the exported package, but other modules
+cannot.
+
+## Service Loading
+The _ServiceLoader_ class provides a lightweight mechanism for matching up service interfaces with implementations. The
+Java Platform Module System makes this mechanism easier to use. Adds maintainability, flexibility, easier to manage and
+evolve.
+
+## Tools for Working with Modules
+The _jdeps_ tool analyzes the dependencies of a given set of JAR files. Suppose, for example, that you want to modularize
+JUnit 4. Run
+```shell
+jdeps -s junit-4.12.jar hamcrest-core-1.3.jar
+```
+
+Use the _jlink_ tool to produce an application that executes without a separate Java runtime.
+
+Finally, the _jmod_ tool builds and inspects the module files that are included with the JDK. 

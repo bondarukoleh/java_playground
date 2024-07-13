@@ -185,4 +185,137 @@ public @interface BugReport {
 ```
 
 ### Annotations
+Each annotation has the format
+```java
+@AnnotationName(elementName1=value1, elementName2=value2, ...)
+```
+```java
+@BugReport(assignedTo="Harry", severity=10)
+```
+The order of the elements does not matter. \
+The default value of the declaration is used if an element value is not specified.
 
+```java
+@BugReport
+@BugReport(assignedTo="[none]", severity=0)
+```
+Such an annotation is called a _marker annotation_.
+The other shortcut is the _single-value annotation_. If an element has the special name value and no other element is
+specified, you can omit the element name
+
+```java
+@ActionListenerFor("yellowButton")
+// instead of
+@ActionListenerFor(value="yellowButton")
+```
+An item can have multiple annotations, and you can repeat the same annotation multiple times if it is declared repeatable.
+```java
+@Test
+@BugReport(showStopper=true, reportedBy="Joe")
+@BugReport(reportedBy={"Harry", "Carl"})
+public void checkRandomInsertions()
+```
+
+> An annotation element can never be set to null, to find other defaults, such as "" or Void.class.
+
+Since an annotation element can be another annotation, you can build arbitrarily complex annotations. For example,
+```java
+@BugReport(ref=@Reference(id="3352627"), . . .)
+```
+
+ ### Annotating Declarations
+Annotations fall into two categories: _declarations_ and _type uses_. _Declaration_ annotations can appear at the
+declarations of:
+- Packages
+- Classes (including enum)
+- Interfaces (including annotation interfaces)
+- Methods
+- Constructors
+- Instance fields (including enum constants)
+- Local variables
+- Parameter variables
+- Type parameters
+
+### Annotating Type Uses
+A declaration annotation provides some information about the item being declared. For example, in the declaration
+```java
+public User getUser(@NonNull String userId)
+```
+it is asserted that the userId parameter is not null.
+
+> The @NonNull annotation is a part of the Checker Framework. With that framework, you can include assertions in your
+> program—for example, that a parameter is non-null and others.
+
+Suppose we have a parameter of type List<String>, and we want to express that all of the strings are non-null.
+Place the annotation before the type argument: `List<@NonNull String>`
+
+Type use annotations can appear in the following places:
+- With generic type arguments: List<@NonNull String>, Comparator.<@NonNull String> reverseOrder().
+- In any position of an array: @NonNull String[][] words (words[i][j] is not null), String @NonNull [][] words (words is
+not null), String[] @NonNull [] words (words[i] is not null).
+- With superclasses and implemented interfaces: class Warning extends @Localized Message.
+- With constructor invocations: new @Localized String(. . .).
+- With casts and instanceof checks: (@Localized String) text, if (text instanceof @Localized String). (The annotations
+are only for use by external tools. They have no effect on the behavior of a cast or an instanceof check.)
+- With exception specifications: public String read() throws @Localized IOException.
+- With wildcards and type bounds: List<@Localized ? extends Message>, List<? extends @Localized Message>.
+- With method and constructor references: @Localized Message::getText.
+
+There are a few type positions that cannot be annotated:
+```java
+@NonNull String.class // ERROR: Cannot annotate class literal
+import java.lang.@NonNull String; // ERROR: Cannot annotate import
+```
+
+### Annotating _this_
+You can annotate _this_
+```java
+public class Point  {
+    public boolean equals(@ReadOnly Point this, @ReadOnly Object other) { ... }
+}
+```
+The first parameter is called the _receiver parameter_. It must be named this. Its type is the class that is being
+constructed.
+
+## Standard Annotations
+| Annotation Interface |          Applicable To           |                       Purpose                       |
+|:--------------------:|:--------------------------------:|:---------------------------------------------------:|
+|      Deprecated      |               All                |              Marks item as deprecated               |
+|  Suppress Warnings   | All but packages and annotations |        Suppresses warnings of the given type        |
+|     SafeVarargs      |     Methods and constructors     |  Asserts that the varargs parameter is safe to use  |
+|       Override       |             Methods              |                  self explanatory                   |
+|        Serial        |             Methods              |                    serialization                    |
+| FunctionalInterface  |            Interfaces            |                  self explanatory                   |
+|      Generated       |               All                |                generated source code                |
+|        Target        |           Annotations            | Specified the item marked annotation can be applied |
+|      Retention       |           Annotations            |       how long marked annotation has retained       |
+|      Documented      |           Annotations            |       marked annotations should be documented       |
+|      Inherited       |           Annotations            |         marked annotation will be inherited         |
+|      Repeatable      |           Annotations            |         marked annotation can be repeatable         |
+
+### Meta-Annotations
+The `@Target` meta-annotation is applied to an annotation, restricting the items to which the annotation applies
+```java
+@Target({ElementType.TYPE, ElementType.METHOD})
+public @interface BugReport
+```
+
+## Source-Level Annotation Processing
+Another use for annotation is the automatic processing of source files to produce more source code, configuration files,
+scripts, or whatever else one might want to generate.
+### Annotation Processors
+Annotation processing is integrated into the Java compiler. During compilation, you can invoke annotation processors by
+running
+```shell
+javac -processor ProcessorClassName1,ProcessorClassName2,. . . sourceFiles
+```
+
+The compiler locates the annotations of the source files. Each annotation processor is executed in turn and given the
+annotations in which it expressed an interest.
+
+>An annotation processor can only generate new source files. It cannot modify an existing source file.
+
+### The Language Model API
+Use the language model API for analyzing source-level annotations. API lets you analyze a Java program according to the
+rules of the Java language. The compiler produces a tree whose nodes are instances of classes that implement the
+_javax.lang.model.element.Element_ interface and its subinterfaces.

@@ -1,33 +1,111 @@
-Maven - program that compiles and builds you project. You can build your java code from console, via IDEA, or via some
-helper program like Ant, Maven, or Gradle.
+## Maven
+You can build your java code from console, via IDE, or via some helper program like Ant, Maven, or Gradle.
+
+Maven simplifies the build process by providing a uniform build system and a project management framework, handles project
+dependencies, lifecycle, and builds, making it easier to manage and deploy Java projects.
 
 Many projects are using maven as a build tool, and it needs some configuration for itself. To not create this structure
-by yourself, we can use mvn to generate a project.
+by yourself, we can use `mvn` to generate a project.
 Maven parses settings file, understands what is going on and passes control to his plugins.
 
 ```shell script
 mvn archetype:generate;
 ```
 
-groupId - url of your company. For example if it would google - it would be "com.google".
-artifactId - name of your project.
-version
-Those properties are uniq identifiers for you project.
+POM (Project Object Model) is a corner settings file for maven. \
+It contains some key elements:
+- GroupId, ArtifactId, Version:
+These elements `groupId, artifactId, and version` uniquely identify the project. For example, `com.example:my-app:1.0-SNAPSHOT`
+- Packaging:
+Specifies that the project will be packaged as a JAR file.
+- Dependencies:
+This project depends on JUnit for testing. The scope is set to test, meaning JUnit is only used during testing.
+- Build and Plugins:
+Configures the maven-compiler-plugin to use Java 1.8 for source and target compilation.
 
-pom.xml - file with maven settings.
-
-After project structure with simple code is generated we can compile it from root folder. 
+After project structure with simple code is generated we can compile it from root folder.
 ```shell script
-mvn compile;
-mvn test; #to run the tests
-mvn package; #to create a jar file
-java -cp target/my_jar_file.jar com.olehbondaruk.App
-         #class pass            #what class I want to run    
+mvn clean install
 ```
+When you combine `clean` and `install`, Maven first cleans up the previous build artifacts and then runs through the
+entire build lifecycle up to the `install` phase.
 
-src/main/java - for app code
-src/main/resources - for media, html, and other data
-src/main/test - for tests
+### Maven Lifecycle Phases
+Maven defines a series of build phases, each representing a step in the build lifecycle. When you run mvn install, Maven
+executes all phases up to and including install in the following order:
+- validate: Checks if the project is correct and all necessary information is available.
+- compile: Compiles the source code of the project.
+- test: Runs tests using a suitable testing framework (e.g., JUnit).
+- package: Packages the compiled code into a distributable format, such as a JAR or WAR file.
+- verify: Runs any checks to ensure the package is valid and meets quality criteria.
+- install: Installs the package into the local repository (default `~/.m2/repository`) for use as a dependency in other
+projects.
+
+
+
+Maven lifecycle - set of plugins that run in once, one after another:
+- default - handles your project deployment
+- **validate** - validate the project is correct and all necessary information is available.
+- initialize - initialize build state, e.g. set properties or create directories.
+- generate-sources - generate any source code for inclusion in compilation.
+- process-sources - process the source code, for example to filter any values.
+- generate-resources - generate resources for inclusion in the package.
+- process-resources - copy and process the resources into the destination directory, ready for packaging.
+- **compile** - compile the source code of the project.
+- process-classes - post-process the generated files from compilation, for example to do bytecode enhancement on Java classes.
+- generate-test-sources - generate any test source code for inclusion in compilation.
+- process-test-sources - process the test source code, for example to filter any values.
+- generate-test-resources - create resources for testing.
+- process-test-resources - copy and process the resources into the test destination directory.
+- test-compile - compile the test source code into the test destination directory
+- process-test-classes - post-process the generated files from test compilation, for example to do bytecode enhancement
+on Java classes.
+- **test** - run tests using a suitable unit testing framework. These tests should not require the code be packaged or deployed.
+- prepare-package - perform any operations necessary to prepare a package before the actual packaging. This often 
+results in an unpacked, processed version of the package.
+- **package** - take the compiled code and package it in its distributable format, such as a JAR.
+- pre-integration-test - perform actions required before integration tests are executed. This may involve things
+such as setting up the required environment.
+- integration-test - process and deploy the package if necessary into an environment where integration tests can be run.
+- post-integration-test - perform actions required after integration tests have been executed. This may include
+  cleaning up the environment.
+- **verify** - run any checks to verify the package is valid and meets quality criteria.
+- **install** - install the package into the local repository, for use as a dependency in other projects locally.
+- **deploy** - done in an integration or release environment, copies the final package to the remote repository for
+sharing with other developers and projects.
+- **clean** - handles project cleaning
+- pre-clean - execute processes needed prior to the actual project cleaning
+- clean - remove all files generated by the previous build
+- post-clean - execute processes needed to finalize the project cleaning
+- site - handles the creation of your project's site documentation.
+- pre-site - execute processes needed prior to the actual project site generation
+- site - generate the project's site documentation
+- post-site - execute processes needed to finalize the site generation, and to prepare for site deployment
+- site-deploy - deploy the generated site documentation to the specified web server.
+
+### Dependency Management
+Dependency system allows you to easily include external libraries (dependencies) in your project. Maven handles downloading
+these libraries, managing version conflicts, and resolving transitive dependencies.
+
+`<dependencies>` -> `<dependency>` containing `groupId, artifactId, version`.
+
+#### Dependency Scopes
+Scopes control the classpath of the various build tasks and specify when the `dependency` is included in the classpath:
+
+The `classpath` is a parameter in the JVM and the Java compiler that specifies the location of user-defined classes and
+packages. It's essentially a list of directories, JAR files, and ZIP files where the JVM looks for classes and resources
+when running Java programs.
+
+- compile (default):
+Available in all classpaths (`compile`, `test`, `runtime`). Included in the final artifact. 
+- provided:
+Available in `compile` and `test` classpaths but not `runtime`. Not included in the _final artifact_ (e.g., servlet API).
+- runtime:
+Not available in the `compile` classpath. Available in `runtime` and `test` classpaths. Included in the _final artifact_ (e.g., JDBC driver).
+- test:
+Only available in the `test` classpath. Not included in the _final artifact_ (e.g., testing frameworks).
+- system:
+Similar to `provided` but requires an explicit path to the JAR on the local file system. _Should be **avoided** if possible._
 
 You can run a maven plugin with some goal separately.
 ```shell script
@@ -37,50 +115,18 @@ mvn help:describe -Dplugin=surefire # "help" plugin with "describe" goal (-D arg
 mvn help:describe -Dplugin=surefire -Dgoal=test #get the info about surefire test goal. (some time need -Dmojo=test ?)
 ```
 
+#### Transitive Dependencies
+Maven automatically includes transitive dependencies. If your project depends on Library A, and Library A depends on
+Library B, Maven will include Library B in your project.
+
+#### Managing Dependency Conflicts
+When multiple versions of the same dependency are included (directly or transitively), Maven uses the nearest-wins
+strategy to resolve conflicts. If conflicts arise, you can explicitly specify the version you want to use or exclude
+the unwanted version.
+
+
+
 The surefire plugin is responsible for testing.
-
-Maven lifecycle - set of plugins that run in once, one after another.
-
-default - handles your project deployment
-    validate - validate the project is correct and all necessary information is available.
-    initialize - initialize build state, e.g. set properties or create directories.
-    generate-sources - generate any source code for inclusion in compilation.
-    process-sources - process the source code, for example to filter any values.
-    generate-resources - generate resources for inclusion in the package.
-    process-resources - copy and process the resources into the destination directory, ready for packaging.
-    compile - compile the source code of the project.
-    process-classes - post-process the generated files from compilation, for example to do bytecode enhancement on Java 
-        classes.
-    generate-test-sources - generate any test source code for inclusion in compilation.
-    process-test-sources - process the test source code, for example to filter any values.
-    generate-test-resources - create resources for testing.
-    process-test-resources - copy and process the resources into the test destination directory.
-    test-compile - compile the test source code into the test destination directory
-    process-test-classes - post-process the generated files from test compilation, for example to do bytecode 
-        enhancement on Java classes.
-    test - run tests using a suitable unit testing framework. These tests should not require the code be packaged or 
-        deployed.
-    prepare-package - perform any operations necessary to prepare a package before the actual packaging. This often 
-        results in an unpacked, processed version of the package.
-    package - take the compiled code and package it in its distributable format, such as a JAR.
-    pre-integration-test - perform actions required before integration tests are executed. This may involve things 
-        such as setting up the required environment.
-    integration-test - process and deploy the package if necessary into an environment where integration tests can be run.
-    post-integration-test - perform actions required after integration tests have been executed. This may including 
-        cleaning up the environment.
-    verify - run any checks to verify the package is valid and meets quality criteria.
-    install - install the package into the local repository, for use as a dependency in other projects locally.
-    deploy - done in an integration or release environment, copies the final package to the remote repository for 
-        sharing with other developers and projects.
-clean - handles project cleaning
-    pre-clean - execute processes needed prior to the actual project cleaning
-    clean - remove all files generated by the previous build
-    post-clean - execute processes needed to finalize the project cleaning
-site - handles the creation of your project's site documentation.
-    pre-site - execute processes needed prior to the actual project site generation
-    site - generate the project's site documentation
-    post-site - execute processes needed to finalize the site generation, and to prepare for site deployment
-    site-deploy - deploy the generated site documentation to the specified web server.
 
 So all job is done with plugins, e.g. to copy resources to target, and compile java code - we need something like: 
 ```shell script

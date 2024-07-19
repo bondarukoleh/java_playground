@@ -6,15 +6,15 @@
 
   <groupId>com.olehbondaruk</groupId>
   <artifactId>maven_stuff</artifactId>
-  <packaging>pom</packaging>
-  <version>1.0</version>
+  <packaging>jar</packaging>
+  <version>1.0-SNAPSHOT</version>
 
-  <name>maven_stuff</name>
+  <name>Maven-tryouts</name>
   <url>http://www.example.com</url>
 
-  <modules>
-    <module>Module_project</module>
-  </modules>
+<!--  <modules>-->
+<!--    <module>Module_project</module>-->
+<!--  </modules>-->
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -36,6 +36,12 @@
         <artifactId>log4j-core</artifactId>
         <version>2.17.1</version>
       </dependency>
+
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>31.0.1-jre</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -54,10 +60,16 @@
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-core</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.12.0</version>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
 
   <build>
-    <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
+    <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (maybe moved to parent pom) -->
       <plugins>
         <plugin>
           <artifactId>maven-clean-plugin</artifactId>

@@ -89,6 +89,56 @@ these libraries, managing version conflicts, and resolving transitive dependenci
 
 `<dependencies>` -> `<dependency>` containing `groupId, artifactId, version`.
 
+Before the maven - you needed to download locally all dependencies for your project, which was not effective.
+All popular dependency maven stores on his repository (like npm) in .jar files.
+All dependencies in the repository, same as you project has coordinates, identification:
+groupId (backwards url), artifactId (name of dependency), and version. With this you can add package you want to
+your project with a pom.xml
+
+e.g. I want to use a logger in my code. I need to add dependencies section to pom.
+```xml
+<dependencys>
+    <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-core</artifactId>
+        <version>2.13.2</version>
+        <!--<package>war/zip/jar</package> not necessary but you can change type of package you want to include-->
+        <!--<optional>true</optional> also we have ability to make dependency optional -->
+    </dependency>
+</dependencys>
+```
+
+Then I have ability to use
+```java
+import org.apache.logging.log4j.Logger;
+public class App {
+    Logger logger = Logger.getLogger(App.class); 
+    public static void main(String[] args) {
+        System.out.println("Ahh... shi... here we go again.");
+        logger.debug("Hello from logger!");
+    }
+}
+```
+
+All dependencies (packages) lies globally in _~/.m2/repository_ (like global node modules in _~/AppData/Roaming_ (win))
+maven plugins also in this folder. \
+All packages are in a hierarchy _groupId > artifactId > version_.
+
+#### Dependency versioning
+( - this brace means from this version but not include it.
+[ - this brace means from this version but include it as well.
+```xml
+<project>
+  <version>(1.2,1.5)</version> <!-- means you can use 1.3, 1.4 -->
+  <version>[1.2,1.5)</version> <!-- means you can use 1.2, 1.3, 1.4 -->
+  <version>(1.2,1.5]</version> <!-- means you can use 1.3, 1.4, 1.5 -->
+  <version>[1.2,1.5]</version> <!-- means you can use 1.2, 1.3, 1.4, 1.5 -->
+  <version>[1.2,]</version> <!-- means you can use 1.2 and all further -->
+  <version>[,1.5)</version> <!-- means you can use all versions before 1.2 -->
+  <version>(,1.5)</version> <!-- not valid (?) -->
+</project>
+```
+
 #### Dependency Scopes
 Scopes control the classpath of the various build tasks and specify when the `dependency` is included in the classpath:
 
@@ -119,131 +169,6 @@ mvn help:describe -Dplugin=surefire -Dgoal=test #get the info about surefire tes
 Maven automatically includes transitive dependencies. If your project depends on Library A, and Library A depends on
 Library B, Maven will include Library B in your project.
 
-#### Managing Dependency Conflicts
-When multiple versions of the same dependency are included (directly or transitively), Maven uses the nearest-wins
-strategy to resolve conflicts. If conflicts arise, you can explicitly specify the version you want to use or exclude
-the unwanted version.
-
-
-
-The surefire plugin is responsible for testing.
-
-So all job is done with plugins, e.g. to copy resources to target, and compile java code - we need something like: 
-```shell script
-mvn resources:resources compiler:compile surefire:test
-```
-But this is too long, so instead you just type.
-```shell script
-mnv compile test
-```
-And all these plugins is run one after another.
-NOTE: if you run the "compile" default lifecycle step, that means maven will run all previous to compile steps like
-initialize, generate, ... process-resources.
-
-maven_folder/lib/maven-model-builder-3.6.3 - here is a super POM, basic pom.xml. And all your settings that you've
-added in your project pom.xml - is overriding setting from a basic pom.xml.
-The effective pom - it's a mix from super POM and your project's pom.xml.
-
-```shell script
-mvn help:effective-pom; # will show current state of your pom.xml
-``` 
-
-```xml
-<myProperty>My_Property_value</myProperty>
-<version>${project.myProperty}-beta</version>
-```
-You can get some properties of your project with template string syntax ${}.
-
-Same story with env vars, we can get the value typing property name.
-```xml
-<version>${MY_ENV_VAR}-beta</version>
-```
-
-Or you can rely on some env var using env reference
-```xml
-<version>${env.MY_ENV_VAR}-beta</version>
-```
-
-Also, we have settings reference.
-<version>${settings.offline}-beta</version>
-
-Your properties you need to add in properties section:
-```xml
-<project>
-    <properties>
-        <myProp>123</myProp>
-    </properties>
-
-    <version>${myProp}-beta</version>
-</project>
-```
-All compiled properties you can find in target/maven-archiver/pom.properties 
-
-Some settings in pom.xml don't have serious impact, and cary only informative sense.
-name, url, organization, developer, timezone, email, id, role, licence, distribution...
-
-Dependencies.
-Before the maven - you needed to download locally all dependencies for your project, which was not effective.
-Maven can manage it for you. All popular dependency maven stores on his repository (like npm) in .jar files.
-All dependencies in the repository, same as you project has coordinates, identification:
-groupId (backwards url), artifactId (name of dependency), and version. With this you can add package you want to 
-your project with a pom.xml
- 
-e.g. I want to use a logger in my code.
-I need to add dependencies section to pom.
-```xml
-<dependencys>
-    <dependency>
-        <groupId>org.apache.logging.log4j</groupId>
-        <artifactId>log4j-core</artifactId>
-        <version>2.13.2</version>
-        <!--<package>war/zip/jar</package> not necessary but you can change type of package you want to include-->
-        <!--<optional>true</optional> also we have ability to make dependency optional -->
-    </dependency>
-</dependencys>
-```
-
-Then I have ability to use
-```java
-import org.apache.logging.log4j.Logger;
-public class App {
-    Logger logger = Logger.getLogger(App.class); 
-    public static void main(String[] args) {
-        System.out.println("Ahh... shi... here we go again.");
-        logger.debug("Hello from logger!");
-    }
-}
-```
-
-All dependencies (packages) lies globally in ~/.m2/repository (like global node modules in ~/AppData/Roaming (win))
-maven plugins also in this folder.
-All packages are in a hierarchy groupId > artifactId > version.
-
-You have ability to add optional dependency.
-For example there is a big project (or yours), with a lot of functionality, and developers decided that not all
-functionality of this project will often be used, or they force user of their project to use his implementation of some
-module, and for some specific functionality - they make dependencies optional.
-When someone will add this project to his pom as a dependency, maven automatically install all not-optional dependencies
-from his repo, and optional won't be installed.
-When you will use this specific functionality - you'll need to add dependency to your pom with your hands.
-Something like peer dependency in npm, it assumes that you have this already in your local .m2 folder, or you need to 
-add it.
-
-Dependency versioning.
-( - this brace means from this version but not include it. 
-[ - this brace means from this version but include it as well.
-```xml
-<project>
-    <version>(1.2,1.5)</version> <!-- means you can use 1.3, 1.4 -->
-    <version>[1.2,1.5)</version> <!-- means you can use 1.2, 1.3, 1.4 -->
-    <version>(1.2,1.5]</version> <!-- means you can use 1.3, 1.4, 1.5 -->
-    <version>[1.2,1.5]</version> <!-- means you can use 1.2, 1.3, 1.4, 1.5 -->
-    <version>[1.2,]</version> <!-- means you can use 1.2 and all further -->
-    <version>[,1.5)</version> <!-- means you can use all versions before 1.2 -->
-    <version>(,1.5)</version> <!-- not valid (?) -->
-</project>
-``` 
-
 Transitive Dependencies, also help when there is cycle dependency in your dependencies:
 ```shell script
  mvn dependency:resolve #will check for dependency
@@ -251,15 +176,29 @@ Transitive Dependencies, also help when there is cycle dependency in your depend
  mvn dependency:analyze #will print statistic about your dependencies
 ```
 
-When a few of your dependencies using different version of same package, and you want to exclude one of it
-you can in dependency tag in your pom add exclusions tag and type ID of needed package to exclude.
+#### Managing Dependency Conflicts
+When multiple versions of the same dependency are included (directly or transitively), Maven uses the nearest-wins
+strategy to resolve conflicts. If conflicts arise, you can explicitly specify the version you want to use or exclude
+the unwanted version.
 
-from dependency tree we know
-[INFO] +- junit:junit:jar:4.11:test
+You have ability to add optional dependency \
+For example there is a big project, with a lot of functionality, and developers decided that not all functionality of
+this project will often be used, or they force user of their project to use his implementation of some module, and for
+some specific functionality - they make dependencies optional. \
+When someone will add this project to his _pom_ as a dependency, maven automatically install all not-optional dependencies
+from his repo, and optional won't be installed. \
+When you will use this specific functionality - you'll need to add dependency to your _pom_ with your hands. Something
+like peer dependency in npm, it assumes that you have this already in your local _.m2_ folder, or you need to add it.
+
+When a few of your dependencies using different version of same package, and you want to exclude one of it you can in
+dependency tag in your pom add exclusions tag and type ID of needed package to exclude. \
+From dependency tree we know
+```text
+[INFO] +- junit:junit:jar:4.11:test 
 [INFO] |  \- org.hamcrest:hamcrest-core:jar:1.3:test
+```
 
-I want to exclude hamcrest
-my pom:
+I want to exclude _hamcrest_. My pom:
 ```xml
     <dependency>
           <groupId>junit</groupId>
@@ -275,13 +214,243 @@ my pom:
         </dependency>
 ```
 and we get:
+```text
 [INFO] +- junit:junit:jar:4.11:test
-without hamcrest.
+```
+without hamcrest. \
 After you exclude something you don't want - you can add needed one as a regular dependency.
 
-Modules.
-Every big project contain from small projects, modules. If we are adding new module to parent project, then in parent
-and child pom will be added:
+### Plugins and Goals
+Maven plugins are a core feature of Maven that provide the ability to extend and customize the build process. Each _plugin_
+has specific _goals_, which are individual tasks that the plugin can execute. Goals can be bound to different phases of
+the build lifecycle to automate a wide range of tasks such as compiling code, running tests, packaging artifacts,
+deploying applications, and more.
+
+#### Common Maven Plugins
+- Maven `Compiler` Plugin:
+Used to compile the project's source code. Goals: `compile`, `testCompile`.
+- Maven `Surefire` (responsible for testing) Plugin:
+Used to run unit tests. Goals: `test`.
+- Maven `JAR` Plugin:
+Used to create a JAR file from the project's compiled classes. Goals: `jar`.
+- Maven `Install` Plugin:
+Used to install the project's artifact into the local repository. Goals: `install`.
+- Maven `Deploy` Plugin:
+Used to deploy the project's artifact to a remote repository. Goals: `deploy`.
+
+So all job is done by plugins, e.g. to copy resources to target, and compile java code - we need something like: 
+```shell script
+mvn resources:resources compiler:compile surefire:test
+```
+But this is too long, so instead you just type.
+```shell script
+mnv compile test
+```
+And all these plugins is run one after another.
+
+> NOTE: if you run the `compile` default lifecycle step, that means maven will run all previous to compile steps like
+initialize, generate, ... process-resources.
+
+#### Custom Plugin Goals and Binding
+You can also bind plugin goals to specific phases of the build lifecycle. This allows you to automate the execution of
+these goals as part of the standard build process. \
+In this example, the `clean` goal of the _maven-clean-plugin_ is explicitly bound to the `clean` phase of the build lifecycle.
+```xml
+  <build>
+  <plugins>
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-clean-plugin</artifactId>
+      <version>3.1.0</version>
+      <executions>
+        <execution>
+          <id>custom-clean</id>
+          <phase>clean</phase>
+          <goals>
+            <goal>clean</goal>
+          </goals>
+        </execution>
+      </executions>
+    </plugin>
+  </plugins>
+</build>
+```
+
+### Maven Repositories
+Maven repositories are locations where Maven stores and retrieves project artifacts (JARs, POMs, etc.). These repositories
+are essential for _dependency management_, allowing Maven to download the dependencies required by your project and to
+upload artifacts produced by your project.
+
+Types of Repositories:
+- Local Repository. A local directory on your machine where _Maven_ stores downloaded artifacts and built projects.
+Default location: _~/.m2/repository_ on Unix-based systems or _C:\Users\<your-username>\.m2\repository_ on Windows.
+Artifacts are stored here after the first download, speeding up subsequent builds.
+- Central Repository. A large public repository maintained by the Maven community. Default repository from which Maven
+downloads dependencies if they are not found in the local repository. URL: https://repo.maven.apache.org/maven2
+- Remote Repositories. Additional repositories specified in your pom.xml or settings.xml file. Used for retrieving
+dependencies or deploying artifacts to a remote server.
+
+#### Configuring Repositories
+Repositories are configured in the _pom.xml_ file or the _settings.xml_ file.
+
+### Effective POM
+The effective POM is the result of merging your project's pom.xml with the super POM and other parent POMs. This merged
+POM includes all inherited configurations, making it a comprehensive representation of the project's build configuration.
+
+maven_folder/lib/maven-model-builder-3.6.3 - here is a super POM, basic pom.xml. And all your settings that you've
+added in your project pom.xml - is overriding setting from a basic pom.xml.
+The effective pom - it's a mix from super POM and your project's pom.xml.
+
+```shell script
+mvn help:effective-pom; # will show current state of your pom.xml
+``` 
+
+### Build Profiles
+Build profiles in Maven allow you to customize the build process for different environments, conditions, or requirements.
+By defining profiles, you can tailor dependencies, plugins, properties, and other configurations dynamically _based on_ 
+certain criteria such as the active profile, operating system, or _specific properties_.
+
+#### Defining Profiles
+Profiles are defined in the _pom.xml_ file within the <profiles> element. Each profile is defined with a unique identifier
+and can include its own set of configurations.
+
+In this example, a dev profile is defined with specific properties, dependencies, and plugin configurations that are only
+active when the `dev` profile is activated.
+Profiles can be added to pom.xml:
+```xml
+<profiles>
+    <profile>
+        <id>dev</id>
+        <properties>
+            <env>development</env>
+            <run_port>3000</run_port>
+        </properties>
+        <dependencies>
+            ...
+        </dependencies>
+        <build>
+            <plugins>
+                ...
+            </plugins>
+        </build>
+    </profile>
+    <profile>
+        <id>prod</id>
+        <properties>
+          <env>production</env>
+          <run_port>4000</run_port>
+        </properties>
+    </profile>
+</profiles>
+```
+
+Or in settings.xml. \
+Or we can create file profiles.xml in project root folder:
+```xml
+<profilesXml xmlns="http://maven.apache.org/PROFILES/1.0.0">
+    <profiles>
+        <profile>
+    <!--activation optional, if you want to run it depend on environment variable env=dev
+            <activation> 
+                <property>
+                    <name>env</name>
+                    <value>dev</value>
+                </property>
+            </activation> -->
+            <id>dev</id>
+            <properties>
+                <run_port>3000</run_port>
+            </properties>
+        </profile>
+    </profiles>
+</profilesXml>
+```
+
+#### Activating Profiles
+Profiles can be activated in several ways:
+```xml
+<activation>
+        <activeByDefault/>
+        <jdk/> <!-- depends on JDK version -->
+        <os> <!-- depends on OS -->
+          <name/>
+          <family/>
+          <arch/>
+          <version/>
+        </os>
+        <property> <!-- if property with some name equals value -> profile will be activated -->
+          <name/>
+          <value/>
+        </property>
+        <file> <!-- depends on existing or messing file -->
+          <missing/>
+          <exists/>
+        </file>
+</activation>
+```
+
+1. Command Line:
+  ```shell
+  mvn clean install -Pdev
+  ```
+2. Settings File:
+```xml
+<settings>
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+    </profiles>
+    <activeProfiles>
+        <activeProfile>dev</activeProfile>
+    </activeProfiles>
+</settings>
+```
+3. Environment Variables:
+```xml
+<profiles>
+    <profile>
+        <id>prod</id>
+        <activation>
+            <property>
+                <name>env</name>
+                <value>production</value>
+            </property>
+        </activation>
+        <!-- Profile configurations -->
+    </profile>
+</profiles>
+```
+You can set the environment variable and then run Maven:
+```shell
+export env=production
+mvn clean install
+```
+
+### Multi-module Projects
+A multi-module project is a project that is made up of multiple subprojects (or modules). Each subproject has its own
+_pom.xml_ file, but there's also a parent project with its own _pom.xml_ that manages the overall structure and 
+configuration of the subprojects.
+
+```text
+parent-project
+│
+├── pom.xml
+├── module1
+│   └── pom.xml
+├── module2
+│   └── pom.xml
+└── module3
+    └── pom.xml
+```
+Parent pom has a `<modules>` section, child pom has a `<parent>` section.
+
+Modules. Every big project contain from small projects, modules. If we are adding new module to parent project, then 
+in parent and child pom will be added:
+
 ```xml
   <!-- Parent pom -->
   <modules>
@@ -297,14 +466,91 @@ and child pom will be added:
   <artifactId>Sub_project</artifactId> <!-- In child module only project name is changed by default, but you can change more--> 
 ```
 Child will inherit all setting from parent, same as all poms inherited settings from super maven pom and can override
-them. Also, if project has a lot of modules, and you don't need all of them - we can build modules separately with
-the maven, via a tool window in IDEA, or via terminal in root folders of submodules.
+them. Also, if project has a lot of modules, and you don't need all of them - we can build modules separately with the
+maven, via a tool window in IDEA, or via terminal in root folders of submodules.
 
-Dependency management.
 For example in your project there are two sub projects (modules), each of the added different version of junit to his
 dependency. To solve this you can add dependency management to your main pom and tell set the version there, after this
-in all sub modules you can set only groupId and artifactId of the dependency, version will be set from parent pom 
+in all sub modules you can set only groupId and artifactId of the dependency, version will be set from parent pom
 automatically.
+
+### Unit Tests with Maven Surefire Plugin
+The Maven Surefire Plugin is used for running unit tests. By default, it looks for test classes in the _src/test/java_
+directory and executes any methods annotated with testing frameworks like JUnit or TestNG.
+
+```xml
+<plugin>
+  <groupId>org.apache.maven.plugins</groupId>
+  <artifactId>maven-surefire-plugin</artifactId>
+  <version>3.0.0-M5</version>
+  <configuration>
+    <includes>
+      <include>**/*Test.java</include>
+    </includes>
+    <!--    parallel test execution-->
+    <parallel>classes</parallel>
+    <threadCount>4</threadCount>
+  </configuration>
+</plugin>
+```
+
+### Integration Tests with Maven Failsafe Plugin
+The Maven Failsafe Plugin is designed for running integration tests. It is typically used in the integration-test and
+verify phases of the Maven build lifecycle. \
+Failsafe expects integration test classes to follow a specific naming convention, typically ending with IT (e.g., MyClassIT.java).
+```xml
+<plugin>
+  <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-failsafe-plugin</artifactId>
+      <version>3.0.0-M5</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+              <goal>verify</goal>
+            </goals>
+          </execution>
+        </executions>
+</plugin>
+```
+
+
+#### Diff
+You can get some properties of your project with template string syntax ${}.
+```xml
+<myProperty>My_Property_value</myProperty>
+<version>${project.myProperty}-beta</version>
+```
+
+Same story with env vars, we can get the value typing property name.
+```xml
+<version>${MY_ENV_VAR}-beta</version>
+```
+
+Or you can rely on some env var using env reference
+```xml
+<version>${env.MY_ENV_VAR}-beta</version>
+```
+
+Also, we have settings reference.
+```xml
+<version>${settings.offline}-beta</version>
+```
+
+Your properties you need to add in properties section:
+```xml
+<project>
+    <properties>
+        <myProp>123</myProp>
+    </properties>
+
+    <version>${myProp}-beta</version>
+</project>
+```
+All compiled properties you can find in _target/maven-archiver/pom.properties_ 
+
+Some settings in _pom.xml_ don't have serious impact, and cary only informative sense. Things like: name, url,
+organization, developer, timezone, email, id, role, licence, distribution...
 
 
 Exec plugin
@@ -312,6 +558,7 @@ Run code not via java -cp ./my_app.jar com.oleh.App App but via maven exec plugi
 ```shell script
 mvn exec:java -Dexec.mainClass=Main
 ```
+
 Jetty plugin
 To run web application - you need to run .war file, and you can serve it with tomcat server, and check it out on 
 localhost. To avoid run a heavy tomcat - you can use the jetty plugin.
@@ -339,85 +586,10 @@ Add jetty to plugins
 And you can run tasks in maven tool window > plugins > jetty
 Also you can run it via a console $> mvn jetty:run
 
-Maven profiles
-To run application in different environments, e.g. dev and prod.
-And you'll see profiles section in maven tool window.
-Also, we can use terminal: mvn clean package -Pdev (-P - for profile)
-We can add profiles in pom
-```xml
-    <profiles>
-        <profile>
-            <id>dev</id>
-            <properties>
-                <run_port>3000</run_port>
-            </properties>
-        </profile>
-        <profile>
-            <id>prod</id>
-            <properties>
-                <run_port>4000</run_port>
-            </properties>
-        </profile>
-    </profiles>
-```
-Or we can create file profiles.xml in project root folder:
-```xml
-<profilesXml xmlns="http://maven.apache.org/PROFILES/1.0.0">
-    <profiles>
-        <profile>
-    <!--activation optional, if you want to run it depend on environment variable env=dev
-            <activation> 
-                <property>
-                    <name>env</name>
-                    <value>dev</value>
-                </property>
-            </activation> -->
-            <id>dev</id>
-            <properties>
-                <run_port>3000</run_port>
-            </properties>
-        </profile>
-    </profiles>
-</profilesXml>
-```
-Or we can add them in ~/settings.xml:
-```xml
-<settings>
-    <profiles>
-        <profile>
-            <id>dev</id>
-            <properties>
-                <run_port>3000</run_port>
-            </properties>
-        </profile>
-    </profiles>
-</settings>
-```
-IDEA will complain that in pom it cannot resolve variables (from ~/setting), but build will be ok.
-activation - tag helps to activate needed profile depends on environment where program starts.
-```xml
-<activation>
-        <activeByDefault/>
-        <jdk/> <!-- depends on JDK version -->
-        <os> <!-- depends on OS -->
-          <name/>
-          <family/>
-          <arch/>
-          <version/>
-        </os>
-        <property> <!-- if property with some name equals value -> profile will be activated -->
-          <name/>
-          <value/>
-        </property>
-        <file> <!-- depends on existing or messing file -->
-          <missing/>
-          <exists/>
-        </file>
-      </activation>
-```
-Filtering resources
-When you want to give ability user of your project customize some properties - you can add in resources
-folder something with contend depend on your pom properties tags. Like some texts file with:
+
+Filtering resources \
+When you want to give the ability for a user of your project to customize some properties - you can add in _resources_
+folder something content dependent on your _pom_ properties section. Like some texts file with:
 ```text
 dbPassword=${db.pass}
 ```
@@ -436,12 +608,13 @@ in pom:
     </resources>
 </build>
 ```
-That gives ability to change dbPassword=${db.pass} to dbPassword=1234 in that text file.
-Or pass it during the resources phrase.
+That gives the ability to change _dbPassword=${db.pass}_ to _dbPassword=1234_ in that text file. Or pass it during the
+_resources_ phrase.
 ```shell script
 mvn resources:resources -Ddb.pass="1234"
 ```
-Predefined maven variables:
-${project.basedir} is the root directory of your project.
-${project.build.directory} is equivalent to ${project.basedir}/target
+
+Predefined maven variables: \
+_${project.basedir}_ is the root directory of your project. \
+_${project.build.directory}_ is equivalent to _${project.basedir}/target_ 
 

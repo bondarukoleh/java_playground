@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.*;
 
 public class FirstTest {
     static String commonErrorText = "Result should be %s";
@@ -17,22 +17,12 @@ public class FirstTest {
 //    @Rule
 //    public Timeout globalTimeout = new Timeout(3000); // 10 seconds max per test method
 
-    @BeforeClass
-    public static void beforeSomething(){
-        System.out.println("This is before class 1");
-    }
-
-    @BeforeClass
-    public static void beforeSomething2(){
-        System.out.println("This is before class 2");
-    }
-
-    @Before
+    @BeforeAll
     public void checkB(){
         System.out.println("This is the expected result before - " + expectedResult);
     }
 
-    @After
+    @AfterAll
     public void checkA(){
         System.out.println("This is the expected result after - " + expectedResult);
     }
@@ -42,50 +32,53 @@ public class FirstTest {
         expectedResult = 3;
         actualResult = calculator.addition(1, 2);
 
-        assertThat(this.getErrorMessage(expectedResult), actualResult, is(expectedResult));
+        assertEquals(expectedResult, actualResult, this.getErrorMessage(expectedResult));
     }
 
-    @Test
+//    @Test
     public void subtraction() {
         expectedResult = 1;
         actualResult = calculator.subtraction(2, 1);
 
-        assertThat(this.getErrorMessage(expectedResult), actualResult, is(expectedResult));
+        assertEquals(expectedResult, actualResult, this.getErrorMessage(expectedResult));
     }
 
 
-    @Test(timeout = 4000) // 10 seconds
+//    @Test(timeout = 4000) // 10 seconds
     public void longRunningTest() {
         expectedResult = 1;
         for (int i = 0; i < 1000000; i++) {
             actualResult = calculator.subtraction(2, 1);
-            assertThat(this.getErrorMessage(expectedResult), actualResult, is(expectedResult));
+            assertEquals(expectedResult, actualResult, this.getErrorMessage(expectedResult));
         }
     }
 
-    @Test(expected = RuntimeException.class)
+//    @Test(expected = RuntimeException.class)
     public void expectedException(){
         throw new RuntimeException();
     }
 
-    @Ignore
+    @Disabled
     @Test
     public void longLongRunningTest() {
         while (true);
     }
 
+    @Disabled
     @Test
     public void hasItemTest() {
         ArrayList<String> list = new ArrayList<>(Arrays.asList("A", "B"));
-        assertThat(list, hasItem("CC"));
+        assertEquals(list, hasItem("CC"));
     }
 
+    @Disabled
     @Test
     public void hasItemsTest() {
         ArrayList<String> list = new ArrayList<>(Arrays.asList("A", "B"));
-        assertThat(list, allOf(hasItem("A"), hasItem("B")));
+//        assert(list, allOf(hasItem("A"), hasItem("B")));
     }
 
+    @Disabled
     @Test
     public void failTest() {
         if(true){

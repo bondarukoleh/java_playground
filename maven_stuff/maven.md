@@ -220,6 +220,13 @@ and we get:
 without hamcrest. \
 After you exclude something you don't want - you can add needed one as a regular dependency.
 
+#### dependencyManagement vs dependencies
+`<dependencies>` - _direct dependencies_, When you add a dependency directly under the `<dependencies>` section, it is
+included in your project's build classpath. \
+`<dependencyManagement>` - _inherited dependencies_, if you have a dependency defined under `<dependencyManagement>`,
+you can include it in your `<dependencies>` section without specifying the version. Maven will use the version defined
+in `<dependencyManagement>`.
+
 ### Plugins and Goals
 Maven plugins are a core feature of Maven that provide the ability to extend and customize the build process. Each _plugin_
 has specific _goals_, which are individual tasks that the plugin can execute. Goals can be bound to different phases of

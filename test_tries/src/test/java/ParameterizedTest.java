@@ -1,14 +1,10 @@
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
-import org.junit.runners.Parameterized;
-
 import java.util.Arrays;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.*;
 
-@RunWith(Parameterized.class)
+//@RunWith(Parameterized.class)
 public class ParameterizedTest {
     private final int actual;
     private final int expected;
@@ -26,13 +22,13 @@ public class ParameterizedTest {
     public int expected;
     *  */
 
-    @Parameterized.Parameters
+//    @Parameterized.Parameters
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][]{{3, 4}, {2, 5}});
     }
 
     @Test
     public void test() {
-        assertThat(actual, not(expected));
+        assertNotEquals(expected, expected);
     }
 }

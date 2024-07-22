@@ -1,5 +1,3 @@
-import org.junit.*;
-
 import java.nio.file.FileStore;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,12 +16,12 @@ public class FirstTest {
 //    public Timeout globalTimeout = new Timeout(3000); // 10 seconds max per test method
 
     @BeforeAll
-    public void checkB(){
+    public static void beforeAll(){
         System.out.println("This is the expected result before - " + expectedResult);
     }
 
     @AfterAll
-    public void checkA(){
+    public static void afterAll(){
         System.out.println("This is the expected result after - " + expectedResult);
     }
 
@@ -35,7 +33,8 @@ public class FirstTest {
         assertEquals(expectedResult, actualResult, this.getErrorMessage(expectedResult));
     }
 
-//    @Test
+    @Test
+    @Disabled
     public void subtraction() {
         expectedResult = 1;
         actualResult = calculator.subtraction(2, 1);
@@ -44,7 +43,8 @@ public class FirstTest {
     }
 
 
-//    @Test(timeout = 4000) // 10 seconds
+    @Test
+    @DisplayName("Test that runs longer")
     public void longRunningTest() {
         expectedResult = 1;
         for (int i = 0; i < 1000000; i++) {
@@ -53,13 +53,16 @@ public class FirstTest {
         }
     }
 
-//    @Test(expected = RuntimeException.class)
+    @Test
     public void expectedException(){
-        throw new RuntimeException();
+        assertThrows(ArithmeticException.class, () -> {
+            int res = 1 / 0;
+        });
     }
 
     @Disabled
     @Test
+    @Tag("long")
     public void longLongRunningTest() {
         while (true);
     }

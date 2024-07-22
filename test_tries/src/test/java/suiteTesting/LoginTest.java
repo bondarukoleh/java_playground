@@ -1,12 +1,12 @@
 package suiteTesting;
 
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.*;
 
 public class LoginTest {
     @Test
     public void testLogin() {
         LoginPage loginPage = new LoginPage();
-        Assert.assertEquals("a", "a");
+        assertEquals("a", "a");
     }
 }

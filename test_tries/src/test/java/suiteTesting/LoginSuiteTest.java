@@ -1,13 +1,13 @@
 package suiteTesting;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+//import org.junit.Assert;
+//import org.junit.Test;
+//import org.junit.runner.RunWith;
+//import org.junit.runners.Suite;
 
 
-@RunWith(Suite.class)
-@Suite.SuiteClasses({LoginTest.class})
+//@RunWith(Suite.class)
+//@Suite.SuiteClasses({LoginTest.class})
 public class LoginSuiteTest {
 //    private suiteTesting.LoginPage loginTest;
 //    private suiteTesting.UserTest userTest;

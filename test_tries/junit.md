@@ -139,3 +139,86 @@ if you need to do some work before get this data.
 ```
 
 ### Test Execution Order
+By default, JUnit 5 executes test methods in a deterministic but arbitrary order. If want to control the execution order
+there is a `@TestMethodOrder` annotation. is used at the class level to specify the order in which test methods are
+executed. It works in conjunction with the _MethodOrderer_ interface, which defines the ordering strategy.
+
+Here are some commonly used MethodOrderer implementations:
+- `@Order`: Specify an explicit order for each test method.
+- MethodOrderer.OrderAnnotation: Orders test methods based on the @Order annotation.
+- MethodOrderer.MethodName: Orders test methods alphabetically by method name.
+- MethodOrderer.DisplayName: Orders test methods by the value of their @DisplayName annotations.
+- MethodOrderer.Random: Orders test methods randomly.
+- Custom Method Order. You can create a custom _MethodOrderer_ by implementing the _MethodOrderer_ interface.
+```java
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.MethodOrderer.DisplayName;
+
+@TestMethodOrder(OrderAnnotation.class)
+public class OrderedTest {
+    @Test
+    @Order(1)
+    void testA(){}
+    @Test
+    @Order(2)
+    void testB() {}
+}
+
+
+@TestMethodOrder(DisplayName.class)
+public class DisplayNameOrderTest {
+
+    @Test
+    @DisplayName("C Test")
+    void testC() {}
+```
+
+#### Nested Tests and @TestInstance
+By default, JUnit creates a new test instance for each test method, which is why @BeforeAll must be static. \
+If you want to use **non-static** `@BeforeAll` and `@AfterAll` methods, you can change the test instance lifecycle
+using the `@TestInstance` annotation.
+```java
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+public class NonStaticLifecycleTest {
+
+    @BeforeAll
+    void setUpAll() {
+        System.out.println("BeforeAll: Set up resources once (non-static)");
+    }
+```
+
+### Conditional Test Execution
+JUnit 5 allows you to conditionally enable or disable tests based on various conditions. This can be useful for skipping
+tests in certain environments, on specific platforms, or under particular configurations.
+
+Basic Annotations for Conditional Test Execution:
+- @EnabledOnOs/@DisabledOnOs: Enables/Disables a test only on specified operating systems.
+- @EnabledOnJre/@DisabledOnJre: Enables/Disables a test only on specified Java Runtime Environments (JREs).
+- @EnabledIf/@DisabledIf: Enables/Disables a test if the given condition is met.
+- @EnabledIfSystemProperty/@DisabledIfSystemProperty: enable or disable tests based on system properties.
+- @EnabledIfEnvironmentVariable/@DisabledIfEnvironmentVariable  enable or disable tests based on environment variables.
+
+```java
+@EnabledOnOs(OS.WINDOWS)
+@DisabledOnOs({OS.LINUX, OS.MAC})
+@EnabledOnJre(JRE.JAVA_8)
+
+@EnabledIf("isFeatureEnabled")
+void testIfFeatureEnabled() {}
+boolean isFeatureEnabled() {
+    return true;
+}
+
+@EnabledIfSystemProperty(named = "env", matches = "ci")
+void testIfCiEnvironment() {
+    System.out.println("This test runs if the system property 'env' is 'ci'");
+}
+
+@EnabledIfEnvironmentVariable(named = "ENV", matches = "PROD")
+void testIfProdEnvironment() {
+    System.out.println("This test runs if the environment variable 'ENV' is 'PROD'");
+}
+```

@@ -1,4 +1,3 @@
-import java.nio.file.FileStore;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -23,6 +22,11 @@ public class FirstTest {
     @AfterAll
     public static void afterAll(){
         System.out.println("This is the expected result after - " + expectedResult);
+    }
+
+    @BeforeEach
+    public void something() {
+        System.out.println("Before each test");
     }
 
     @Test

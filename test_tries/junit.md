@@ -222,3 +222,125 @@ void testIfProdEnvironment() {
     System.out.println("This test runs if the environment variable 'ENV' is 'PROD'");
 }
 ```
+
+### Extensions in JUnit 5
+Extensions can be used to extend the functionality of JUnit in various ways, such as modifying test lifecycle events,
+providing additional annotations, or integrating with external systems.
+
+Writing an Extension \
+To create a custom extension, you need to implement one or more interfaces from the _org.junit.jupiter.api.extension_
+package. \
+You can plug in extension with `@ExtendWith` or `@RegisterExtension` annotation.
+
+`@ExtendWith`:
+- @ExtendWith is straightforward and easy to use when you want to apply an extension to an entire test class
+- It applies the extension to all test methods within a class if you want this
+- It offers a clear, declarative way to specify extensions, making the test class easier to read.
+
+`@RegisterExtension`:
+- Allows for detailed configuration and initialization of the extension instance, suitable for more complex scenarios.
+- Can be used as either a static or non-static field, providing flexibility in how the extension is applied and whether
+it should be shared across all tests or instantiated a new for each test.
+- Ideal for extensions that need to maintain state or require dynamic configuration.
+
+Common Types of Extensions:
+- Lifecycle Callbacks: Custom logic to be executed before and after tests or test classes. _BeforeAllCallback_, 
+_AfterAllCallback_, _BeforeEachCallback_, _AfterEachCallback_ interfaces.
+- Test Instance Post-Processing: Modifying test instances after they are created. _TestInstancePostProcessor_ interface.
+- Conditional Test Execution: Custom conditions to enable or disable tests. _ExecutionCondition_ interface.
+- Parameter Resolution: Supplying custom parameters to test methods. _ParameterResolver_ interface.
+- Exception Handling: Custom logic to handle exceptions thrown during tests. _TestExecutionExceptionHandler_ interface.
+
+Parameter Resolver
+```java
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.ParameterContext;
+import org.junit.jupiter.api.extension.ParameterResolver;
+
+public class StringParameterResolver implements ParameterResolver {
+
+    @Override
+    public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) {
+        return parameterContext.getParameter().getType() == String.class;
+    }
+
+    @Override
+    public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) {
+        return "Injected String";
+    }
+}
+
+// ...
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+@ExtendWith(StringParameterResolver.class)
+public class ParameterResolverTest {
+
+    @Test
+    void testWithInjectedParameter(String injectedString) {
+        assertEquals("Injected String", injectedString);
+    }
+}
+```
+
+### Dynamic Tests
+Dynamic tests in JUnit 5 provide a way to define and execute tests at runtime. Unlike static tests that are defined at
+compile time using the @Test annotation, dynamic tests are generated programmatically and can be useful for scenarios
+where the test cases depend on external data or complex logic.
+
+- DynamicTest: Represents a single dynamic test. It can be created using the _DynamicTest.dynamicTest_ factory method.
+- `@TestFactory`: Marks a method as a factory for dynamic tests. The method must return a Stream, Collection, Iterable,
+or Iterator of DynamicTest instances.
+- Dynamic Container: Represents a group of dynamic tests and containers, allowing for nested test structures.
+
+```java
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
+import java.util.stream.Stream;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.DynamicTest.dynamicTest;
+
+public class DynamicTestsExample {
+
+    @TestFactory
+    Stream<DynamicTest> dynamicTestsFromStream() {
+        return Stream.of("A", "B", "C")
+                .map(str -> dynamicTest("Test: " + str,
+                        () -> assertTrue(str.matches("[A-Z]"))));
+    }
+
+    @TestFactory
+    Stream<DynamicContainer> dynamicTestContainers() {
+        return Stream.of("A", "B", "C")
+                .map(str -> dynamicContainer("Container: " + str, Stream.of(
+                        dynamicTest("Test 1 for " + str, () -> assertTrue(str.matches("[A-Z]"))),
+                        dynamicTest("Test 2 for " + str, () -> assertTrue(str.length() == 1))
+                )));
+    }
+}
+```
+
+Use Cases for Dynamic Tests
+- Data-Driven Testing: Generate tests based on external data sources such as databases, files, or APIs.
+- Complex Test Scenarios: Create tests for scenarios that cannot be determined at compile time.
+- Parameterized Testing: When @ParameterizedTest is insufficient or less flexible.
+
+### Integration with maven
+Yes, in a Maven project, JUnit tests are typically executed using the _maven-surefire-plugin_
+```xml
+<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M5</version>
+                <configuration>
+                    <includes>
+                        <include>**/*Tests.java</include>
+                        <include>**/*Test.java</include>
+                    </includes>
+                    <!-- after Java 9 module-path is default instead of class-path. This turns it off-->
+                    <useModulePath>false</useModulePath>
+                </configuration>
+            </plugin>
+```

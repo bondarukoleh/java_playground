@@ -121,3 +121,134 @@ when().get("/lotto").then().time(lessThan(2000L)); // Milliseconds
 ```
 
 ### Authentication
+```java
+//for each request
+given().auth().basic("username", "password"). ..
+//  for all requests:
+RestAssured.authentication = basic("username", "password");
+```
+There are two types of authentication, **basic**, **digest**, and the way REST Assured sends them.
+- Basic: Client sends HTTP request with an _Authorization_ header containing a base64-encoded string of `username:password`.
+- Digest:
+  - The server sends a `nonce` (a one-time token) to the client. 
+  - The client creates a hash of the `username:password` and the `nonce`, then sends this hash back to the server. 
+  - The server performs the same hashing operation and compares the results to authenticate the user.
+The way authentication sent by REST Assured:
+- Preemptive Authentication: Isn't protocol specific, sends the credentials without waiting for the server to challenge
+for them. 
+- "Challenged Basic Authentication": the client does not send credentials upfront but waits for the server to challenge
+it with a _401 Unauthorized response_. After that, the client resends the request with the Authorization header
+containing the credentials. \
+By default, Rest Assured uses Challenged Basic Authentication when you specify basic without preemptive.
+
+```java
+// will send the basic authentication credentials always
+given().auth().preemptive().basic("username", "password")
+// will use challenged 
+given().auth().basic("username", "password")
+```
+
+There are also Form, CSRF and OAuth authentication.
+
+### Multi-part form data
+When sending larger amount of data to the server - `multiPart`  allows you to specify a file, byte-array, input stream
+or text to upload. 
+```java
+given().
+        multiPart(new File("/path/to/file")).
+        multiPart("controlName1", new File("/path/to/file")).
+        multiPart("controlName2", "my_file_name.txt", someData).
+        multiPart("controlName3", someJavaObject, "application/json").
+        multiPart(new MultiPartSpecBuilder(greeting, ObjectMapperType.JACKSON_2)
+                .fileName("greeting.json")
+                .controlName("text")
+                .mimeType("application/vnd.custom+json").build()).
+when().
+        post("/upload");
+```
+
+### Object Mapping
+REST Assured supports mapping Java objects to and from JSON and XML. For JSON you need to have either Jackson, Jackson2,
+Gson or Johnzon in the classpath and for XML you need Jakarta EE or JAXB.
+
+#### Serialization
+You have an object which you want to JSON and send it with the request.
+```java
+public class Message {
+    private String message;
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+}
+```
+**From content type**
+```java
+Message message = new Message();
+message.setMessage("My messagee");
+given().
+       contentType("application/json").
+       body(message).
+when().
+      post("/message");
+```
+REST Assured will serialize the object to JSON since the request content-type is set to "application/json".
+With Jackson if found, if not - Gson. If you change the content-type to "application/xml" it will try JAXB for to XML.
+
+**From HashMap**
+```java
+Map<String, Object>  jsonAsMap = new HashMap<>();
+jsonAsMap.put("firstName", "John");
+jsonAsMap.put("lastName", "Doe");
+
+given().
+        contentType(JSON).
+        body(jsonAsMap).
+when().
+        post("/somewhere").
+then().
+        statusCode(200);
+```
+**Using an Explicit Serializer**
+```java
+Message message = new Message();
+message.setMessage("My messagee");
+given().
+       body(message, ObjectMapperType.JAXB).
+when().
+      post("/message");
+```
+
+### Deserialization
+```java
+// For this to work the response content-type must be "application/json"
+Message message = get("/message").as(Message.class);
+// Custom Content-Type Deserialization  
+Message message = expect().parser("application/something", Parser.XML).when().get("/message").as(Message.class);
+// Using an Explicit Deserializer
+Message message = get("/message").as(Message.class, ObjectMapperType.GSON);
+```
+
+### Configuration
+You can configure the pre-defined object mappers by using a ObjectMapperConfig and pass it to detailed configuration. \
+You can add a Custom parser. The format is:
+```java
+RestAssured.registerParser(<content-type>, <parser>);
+RestAssured.registerParser("application/vnd.uoml+xml", Parser.XML);
+```
+
+### Default values
+You can also change the default values:
+```java
+RestAssured.baseURI = "http://myhost.org";
+RestAssured.port = 80;
+RestAssured.basePath = "/resource";
+RestAssured.authentication = basic("username", "password");
+RestAssured.rootPath = "x.y.z";
+```
+
+### Specification Re-use

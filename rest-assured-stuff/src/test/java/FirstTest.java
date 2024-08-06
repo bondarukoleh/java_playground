@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Optional;
 
 import static io.restassured.RestAssured.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,13 +16,22 @@ public class FirstTest {
         RestAssured.baseURI = "https://jsonplaceholder.typicode.com";
 
         // GET request
-        Response response = given()
+        Response response =
+                given()
                 .when()
-                .get("/posts/1")
+                    .get("/albums")
                 .then()
-                .statusCode(200)
+                    .statusCode(200)
                 .extract()
                 .response();
-        System.out.println(response.body().peek());
+
+        int anotherResp = get("/albums/1").path("userId");
+
+//        System.out.println(response.asString());
+        assertEquals(1, (int) response.jsonPath().get("[0].userId"), "ID should be 1");
+        assertEquals(1, (int) response.path("[0].userId"), "ID should be from path");
+        assertEquals(1, anotherResp, "ID should be 1 from single path");
+
+
     }
 }

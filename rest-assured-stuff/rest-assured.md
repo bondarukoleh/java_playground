@@ -252,3 +252,239 @@ RestAssured.rootPath = "x.y.z";
 ```
 
 ### Specification Re-use
+Instead of having to duplicate response expectations and/or request parameters for different tests you can re-use an
+entire specification. To do this you define a specification using either the _RequestSpecBuilder_ or _ResponseSpecBuilder_. \
+In this example the data defined in "responseSpec" is merged with the additional body expectation and all expectations
+must be fulfilled in order for the test to pass.
+```java
+ResponseSpecBuilder builder = new ResponseSpecBuilder();
+builder.expectStatusCode(200);
+builder.expectBody("x.y.size()", is(2));
+ResponseSpecification responseSpec = builder.build();
+
+// Now you can re-use the "responseSpec" in many different tests:
+when().
+       get("/something").
+then().
+       spec(responseSpec).
+       body("x.y.z", equalTo("something"));
+```
+If you need to extract something from the spec:
+```java
+QueryableRequestSpecification queryable = SpecificationQuerier.query(spec);
+String headerValue = queryable.getHeaders().getValue("header");
+String param = queryable.getFormParams().get("someparam");
+```
+
+### Filters
+- Intercept and modify HTTP requests and responses.
+- Perform actions before a request is sent or after a response is received.
+- Implement cross-cutting concerns (e.g., logging, authentication) across multiple tests without repeating code.
+```java
+import io.restassured.filter.Filter;
+import io.restassured.filter.FilterContext;
+import io.restassured.response.Response;
+import io.restassured.specification.FilterableRequestSpecification;
+import io.restassured.specification.FilterableResponseSpecification;
+
+public class CustomLoggingFilter implements Filter {
+    @Override
+    public Response filter(FilterableRequestSpecification requestSpec, FilterableResponseSpecification responseSpec, FilterContext ctx) {
+        System.out.println("Request URI: " + requestSpec.getURI());
+        System.out.println("Request Method: " + requestSpec.getMethod());
+        
+        // Send the request
+        Response response = ctx.next(requestSpec, responseSpec);
+        
+        // Log the response
+        System.out.println("Response Status Code: " + response.getStatusCode());
+        
+        return response;
+    }
+}
+```
+```java
+import static io.restassured.RestAssured.given;
+
+public class LocalFilterExample {
+  // global using  
+  static {
+    RestAssured.filters(new CustomLoggingFilter());
+  }
+    
+    // using in the test
+  public someTestWithFilter() {
+        given()
+            .filter(new CustomLoggingFilter())
+        .when()
+            .get("https://example.com/api")
+        .then()
+            .statusCode(200);
+    }
+}
+```
+
+You can alternate the response from a filter with _ResponseBuilder_ to create a new Response based on the original response
+```java
+Response newResponse = new ResponseBuilder().clone(originalResponse).setBody("Something").build();
+```
+
+### Logging
+**Request logging**
+```java
+given().log().all(). .. // Log all request specification details including parameters, headers and body
+given().log().params(). .. // Log only the parameters of the request
+given().log().body(). .. // Log only the request body
+given().log().headers(). .. // Log only the request headers
+given().log().cookies(). .. // Log only the request cookies
+given().log().method(). .. // Log only the request method
+given().log().path(). .. // Log only the request path
+```
+
+**Response logging**
+```java
+get("/x").then().log().body() ..
+get("/x").then().log().ifError(). ..
+get("/x").then().log().all(). ..
+get("/x").then().log().statusLine(). .. // Only log the status line
+get("/x").then().log().headers(). .. // Only log the response headers
+get("/x").then().log().cookies(). .. // Only log the response cookies
+get("/x").then().log().ifStatusCodeIsEqualTo(302). .. // Only log if the status code is equal to 302
+```
+
+**Log when something goes wrong**
+```java
+// request
+given().log().ifValidationFails(). ..
+// response        
+.then().log().ifValidationFails(). ..
+```
+**Blacklist Headers from Logging**
+```java
+given().config(config().logConfig(logConfig().blacklistHeader("Accept"))). ..
+```
+
+### Root path
+instead of
+```java
+when().
+        get("/something").
+then().
+        body("x.y.firstName", is(..)).
+        body("x.y.age", is(..)).
+```
+you can 
+```java
+// either 
+RestAssured.rootPath = "x.y";
+// or
+when().
+        get("/something").
+then().
+         root("x.y"). // You can also use the "root" method
+         body("firstName", is(..)).
+         body("age", is(..)).
+```
+
+There is more powerful usage:
+```java
+when().
+    get("/jsonStore").
+then().
+    root("store.%s", withArgs("book")). //sets the root path to store.book. The %s is replaced by "book" from withArgs.
+    body("category.size()", equalTo(4)). // size() is a Groovy GPath method that returns the number of elements in the collection.
+    appendRoot("%s.%s", withArgs("author", "size()")). // appends to the root path, making it store.book.author.size().
+    body(withNoArgs(), equalTo(4)); // withNoArgs() is used here to refer to the already constructed path, which is store.book.author.size().
+```
+
+GPath: Groovy's expression language, similar to XPath for XML. It allows for powerful and concise querying of JSON and
+XML structures.
+
+
+### Path arguments
+Path arguments are useful in situations where you have e.g. pre-defined variables that constitutes the path.
+```java
+String someSubPath = "else";
+int index = 0;
+get("/x").then().body("something.%s[%d]", withArgs(someSubPath, index), equalTo("some value")). ..
+// "something.else[0]" is equal to "some value".
+```
+
+### Session support
+You can manage and rename sessionId in SessionConfig and SpecBuilder. There is a session filter also available.
+
+Useful because:
+- Stateful Communication
+- Avoiding Repeated Logins
+- Realistic Testing
+- Consistency and Reusability
+
+Imagine you have a web application with the following flow:
+1. User logs in.
+2. User accesses their dashboard. 
+3. User updates their profile. 
+4. User logs out.
+
+```java
+import io.restassured.filter.session.SessionFilter;
+import static io.restassured.RestAssured.*;
+import static org.hamcrest.Matchers.*;
+
+public class SessionFilterExample {
+    public static void main(String[] args) {
+        // Create a session filter
+        SessionFilter sessionFilter = new SessionFilter();
+        
+        // Step 1: Login
+        given()
+            .auth().form("username", "password")
+            .filter(sessionFilter)
+        .when()
+            .post("https://example.com/login")
+        .then()
+            .statusCode(200);
+        
+        // Step 2: Access Dashboard
+        given()
+            .filter(sessionFilter)
+        .when()
+            .get("https://example.com/dashboard")
+        .then()
+            .statusCode(200)
+            .body("welcomeMessage", equalTo("Welcome, User!"));
+        
+        // Step 3: Update Profile
+        given()
+            .filter(sessionFilter)
+            .body("{ \"email\": \"newemail@example.com\" }")
+        .when()
+            .post("https://example.com/profile/update")
+        .then()
+            .statusCode(200)
+            .body("message", equalTo("Profile updated successfully"));
+        
+        // Step 4: Logout
+        given()
+            .filter(sessionFilter)
+        .when()
+            .post("https://example.com/logout")
+        .then()
+            .statusCode(200)
+            .body("message", equalTo("Logged out successfully"));
+    }
+}
+```
+
+#### SSL
+There is ability to use not only HTTP(S) protocol
+
+#### URL Encoding
+In some cases though it may be useful to turn URL Encoding off, and you can do it. In case you've already encoded the
+URL before you give it to REST Assured
+
+#### Proxy Configuration
+You can setup a proxy of course
+
+### Detailed configuration
+Detailed configuration is provided by the RestAssuredConfig instance with which you can configure the parameters of
+HTTP Client as well as Redirect, Log, Encoder, Decoder, Session, ObjectMapper, Connection, SSL and ParamConfig settings.

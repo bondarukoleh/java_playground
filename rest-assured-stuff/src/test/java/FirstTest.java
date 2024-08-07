@@ -19,15 +19,14 @@ public class FirstTest {
         Response response =
                 given()
                 .when()
-                    .get("/albums")
-                .then()
+                    .get("/albums").then().
+                        log().body()
                     .statusCode(200)
                 .extract()
                 .response();
 
         int anotherResp = get("/albums/1").path("userId");
 
-//        System.out.println(response.asString());
         assertEquals(1, (int) response.jsonPath().get("[0].userId"), "ID should be 1");
         assertEquals(1, (int) response.path("[0].userId"), "ID should be from path");
         assertEquals(1, anotherResp, "ID should be 1 from single path");

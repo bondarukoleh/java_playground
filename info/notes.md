@@ -182,7 +182,7 @@ public interface UserMapper {
 }
 // Here, the name field in User is mapped to the fullName field in UserDTO.
 ```
-- @Named annotation is used to assign a specific name to a method, allowing it to be referenced in @Mapping annotations
+- _@Named_ annotation is used to assign a specific name to a method, allowing it to be referenced in @Mapping annotations
 especially when reusing methods or applying custom logic. You can use @Named to define reusable conversion methods or
 complex mappings that can be applied across multiple mapping methods.
 ```java
@@ -198,4 +198,53 @@ public interface UserMapper {
         return Period.between(birthDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate(), LocalDate.now()).getYears();
     }
 }
+```
+
+#### Jackson
+Java library used for converting Java objects to and from JSON. It is widely used in applications that need to serialize
+Java objects into JSON for storage, communication, or logging purposes, and to deserialize JSON back into Java objects.
+
+- ObjectMapper: core class of the Jackson library. It provides functionality for serialization and deserialization.
+```java
+ObjectMapper objectMapper = new ObjectMapper();
+// Serialize Java object to JSON
+String jsonString = objectMapper.writeValueAsString(someObject);
+// Deserialize JSON to Java object
+SomeClass someObject = objectMapper.readValue(jsonString, SomeClass.class);
+```
+- Annotations:
+  - _@JsonProperty_: Used to specify the JSON property name for a field.
+  - _@JsonIgnore_: Used to ignore a field during serialization and deserialization.
+  - _@JsonInclude_: Controls whether to include properties in the JSON output based on criteria like non-null or non-empty.
+    `@JsonInclude(JsonInclude.Include.NON_NULL)`
+  - _@JsonFormat_: Used to specify the format for date and time fields during serialization and deserialization.
+    `@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")`
+  - _@JsonCreator_ and _@JsonSetter_: These are used to control how Jackson deserializes objects, especially when dealing
+  with constructors or factory methods.
+- Modules: \
+  Jackson is highly extensible, customizable and there are modules available for various purposes:
+  - _jackson-datatype-jsr310_: For Java 8 Date and Time API support.
+  - _jackson-module-kotlin_: For better Kotlin support.
+  - _jackson-databind_: Core data-binding functionality that combines JSON with POJOs.
+- Data Binding: \
+  Simple and Complex. Jackson supports both simple and complex data binding. Simple data binding deals with converting
+  JSON to and from simple Java objects like Strings and integers, while complex data binding deals with more intricate
+  types like collections, maps, and nested objects.
+- Streaming API: \
+  Performance-Oriented: Jackson provides a streaming API (`JsonParser` and `JsonGenerator`) that is more performance-oriented
+  and allows for reading and writing JSON content token by token. This is useful for processing large amounts of JSON data
+  efficiently.
+```java
+JsonParser parser = objectMapper.getFactory().createParser(jsonString);
+while (parser.nextToken() != JsonToken.END_OBJECT) {
+    // Process JSON tokens
+}
+```
+- Tree Model: \
+  Dynamic Processing: Jackson also offers a tree model (_JsonNode_), where you can parse JSON into a tree of nodes
+  (_JsonNode_) and navigate through them. This approach is useful when the JSON structure is dynamic or unknown at
+   compile time.
+```java
+JsonNode rootNode = objectMapper.readTree(jsonString);
+String name = rootNode.path("name").asText();
 ```

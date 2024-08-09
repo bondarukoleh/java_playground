@@ -9,7 +9,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.*;
 
-public class FirstTest {
+public class FirstTest extends BaseTest {
     @Test
     public void addition() {
         // Base URI

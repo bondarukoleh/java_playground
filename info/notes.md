@@ -248,3 +248,72 @@ while (parser.nextToken() != JsonToken.END_OBJECT) {
 JsonNode rootNode = objectMapper.readTree(jsonString);
 String name = rootNode.path("name").asText();
 ```
+
+### Gatling io.gatling.javaapi
+- _Gatling_ Class: This is the entry point for running a simulation in the Java API. It provides methods to define and
+configure the simulation.
+- _Simulation_ Class: This is where you define your load testing scenario. It typically includes:
+  - SetUp: Configuring the user journey (e.g., number of users, duration, and scenario definition).
+  - Scenarios: A sequence of HTTP requests that simulate user behavior. 
+- _http_ package: This package contains classes for defining HTTP protocols and requests.
+  - _HttpDsl_: Contains methods to define HTTP requests, headers, bodies, etc. 
+  - _HttpProtocolBuilder_: Used to configure HTTP settings, like base URL, headers, and connection settings.
+- Core DSL:
+  - _ScenarioBuilder_: This is where you define the scenario, which represents a user's journey or sequence of actions.
+  - _ChainBuilder_: Used for defining sequences of actions (like HTTP requests) in a scenario.
+- Actions: Classes that define specific actions users will perform during the simulation, like sending HTTP requests,
+waiting for a certain amount of time, etc.
+- Assertions: Gatling allows you to define assertions to validate the performance criteria, such as response times and
+error rates.
+
+`maxConnectionsPerHost` is a configuration setting used in HTTP clients to control the maximum number of concurrent
+connections that the client can establish to a single host, number of clients connections. If the simulation tries to 
+open more connections, they will either be queued or fail, depending on other configurations.
+
+`exec()` - method is a member of the ScenarioBuilder class. `public ScenarioBuilder exec(ActionBuilder actionBuilder)`
+takes an _ActionBuilder_ (which is often an HTTP request, but could be other actions as well) as a parameter and adds
+it to the scenario's list of actions.
+
+`http("request_name").post()` returns HttpRequestActionBuilder
+```java
+ScenarioBuilder scn = scenario("UserLoginScenario")
+    .exec(http("LoginPageRequest")
+        .get("/login"))
+    .pause(1)
+    .exec(http("SubmitLoginForm")
+        .post("/login")
+        .formParam("username", "testuser")
+        .formParam("password", "password123"))
+    .pause(2)
+    .exec(http("DashboardRequest")
+        .get("/dashboard"));
+```
+
+`setUp()` method is typically placed within a block of code, such as an instance initializer block or a constructor, to
+ensure that it is executed when the simulation class is instantiated. This is how Gatling is designed to work. Gatling
+simulations are classes that extend the _Simulation_ class. When a simulation is run, an instance of this class is
+created, and Gatling expects the setUp() method to be called during this initialization phase to define the load test
+configuration.
+
+`injectOpen`: Open Workload Model
+- The open workload model simulates a scenario where users arrive independently of each other. This means new users can
+be continuously added to the system at a specific rate, regardless of how many users are currently active.
+- It’s called "open" because the number of users in the system is not fixed; users can enter or leave the system
+independently.
+- Used for: Public Websites, Stress Testing (to simulate a continuous stream of traffic to see how the system handles)
+
+`injectClosed`: Closed Workload Model
+- The closed workload model simulates a scenario where the number of active users is controlled and kept constant. The
+total number of users in the system at any time is fixed, with users typically replacing others as they finish their tasks.
+- It’s called "closed" because the number of concurrent users is restricted to a specific number.
+- Use Cases: Internal Applications, Capacity Planning (determining how many users the system can support before degrades)
+
+`rampUsersPerSec` simulates a gradually increasing load of virtual users over time. This is part of the open workload
+model, where the focus is on the rate of user arrival rather than the total number of concurrent users.
+```java
+rampUsersPerSec(startRate).to(endRate).during(duration)
+```
+
+`getInteger("config_value", 20)` attempts to retrieve an integer value associated with the key _"config_value"_. This key
+could be linked to a system property, _environment variable_, or some other _external configuration_. If the value is not
+found, the default value (20 in this case) is used.

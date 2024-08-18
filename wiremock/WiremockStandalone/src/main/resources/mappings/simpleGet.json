@@ -1,0 +1,16 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/test/simple-get"
+  },
+
+  "response": {
+    "status": 200,
+    "jsonBody": {
+      "message": "Hello, world!"
+    },
+    "headers": {
+      "Content-Type": "text/plain"
+    }
+  }
+}

@@ -143,3 +143,26 @@ wiremock's _The request model_, with a bunch of stuff available, that you can dy
 You can match a lot if thing in JSON/XML, including negative matches, and regex/xpath.
 
 ### Response Templating
+Response headers and bodies, as well as proxy URLs, can optionally be rendered using _Handlebars templates_.
+This can help with generating the data instead of hard coding it. \
+The response will be templated, replacing {{request.query.name}} with the value of the name query parameter. \
+Transformers line tells WireMock to apply the response templating to this particular stub.
+```json
+{
+  "request": {
+    "method": "GET",
+    "url": "/some/endpoint"
+  },
+  "response": {
+    "status": 200,
+    "body": "Hello, {{request.query.name}}!",
+    "transformers": ["response-template"]
+  }
+}
+```
+
+There is a ton of helpers that can generate any data you like, dates, names, numbers, random values, arrays. There is 
+conditionals. 
+
+#### Simulating Faults
+

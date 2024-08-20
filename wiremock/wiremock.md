@@ -165,4 +165,10 @@ There is a ton of helpers that can generate any data you like, dates, names, num
 conditionals. 
 
 #### Simulating Faults
+Delays, chunked responses, different MALFORMED and corrupted responses.
 
+#### Stateful Behaviour
+Scenarios - A scenario is essentially a state machine whose states can be arbitrarily assigned. Its starting state is
+always Scenario.STARTED. Stub mappings can be configured to match on scenario state, such that stub A can be returned
+initially, then stub B once the next scenario state has been triggered.
+You can reset scenario individually and all of them.

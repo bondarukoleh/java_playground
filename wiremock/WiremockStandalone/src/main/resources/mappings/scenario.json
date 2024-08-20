@@ -1,0 +1,56 @@
+{
+  "mappings": [
+    {
+      "scenarioName": "to_do_list",
+      "requiredScenarioState": "Started",
+      "request": {
+        "method": "GET",
+        "url": "/test/items"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "itemsToDo": [
+            "Buy milk"
+          ]
+        }
+      }
+    },
+    {
+      "scenarioName": "to_do_list",
+      "requiredScenarioState": "Started",
+      "newScenarioState": "Added buy apples",
+      "request": {
+        "method": "POST",
+        "url": "/test/items",
+        "bodyPatterns": [
+          {
+            "equalToJson": "{ \"items\": [\"Buy apples\"] }",
+            "ignoreArrayOrder": true,
+            "ignoreExtraElements": true
+          }
+        ]
+      },
+      "response": {
+        "status": 201
+      }
+    },
+    {
+      "scenarioName": "to_do_list",
+      "requiredScenarioState": "Added buy apples",
+      "request": {
+        "method": "GET",
+        "url": "/test/items"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "itemsToDo": [
+            "Buy milk",
+            "Buy apples"
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -172,3 +172,38 @@ Scenarios - A scenario is essentially a state machine whose states can be arbitr
 always Scenario.STARTED. Stub mappings can be configured to match on scenario state, such that stub A can be returned
 initially, then stub B once the next scenario state has been triggered.
 You can reset scenario individually and all of them.
+
+#### Proxy
+You can selectively proxy and intercept requests to other services. There is ability to record te requests.
+Wiremock can be setup as forward proxy (difference with regular, that wiremock is a gatekeeper, and in control of all
+requests, not just passing along) for browser. 
+
+#### Verify requests
+You can verify the requests to Wiremock wether it got them or not, how many requests are matched and so on.
+You can find the requests by this URL http://host:port/__admin/requests. Some queries available:
+- http://localhost:8080/__admin/requests?since=2016-06-06T12:00:00&limit=3
+- http://localhost:8080/__admin/requests?unmatched=true
+- http://localhost:8080/__admin/requests/unmatched for unmatched
+- /__admin/requests/unmatched/near-misses for near misses
+- http://localhost:8080/__admin/requests?matchingStub=59651373-6deb-4707-847c-9e8caf63266e
+
+You can post a search criteria to get filter out something special
+POST to http://<host>:<port>/__admin/requests/find
+```json
+{
+    "method": "POST",
+    "url": "/resource/to/find",
+    "headers": {
+        "Content-Type": {
+            "matches": ".*/xml"
+        }
+    }
+}
+```
+You can find near matched requests.
+You can remove the records from logs.
+
+### Using templates in WireMock 
+There are some templates pre-setup for some big platforms, if you need to mock them.
+
+### Record and Playback

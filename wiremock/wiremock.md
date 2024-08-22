@@ -174,12 +174,14 @@ initially, then stub B once the next scenario state has been triggered.
 You can reset scenario individually and all of them.
 
 #### Proxy
-You can selectively proxy and intercept requests to other services. There is ability to record te requests.
-Wiremock can be setup as forward proxy (difference with regular, that wiremock is a gatekeeper, and in control of all
-requests, not just passing along) for browser. 
+You can selectively proxy and intercept requests to other services, but not the body of the request. There is ability
+to record te requests. Wiremock can be setup as forward proxy (difference with regular, that wiremock is a gatekeeper,
+and in control of all requests, not just passing along) for browser.
+To change the body of the requests, you need to register to wiremock a request transformer that uses RequestWrapper,
+where you will filter and change whatever you like in the request before sending it.
 
 #### Verify requests
-You can verify the requests to Wiremock wether it got them or not, how many requests are matched and so on.
+You can verify the requests to Wiremock weather it got them or not, how many requests are matched and so on.
 You can find the requests by this URL http://host:port/__admin/requests. Some queries available:
 - http://localhost:8080/__admin/requests?since=2016-06-06T12:00:00&limit=3
 - http://localhost:8080/__admin/requests?unmatched=true
@@ -207,3 +209,26 @@ You can remove the records from logs.
 There are some templates pre-setup for some big platforms, if you need to mock them.
 
 ### Record and Playback
+WireMock can create stub mappings from requests it has received. Combined with its proxying feature this allows you to 
+“record” stub mappings from interaction with existing APIs. \
+Two approaches are available: Recording or snapshotting.
+
+You can setup record on http://localhost:8080/__admin/recorder. After the start the recording from some URL, you need to
+send requests to Wiremock, and it will proxy them to URL, recording the responses in the same time. Once you click stop -
+new stubs will appear in mappings. This all can be setup via Wiremock API also.
+
+Snapshoting - is to create a snapshot of current state of wiremock. It has a powerful filtering and preparing settings
+where you can choose what requests do you need, filter and match them. Snapshoting gives you clean and configurable way
+of saving the requests that were passed along by Wiremock (via Proxy in most cases). If there are a few identical requests
+to the same endpoint - you can make a scenario automatically from it.
+
+#### Webhooks and Callbacks
+You can add a webhook or a callback to some stub. When something hit it, callback request is sent.
+
+#### JWT
+There is an extantion for generating JWT tokens, configurable.
+
+#### Multi-domain Mocking
+You can setup a multi-domain mocking, where one instance of wiremock will behave as a few services with different host,
+with all aspects of domain interactions — like CORS, cookies, and SSL. Useful when you need to mock a few services at
+once.  

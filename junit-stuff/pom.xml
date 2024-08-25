@@ -8,7 +8,7 @@
     </properties>
 
     <groupId>com.oleh</groupId>
-    <artifactId>test_tries</artifactId>
+    <artifactId>junit_stuff</artifactId>
     <version>1.0-SNAPSHOT</version>
     <dependencies>
         <dependency>

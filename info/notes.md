@@ -16,6 +16,53 @@ It is abandoned because in modern Java there is _Record_ as an immutable object,
 mappings, dependency injection frameworks like _Spring_, and getters and setters generators like _Lombok_. Those things
 substitute JavaBeans with more modern approaches.
 
+### Spring IoC (Inversion of Control) container
+The IoC container's primary function is to implement _Inversion of Control_ by injecting dependencies into objects
+rather than having those objects create or look for dependencies themselves. This is a core concept in Spring's approach
+to _Dependency Injection (DI)_. IoC container is the core of the Spring Framework. It is responsible for managing the
+lifecycle of beans, including their creation, configuration, and destruction. \
+"Container" is a metaphor, it means it contains and manages all beans and dependencies application needs.
+
+DI provided by @Configuration class is better than directly instantiate the dependencies in service classes because:
+- Separation of Concerns, service class does not mix logic of creating dependencies with his business logic;
+- Flexibility in Configuration (Multiple Implementations), you can change the implementation of dependencies without
+touching the service class, just swap config class or by Spring profiles, property files, or conditional beans
+- Easier Testing, you can easily provide mock implementations for dependencies by injecting them;
+- Centralized Configuration Management, if multiple classes need dependencies, each would need to instantiate them on its
+own, with DI the configuration is centralized in @Configuration, ensuring consistency and reducing redundancy.
+- Decoupling from Frameworks: you can use different DI framework that provides your dependencies without many changes of
+the source code.
+
+The _Spring Application Context is_ an extension of _IoC container_. It not only includes all the features of the basic
+IoC container but also provides additional enterprise-specific functionalities (Event Propagation, Internationalization,
+Environment Abstraction, Resource Loading). 
+
+Some key annotations that help bootstrap the Spring context:
+- @Configuration. Marks a class as a source of bean definitions, indicates that the class can be used by the Spring IoC
+container as a configuration class.
+- @ComponentScan. Tells Spring where to look for components (@Component, @Service, @Repository, @Controller, etc.) to 
+auto-detect and register them as beans in the context. Often is used with @Configuration.
+- @EnableAutoConfiguration. Enables Spring Boot’s auto-configuration mechanism, which automatically configures your
+Spring application, helps in setting up the context by scanning the classpath and setting up beans based on what’s available
+- @SpringBootApplication. Combines @Configuration, @EnableAutoConfiguration, and @ComponentScan, used in main class.
+- @Import. Allows to add extra classes to @Configuration class and so into the Spring context. Useful for modularizing
+configuration and combining them into a single application context.
+- @PropertySource. Used to add property files to the Spring Environment, allowing you to use properties from external
+files, typically used in @Configuration
+- @Bean (below)
+
+How these all work together? \
+When you start a Spring application, these annotations play a critical role in setting up the application context:
+- @SpringBootApplication (or the combination of @Configuration, @ComponentScan, and @EnableAutoConfiguration) tells 
+Spring to start scanning the specified packages, load the necessary configurations, and automatically configure components.
+- @ComponentScan ensures that all the classes with relevant annotations (@Component, @Service, etc.) are detected and
+registered as beans.
+- @Configuration and @Bean methods explicitly define beans that should be managed by Spring.
+- @PropertySource adds properties that can be injected into the beans.
+
+This orchestration of annotations bootstraps the Spring context, allowing your application to start with all the
+necessary configurations and beans in place.
+
 #### @Autowired
 Spring dependency injection instantiate annotated field for you. You can use it for class field, method parameter or
 constructor parameter. Dependencies that can be instantiated annotated with @Bean and lie in the classes annotated special
@@ -23,9 +70,8 @@ annotations, like @Configuration.
 
 #### @Bean
 In Spring declare a method as a bean producer, to be managed by the Spring IoC (Inversion of Control) container.
-Each container has a few contexts, Spring Application Context - a central interface to Spring's IoC container, managing
-the lifecycle and configuration of beans.
-It's typically used within a _@Configuration_ class. You can customise it a bit, and also declare a _@Scope_:
+@BBean is typically used within a _@Configuration_ class (a source of bean definitions). You can customise it a bit,
+and also declare a _@Scope_:
 - Singleton: (Default) Only one instance of the bean is created and shared throughout the Spring container.
 - Prototype: A new instance of the bean is created every time it is requested from the container.
 - Request: A new instance is created for each HTTP request. (Web applications only)

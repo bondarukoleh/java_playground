@@ -166,6 +166,60 @@ these properties into the Spring Environment.
 The method annotated with `@DynamicPropertySource` must be `static` and accept a single argument of type _DynamicPropertyRegistry_.
 The _DynamicPropertyRegistry_ is a callback interface that allows you to register properties as key-value pairs.
 
+### Some Spring Web annotations
+#### @RestController
+A specialized version of the _@Controller_ annotation:
+- A combination of _@Controller_ and _@ResponseBody_. It tells Spring that the class is a web controller (means handles
+  HTTP requests and return web responses), and because of ResponseBody - all the methods within it should return data
+  directly in the response body rather than rendering a view.
+- Handles JSON/XML Responses by Default,  automatically converts the return value of each method into JSON (or XML if
+  configured) and sends it as the HTTP response. Perfect for creating RESTful services.
+
+#### @RequestMapping("/path")
+Can be applied at both the class level and the method level, allowing you to define request paths, request methods, and
+other attributes such as parameters and headers that the handler should match. \
+- Sets a base path for all endpoints in this controller.
+- By default, handles all the methods to this path, but you can restrict them `@RequestMapping(value = "/hello", method = RequestMethod.GET)`
+  Can be done with special annotations: `@GetMapping, @PostMapping, etc.`
+- `params`: Restrict handler methods to requests that contain specific query parameters `@RequestMapping(value = "/hello", params = "name")`
+- `headers`: Restrict handler methods to requests with specific headers.
+- `produces`: Specifies the type of media types that the method can produce (e.g., application/json).
+
+#### @GetMapping("/path"), @PostMapping(), etc.
+A shorthand for `@RequestMapping(value = "/hello", method = RequestMethod.GET)` on method level.
+
+#### @RequestParam
+You can use it methods annotations `@GetMapping, @PostMapping, etc.`, it tells that this method will handle request only
+with a specific parameter.
+```java
+@GetMapping("/greet")
+public String greet(@RequestParam String name) {
+    return "Hello, " + name;
+}
+```
+Here, the greet method will handle GET requests like `/greet?name=John`
+
+#### @PathVariable
+Can be used with path variables to capture parts of the URL
+```java
+@GetMapping("/users/{id}")
+public String getUserById(@PathVariable String id) {
+    return "User ID: " + id;
+}
+```
+will handle GET requests like `/users/123` and return `"User ID: 123"`.
+
+#### @RequestBody
+You can capture this data in your handler method using the @RequestBody annotation:
+```java
+@PostMapping("/users")
+public String createUser(@RequestBody User user) {
+    return "User created: " + user.getName();
+}
+```
+The createUser method will handle POST requests to /users and expects a JSON (or other format) representation of a User
+object in the request body.
+
 ####  CDATA in XML
 XML feature known as CDATA (Character Data) used to include text data that should not be parsed by the XML parser. When
 you wrap text in a CDATA section, it tells the parser to treat everything inside as literal text, not as markup.

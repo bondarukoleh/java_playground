@@ -417,3 +417,12 @@ rampUsersPerSec(startRate).to(endRate).during(duration)
 `getInteger("config_value", 20)` attempts to retrieve an integer value associated with the key _"config_value"_. This key
 could be linked to a system property, _environment variable_, or some other _external configuration_. If the value is not
 found, the default value (20 in this case) is used.
+
+#### SLF4J 
+Placeholder `log.debug("Got a User greeting: \"{}\"", userGreeting);` will handle all data types for you.
+You can set up logging in property files:
+```text
+logging.level.root=INFO
+logging.level.com.yourpackage=DEBUG
+logging.file.name=logs/spring-boot-application.log
+```

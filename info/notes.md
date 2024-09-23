@@ -426,3 +426,74 @@ logging.level.root=INFO
 logging.level.com.yourpackage=DEBUG
 logging.file.name=logs/spring-boot-application.log
 ```
+
+### @ControllerAdvice
+Is a Spring annotation that allows you to handle exceptions globally across all controllers. \
+To that class you need to add specific handler methods annotated:
+```java
+    @ExceptionHandler(MyCustomExceptionHandles.class)
+    public ResponseEntity<?> handleMyException(MyCustomExceptionHandles ex, WebRequest request) {
+        /* Your error response class */
+        ErrorResponse errorDetails = new ErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
+    }
+```
+Then in the logic of controller, if you throw:
+```java
+    @GetMapping("/{id}")
+    public String greetById(@PathVariable("id") Long id) {
+        if (id == null || id <= 0) {
+            throw new ResourceNotFoundException("Invalid ID: " + id);
+        }
+        return "Hello, User with ID: " + id;
+    }
+```
+Spring will first check if that exception has a corresponding handler in the `@ControllerAdvice` class.
+
+If you don't want it to handle all exceptions - you can target it to a Specific Controllers with the 
+`@ControllerAdvice(basePackages = {"com.example.controller"})` or `@ControllerAdvice(assignableTypes = {YourController.class})`
+
+
+### @Valid
+The @Valid annotation is provided by the Java Bean Validation API (javax.validation package). It is commonly used to 
+indicate that an object should be validated before it is processed. \
+When applied to a method parameter (usually an incoming request object), Spring will automatically validate the object’s
+fields against the constraints defined using Bean Validation annotations (e.g., @NotNull, @Size, etc.).
+```java
+    @PostMapping
+    public String createUser(@RequestBody @Valid User user) {
+        // If the 'user' object is valid, this method is executed
+        return "User is valid";
+    }
+```
+```java
+import javax.validation.constraints.*;
+
+public class User {
+
+    @NotNull(message = "Username cannot be null")
+    @Size(min = 2, max = 30, message = "Username must be between 2 and 30 characters")
+    private String username;
+
+    @NotNull(message = "Email cannot be null")
+    @Email(message = "Email should be valid")
+    private String email;
+
+    @Min(value = 18, message = "Age should be at least 18")
+    private int age;
+}
+```
+If the passed User object violates any of the constraints (e.g., @NotNull, @Size, @Email), Spring will automatically 
+return a 400 Bad Request response with validation errors.
+
+### @Validated
+The @Validated annotation is provided by the Spring Framework (org.springframework.validation.annotation.Validated).
+It is used to indicate that a class or method parameter should be validated, just like `@Valid`. \
+The key difference is that `@Validated` supports group-based validation. This allows you to define different validation
+rules for different groups of operations (e.g., create vs. update operations).
+
+### jakarta.validation-api and spring-boot-starter-validation
+- jakarta.validation-api - Defines the validation annotations and interfaces.
+- spring-boot-starter-validation - Bundles the jakarta.validation-api and integrates it into Spring Boot with additional
+tools and libraries, like Hibernate Validator, to handle validation seamlessly.
+

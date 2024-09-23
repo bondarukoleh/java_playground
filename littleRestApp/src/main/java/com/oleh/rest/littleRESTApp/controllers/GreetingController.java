@@ -1,6 +1,8 @@
 package com.oleh.rest.littleRESTApp.controllers;
 
 import com.oleh.rest.littleRESTApp.Utils.exceptionHandle.GreetingNotValidException;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +24,7 @@ public class GreetingController {
 
     @PostMapping("/greet")
     public String postUserGreeting(@RequestBody String userGreeting) {
-        if(userGreeting == null | Objects.equals(userGreeting, "")) {
+        if (userGreeting == null | Objects.equals(userGreeting, "")) {
             log.warn("Got an invalid User greeting: \"{}\"", userGreeting);
             throw new GreetingNotValidException(String.format("This greeting \"%s\"", userGreeting));
         }
@@ -31,7 +33,10 @@ public class GreetingController {
     }
 
     @PutMapping("/greet")
-    public String updateGreeting(@RequestBody String message) {
+    public String updateGreeting(
+            @NotNull(message = "Update greeting message shouldn't be null")
+            @Size(min = 1, message = "Update greeting message shouldn't be empty")
+            @RequestBody String message) {
         greetingMsg = message;
         log.debug("Updated greeting message to: \"{}\"", greetingMsg);
         return String.format("Updated greeting message to: \"%s\"", greetingMsg);

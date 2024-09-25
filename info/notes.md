@@ -242,7 +242,8 @@ public class User {
 2. Constructors:
    1. _@NoArgsConstructor_: Generates a no-argument constructor.
    2. _@RequiredArgsConstructor_: Generates a constructor with required arguments (i.e., final fields or fields with 
-   constraints like _@NonNull_). 
+   constraints like _@NonNull_. If there is no final or NotNull fields - no required constructor is generated. Even if
+   there are fields like that, you still can whatever you like before the validation will kick in after code compilation (?)). 
    3. _@AllArgsConstructor_: Generates a constructor with all fields as arguments.
 3. _@ToString_ - Generates a toString() method that includes all fields or selected fields.
 4. _@EqualsAndHashCode_ - Generates equals() and hashCode() methods based on the fields of the class.
@@ -315,6 +316,9 @@ SomeClass someObject = objectMapper.readValue(jsonString, SomeClass.class);
 - Annotations:
   - _@JsonProperty_: Used to specify the JSON property name for a field.
   - _@JsonIgnore_: Used to ignore a field during serialization and deserialization.
+  - _@JsonIgnoreProperties(ignoreUnknown = true)_: You annotate a class or a Record with this, and when you map JSON
+  response with annotated class, all properties that is not in the constructor of the class - will be just ignored
+  and you won't get a deserialization error.
   - _@JsonInclude_: Controls whether to include properties in the JSON output based on criteria like non-null or non-empty.
     `@JsonInclude(JsonInclude.Include.NON_NULL)`
   - _@JsonFormat_: Used to specify the format for date and time fields during serialization and deserialization.

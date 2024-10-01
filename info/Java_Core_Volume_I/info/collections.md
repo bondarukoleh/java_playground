@@ -391,6 +391,12 @@ var names = new ArrayList<>(List.of("Peter", "Paul", "Mary"));
 The method call `Collections.nCopies(n, anObject)` returns an immutable object.
 > Previously, there was a static `Arrays.asList` method that returns a list that is mutable but not resizable.
 
+> when you use `Arrays.asList(intArray)`, it creates a fixed-size List that is backed by the original array. This means
+> that any modification to the List will also modify the underlying array because they share the same data structure in
+> memory. Mutable (modify but don't add/remove) but Fixed-Size, Null Values allowed
+
+> List.of(intArray) - Immutable, Not Backed by Array (creates a new, independent list), No Null Values.
+
 ### Unmodifiable Copies and Views
 To make an _unmodifiable copy_ of a collection, use the static _copyOf_. **Immutable Views** are created using methods
 like `Collections.unmodifiableList`. These views do not allow any modifications. Any attempt to modify will result in

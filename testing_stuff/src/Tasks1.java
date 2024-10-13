@@ -13,7 +13,8 @@ public class Tasks1 {
 //        System.out.println(Arrays.toString(kidsWithCandies(new int[]{12,1,12}, 3).toArray()));
 //        System.out.println(canPlaceFlowers(new int[]{1,0,0,0,1,0,1}, 1));
 //        System.out.println(reverseVowels("IceCreAm"));
-        System.out.println(reverseWords("  IceCreAm as  kl "));
+//        System.out.println(reverseWords("  IceCreAm as  kl "));
+        System.out.println(Arrays.toString(productExceptSelf(new int[]{1,2,3,4})));
     }
 
 
@@ -146,5 +147,24 @@ public class Tasks1 {
         System.out.println(Arrays.toString(strings));
 
         return String.join(" ", strings);
+    }
+
+    public static int[] productExceptSelf(int[] nums) {
+        int arrLength = nums.length;
+        int[] res = new int[arrLength];
+
+        int leftProduct = 1;
+        for (int i = 0; i < arrLength; i++) {
+            res[i] = leftProduct;
+            leftProduct *= nums[i];
+        }
+
+        int rightProduct = 1;
+        for (int i = arrLength - 1; i >= 0; i--) {
+            res[i] *= rightProduct;
+            rightProduct *= nums[i];
+        }
+
+        return res;
     }
 }

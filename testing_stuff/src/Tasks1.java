@@ -14,7 +14,9 @@ public class Tasks1 {
 //        System.out.println(canPlaceFlowers(new int[]{1,0,0,0,1,0,1}, 1));
 //        System.out.println(reverseVowels("IceCreAm"));
 //        System.out.println(reverseWords("  IceCreAm as  kl "));
-        System.out.println(Arrays.toString(productExceptSelf(new int[]{1,2,3,4})));
+//        System.out.println(Arrays.toString(productExceptSelf(new int[]{1,2,3,4})));
+//        System.out.println(increasingTriplet(new int[]{1,1,1,1,1,1,1,1,1,1,1,}));
+        System.out.println(compress(new char[]{'a', 'a', 'b', 'b', 'c', 'c', 'c'}));
     }
 
 
@@ -166,5 +168,56 @@ public class Tasks1 {
         }
 
         return res;
+    }
+
+    public static boolean increasingTriplet(int[] nums) {
+        if (nums == null && nums.length < 3) {
+            return false;
+        }
+
+        int smallest = Integer.MAX_VALUE;
+        int secondSmallest = Integer.MAX_VALUE;
+
+        for (int num : nums) {
+            if (num <= smallest) {
+                smallest = num;
+            } else if (num <= secondSmallest) {
+                secondSmallest = num;
+            } else {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static int compress(char[] chars) {
+        if (chars == null || chars.length == 1) {
+            return 1;
+        }
+
+
+        var lastCharGroupIndex = 0;
+        var elementIndex = 0;
+
+        while (elementIndex < chars.length) {
+            var currentCharGroup = chars[elementIndex];
+            var currentCharGroupCounter = 0;
+
+            while (elementIndex < chars.length && currentCharGroup == chars[elementIndex]) {
+                currentCharGroupCounter++;
+                elementIndex++;
+            }
+
+            chars[lastCharGroupIndex++] = currentCharGroup;
+
+            if (currentCharGroupCounter > 1) {
+                for (char counter : Integer.toString(currentCharGroupCounter).toCharArray()) {
+                    chars[lastCharGroupIndex++] = counter;
+                }
+            }
+
+        }
+        return lastCharGroupIndex;
     }
 }

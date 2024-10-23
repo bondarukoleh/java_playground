@@ -16,7 +16,8 @@ public class Tasks1 {
 //        System.out.println(reverseWords("  IceCreAm as  kl "));
 //        System.out.println(Arrays.toString(productExceptSelf(new int[]{1,2,3,4})));
 //        System.out.println(increasingTriplet(new int[]{1,1,1,1,1,1,1,1,1,1,1,}));
-        System.out.println(compress(new char[]{'a', 'a', 'b', 'b', 'c', 'c', 'c'}));
+//        System.out.println(compress(new char[]{'a', 'a', 'b', 'b', 'c', 'c', 'c'}));
+        System.out.println(Arrays.toString(moveZeroes(new int[]{5,0,5,0,5})));
     }
 
 
@@ -216,8 +217,26 @@ public class Tasks1 {
                     chars[lastCharGroupIndex++] = counter;
                 }
             }
-
         }
         return lastCharGroupIndex;
     }
+
+    public static int[] moveZeroes(int[] nums) {
+        int nextInsertPosition = 0;
+
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] != 0) {
+                nums[nextInsertPosition] = nums[i];
+                nextInsertPosition++;
+            }
+        }
+
+        int zeroInsertPosition = nextInsertPosition;
+        for (int i = zeroInsertPosition; i < nums.length; i++) {
+            nums[i] = 0;
+        }
+
+        return nums;
+    }
+
 }

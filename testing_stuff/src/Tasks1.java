@@ -6,6 +6,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+
 public class Tasks1 {
     public static void main(String[] args) {
 //        System.out.println(mergeAlternately("asdasd", "qqq"));
@@ -17,7 +20,11 @@ public class Tasks1 {
 //        System.out.println(Arrays.toString(productExceptSelf(new int[]{1,2,3,4})));
 //        System.out.println(increasingTriplet(new int[]{1,1,1,1,1,1,1,1,1,1,1,}));
 //        System.out.println(compress(new char[]{'a', 'a', 'b', 'b', 'c', 'c', 'c'}));
-        System.out.println(Arrays.toString(moveZeroes(new int[]{5,0,5,0,5})));
+//        System.out.println(Arrays.toString(moveZeroes(new int[]{5, 0, 5, 0, 5})));
+//        System.out.println("Array after moving zeros to end: " + Arrays.toString(moveZerosToEnd(new int[]{0, 1, 0, 0, 3, 12})));
+//        System.out.println("Array after moving zeros to end: " + Arrays.toString(moveZerosToEnd(new int[]{0, 1, 0, 0, 3, 12})));
+//        System.out.println(isSubsequence("b", ""));
+        System.out.println("maxArea: " + maxArea(new int[]{1,8,6,2,5,4,8,3,7}));
     }
 
 
@@ -239,4 +246,51 @@ public class Tasks1 {
         return nums;
     }
 
+    public static int[] moveZerosToEnd(int[] arr) {
+        int left = 0;
+
+        for (int right = 0; right < arr.length; right++) {
+            if (arr[right] != 0) {
+                int temp = arr[left];
+                arr[left] = arr[right];
+                arr[right] = temp;
+                left++;
+            }
+        }
+
+        return arr;
+    }
+
+    public static boolean isSubsequence(String s, String t) {
+        int left = 0;
+
+        if (s.isEmpty()) {
+            return true;
+        }
+
+        for (int i = 0; i < t.length(); i++) {
+            if(left < s.length() && s.charAt(left) == t.charAt(i)) {
+                left++;
+            }
+        }
+
+        return left == s.length();
+    }
+
+    public static int maxArea(int[] height) {
+        int maxArea = 0;
+
+        int left = 0;
+        int right = height.length - 1;
+
+        while (left < right) {
+            maxArea = max(maxArea, (min(height[left], height[right]) * (right - left)));
+            if(height[left] < height[right]) {
+                left++;
+            } else {
+                right--;
+            }
+        }
+        return maxArea;
+    }
 }

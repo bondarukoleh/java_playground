@@ -24,7 +24,8 @@ public class Tasks1 {
 //        System.out.println("Array after moving zeros to end: " + Arrays.toString(moveZerosToEnd(new int[]{0, 1, 0, 0, 3, 12})));
 //        System.out.println("Array after moving zeros to end: " + Arrays.toString(moveZerosToEnd(new int[]{0, 1, 0, 0, 3, 12})));
 //        System.out.println(isSubsequence("b", ""));
-        System.out.println("maxArea: " + maxArea(new int[]{1,8,6,2,5,4,8,3,7}));
+//        System.out.println("maxArea: " + maxArea(new int[]{1,8,6,2,5,4,8,3,7}));
+        System.out.println("maxOperations: " + maxOperations(new int[]{1,8,2,2,5,1,8,3,7}, 3));
     }
 
 
@@ -292,5 +293,29 @@ public class Tasks1 {
             }
         }
         return maxArea;
+    }
+
+    public static int maxOperations(int[] nums, int k) {
+        Arrays.sort(nums);
+
+        int left = 0;
+        int right = nums.length - 1;
+        int operationCount = 0;
+
+        while (left < right) {
+            int sum = nums[left] + nums[right];
+
+            if (sum == k) {
+                operationCount++;
+                left++;
+                right--;
+            } else if (sum < k) {
+                left++;
+            } else {
+                right--;
+            }
+        }
+
+        return operationCount;
     }
 }

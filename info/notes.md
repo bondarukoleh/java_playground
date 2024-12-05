@@ -500,4 +500,3 @@ rules for different groups of operations (e.g., create vs. update operations).
 - jakarta.validation-api - Defines the validation annotations and interfaces.
 - spring-boot-starter-validation - Bundles the jakarta.validation-api and integrates it into Spring Boot with additional
 tools and libraries, like Hibernate Validator, to handle validation seamlessly.
-

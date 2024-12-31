@@ -4,6 +4,8 @@ WORKDIR /app
 COPY pom.xml /app/
 COPY src /app/src/
 
+RUN mvn clean install
+
 RUN mvn clean package -DskipTests
 
 CMD ["mvn", "test"]

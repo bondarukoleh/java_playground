@@ -17,7 +17,7 @@ public class CheckTheFrontPageTest {
     static void launchBrowser() {
         playwright = Playwright.create();
         browser = playwright.chromium().launch(
-                new BrowserType.LaunchOptions().setHeadless(false).setSlowMo(50)
+                new BrowserType.LaunchOptions().setHeadless(true).setSlowMo(50)
         );
     }
 
